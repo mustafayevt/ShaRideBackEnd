@@ -10,7 +10,7 @@ namespace ShaRide.WebApi.Extensions
             app.UseSwagger();
             app.UseSwaggerUI(c =>
             {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "CleanArchitecture.CleanArchitecture.WebApi1.WebApi");
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "ShaRide.WebAPi");
             });
         }
         public static void UseErrorHandlingMiddleware(this IApplicationBuilder app)
