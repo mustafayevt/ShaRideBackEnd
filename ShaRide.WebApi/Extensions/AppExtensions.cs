@@ -15,7 +15,7 @@ namespace ShaRide.WebApi.Extensions
         }
         public static void UseErrorHandlingMiddleware(this IApplicationBuilder app)
         {
-            //app.UseMiddleware<ErrorHandlerMiddleware>();
+            app.UseMiddleware<ErrorHandlerMiddleware>();
         }
     }
 }
