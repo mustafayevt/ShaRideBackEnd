@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Text.Json.Serialization;
-
-namespace ShaRide.Application.DTOs.Account
+﻿namespace ShaRide.Application.DTOs.Account
 {
     public class AuthenticationResponse
     {

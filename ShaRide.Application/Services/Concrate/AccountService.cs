@@ -99,6 +99,7 @@ namespace ShaRide.Application.Services.Concrate
             }
 
             var user = _mapper.Map<ApplicationUser>(request);
+            user.Img = request.Img.ToArray();
             var result = await _userManager.CreateAsync(user, request.Password);
             if (result.Succeeded)
             {

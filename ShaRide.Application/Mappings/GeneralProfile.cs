@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using System.Linq;
+using AutoMapper;
 using ShaRide.Application.DTOs.Account;
 using ShaRide.Domain.Entities;
 
@@ -18,6 +19,7 @@ namespace ShaRide.Application.Mappings
                 .ForMember(x => x.FirstName, opt => opt.MapFrom(y => y.Name))
                 .ForMember(x => x.LastName, opt => opt.MapFrom(y => y.Surname))
                 .ForMember(x => x.Phones, opt => opt.MapFrom(y => y.Phones))
+                .ForMember(x => x.Img, opt => opt.Ignore())
                 .ReverseMap();
         }
     }

@@ -12,12 +12,18 @@ namespace ShaRide.Application.DTOs.Account
 
         [Required]
         public string LastName { get; set; }
+
         [Required]
         public List<PhoneDto> Phones { get; set; }
+
         [Required]
         [Password]
         public string Password { get; set; }
-        public byte[] Img { get; set; }
+
+        [Required]
+        public List<byte> Img { get; set; }
+
+        [Required]
         public string ImgExtension { get; set; }
     }
 }
