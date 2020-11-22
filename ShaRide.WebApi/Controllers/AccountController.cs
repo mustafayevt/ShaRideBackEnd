@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using AutoWrapper.Wrappers;
 using Microsoft.AspNetCore.Mvc;
@@ -19,9 +20,9 @@ namespace ShaRide.WebApi.Controllers
             _accountService = accountService;
         }
         [HttpPost("authenticate")]
-        public async Task<IActionResult> AuthenticateAsync(AuthenticationRequest request)
+        public async Task<ApiResponse> AuthenticateAsync(AuthenticationRequest request)
         {
-            return Ok(await _accountService.AuthenticateAsync(request, GenerateIpAddress()));
+            return new ApiResponse(await _accountService.AuthenticateAsync(request, GenerateIpAddress()));
         }
 
         [HttpPost("register")]

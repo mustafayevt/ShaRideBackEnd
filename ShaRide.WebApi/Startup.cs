@@ -51,7 +51,14 @@ namespace ShaRide.WebApi
                     .AllowAnyMethod()
                     .AllowAnyHeader();
             });
-            app.UseApiResponseAndExceptionWrapper();
+            app.UseApiResponseAndExceptionWrapper(new AutoWrapperOptions
+            {
+                ShowStatusCode = true,
+                ShowIsErrorFlagForSuccessfulResponse = true,
+                EnableResponseLogging = true,
+                LogRequestDataOnException = true,
+                IgnoreNullValue = true
+            });
             app.UseHttpsRedirection();
             app.UseRouting();
             app.UseCors("CorsPolicy");
