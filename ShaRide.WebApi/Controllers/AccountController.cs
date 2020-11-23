@@ -21,12 +21,22 @@ namespace ShaRide.WebApi.Controllers
         {
             _accountService = accountService;
         }
+        
+        /// <summary>
+        /// Authenticate user.
+        /// </summary>
+        /// <returns></returns>
         [HttpPost("authenticate")]
         public async Task<ApiResponse> AuthenticateAsync(AuthenticationRequest request)
         {
             return new ApiResponse(await _accountService.AuthenticateAsync(request, GenerateIpAddress()));
         }
 
+        /// <summary>
+        /// Register user.
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
         [HttpPost("register")]
         public async Task<ApiResponse> RegisterAsync(RegisterRequest request)
         {
@@ -34,6 +44,11 @@ namespace ShaRide.WebApi.Controllers
             return new ApiResponse(await _accountService.RegisterAsync(request, origin));
         }
 
+        /// <summary>
+        /// Gets verification code by given phone number.
+        /// </summary>
+        /// <param name="phoneNumber"></param>
+        /// <returns></returns>
         [HttpPost("get-verification-code")]
         public async Task<ApiResponse> GetVerificationCodeAsync(string phoneNumber)
         {

@@ -1,4 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Reflection;
 using FluentValidation.AspNetCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
@@ -32,7 +35,8 @@ namespace ShaRide.WebApi.Extensions
                     Type = SecuritySchemeType.ApiKey,
                     Scheme = "Bearer",
                     BearerFormat = "JWT",
-                    Description = "Input your Bearer token in this format - Bearer {your token here} to access this API",
+                    Description =
+                        "Input your Bearer token in this format - Bearer {your token here} to access this API",
                 });
                 c.AddSecurityRequirement(new OpenApiSecurityRequirement
                 {
@@ -47,7 +51,8 @@ namespace ShaRide.WebApi.Extensions
                             Scheme = "oauth2",
                             Name = "Bearer",
                             In = ParameterLocation.Header,
-                        }, new List<string>()
+                        },
+                        new List<string>()
                     },
                 });
                 c.AddSecurityDefinition("x-api-key", new OpenApiSecurityScheme
@@ -74,6 +79,10 @@ namespace ShaRide.WebApi.Extensions
                         new List<string>()
                     }
                 });
+                foreach (var file in Directory.GetFiles(AppContext.BaseDirectory, "*.xml"))
+                {
+                    c.IncludeXmlComments(file);
+                }
                 c.AddFluentValidationRules();
             });
         }
