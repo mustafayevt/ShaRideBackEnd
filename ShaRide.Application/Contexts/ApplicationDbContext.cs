@@ -31,11 +31,11 @@ namespace ShaRide.Application.Contexts
                 {
                     case EntityState.Added:
                         entry.Entity.Created = _dateTime.NowUtc;
-                        entry.Entity.CreatedBy = _authenticatedUser.UserId;
+                        entry.Entity.CreatedBy = _authenticatedUser.UserId.Value;
                         break;
                     case EntityState.Modified:
                         entry.Entity.LastModified = _dateTime.NowUtc;
-                        entry.Entity.LastModifiedBy = _authenticatedUser.UserId;
+                        entry.Entity.LastModifiedBy = _authenticatedUser.UserId.Value;
                         break;
                 }
             }
@@ -49,11 +49,11 @@ namespace ShaRide.Application.Contexts
                 {
                     case EntityState.Added:
                         entry.Entity.Created = _dateTime.NowUtc;
-                        entry.Entity.CreatedBy = _authenticatedUser.UserId;
+                        entry.Entity.CreatedBy = _authenticatedUser.UserId.Value;
                         break;
                     case EntityState.Modified:
                         entry.Entity.LastModified = _dateTime.NowUtc;
-                        entry.Entity.LastModifiedBy = _authenticatedUser.UserId;
+                        entry.Entity.LastModifiedBy = _authenticatedUser.UserId.Value;
                         break;
                 }
             }
