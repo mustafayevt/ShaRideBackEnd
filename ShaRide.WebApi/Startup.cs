@@ -1,9 +1,14 @@
+using System.Collections.Generic;
+using System.Globalization;
 using AutoWrapper;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Localization;
+using Microsoft.AspNetCore.Localization.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 using ShaRide.Application;
 using ShaRide.Application.Services.Interface;
 using ShaRide.WebApi.Extensions;
@@ -26,7 +31,7 @@ namespace ShaRide.WebApi
             services.AddSwaggerExtension();
             services.AddHealthChecks();
             services.AddScoped<IAuthenticatedUserService, AuthenticatedUserService>();
-            services.AddLocalization(options => options.ResourcesPath = "Resources");
+            services.AddLocalization();
             services.AddCors();
             services.AddMvc()
                 .AddViewLocalization(Microsoft.AspNetCore.Mvc.Razor.LanguageViewLocationExpanderFormat.Suffix)
@@ -58,6 +63,15 @@ namespace ShaRide.WebApi
                 EnableResponseLogging = true,
                 LogRequestDataOnException = true,
                 IgnoreNullValue = true
+            });
+            var cultures = new List<CultureInfo> {
+                new CultureInfo("en"),
+                new CultureInfo("az")
+            };
+            app.UseRequestLocalization(options => {
+                options.DefaultRequestCulture = new RequestCulture("en");
+                options.SupportedCultures = cultures;
+                options.SupportedUICultures = cultures;
             });
             app.UseHttpsRedirection();
             app.UseRouting();

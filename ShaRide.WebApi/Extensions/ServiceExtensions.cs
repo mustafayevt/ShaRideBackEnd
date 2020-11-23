@@ -50,6 +50,30 @@ namespace ShaRide.WebApi.Extensions
                         }, new List<string>()
                     },
                 });
+                c.AddSecurityDefinition("x-api-key", new OpenApiSecurityScheme
+                {
+                    Description =
+                        "Api Key for authorize to the API",
+                    Name = "x-api-key",
+                    In = ParameterLocation.Header,
+                    Type = SecuritySchemeType.ApiKey,
+                });
+                c.AddSecurityRequirement(new OpenApiSecurityRequirement()
+                {
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference
+                            {
+                                Type = ReferenceType.SecurityScheme,
+                                Id = "x-api-key"
+                            },
+                            Name = "x-api-key",
+                            In = ParameterLocation.Header,
+                        },
+                        new List<string>()
+                    }
+                });
                 c.AddFluentValidationRules();
             });
         }

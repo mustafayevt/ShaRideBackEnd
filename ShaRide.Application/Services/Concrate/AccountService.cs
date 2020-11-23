@@ -11,10 +11,12 @@ using AutoMapper;
 using AutoWrapper.Wrappers;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using ShaRide.Application.DTOs.Account;
 using ShaRide.Application.Helpers;
+using ShaRide.Application.Localize;
 using ShaRide.Application.Managers;
 using ShaRide.Application.Services.Interface;
 using ShaRide.Application.Wrappers;
@@ -32,13 +34,15 @@ namespace ShaRide.Application.Services.Concrate
         private readonly IDateTimeService _dateTimeService;
         private readonly IVerificationCodeService _verificationCodeService;
         private readonly IMapper _mapper;
+        private readonly IStringLocalizer _localizer;
 
         public AccountService(UserManager userManager,
             IOptions<JWTSettings> jwtSettings,
             IDateTimeService dateTimeService,
             IEmailService emailService,
             IVerificationCodeService verificationCodeService,
-            IMapper mapper)
+            IMapper mapper,
+            IStringLocalizer<Resource> localizer)
         {
             _userManager = userManager;
             _jwtSettings = jwtSettings.Value;
@@ -46,6 +50,7 @@ namespace ShaRide.Application.Services.Concrate
             _emailService = emailService;
             _verificationCodeService = verificationCodeService;
             _mapper = mapper;
+            _localizer = localizer;
         }
 
         /// <summary>
@@ -60,20 +65,15 @@ namespace ShaRide.Application.Services.Concrate
             var user = await _userManager.FindByPhoneAsync(request.Phone);
             if (user == null)
             {
-                throw new ApiException($"Invalid Credentials for '{request.Phone}'.");
+                throw new ApiException(_localizer.GetString(LocalizationKeys.INVALID_CREDENTIALS,request.Phone));
             }
 
             var result = await _userManager.PasswordSignInAsync(request.Phone, request.Password);
             if (!result.Succeeded)
             {
-                throw new ApiException($"Invalid Credentials for '{request.Phone}'.");
+                throw new ApiException(_localizer.GetString(LocalizationKeys.INVALID_CREDENTIALS,request.Phone));
             }
-
-            //TODO: Do email confirmation if feature added to project
-            // if (!user.EmailConfirmed)
-            // {
-            //     throw new ApiException($"Account Not Confirmed for '{request.Email}'.");
-            // }
+            
             JwtSecurityToken jwtSecurityToken = await GenerateJWToken(user);
             AuthenticationResponse response = new AuthenticationResponse();
             response.Id = user.Id;
@@ -98,7 +98,7 @@ namespace ShaRide.Application.Services.Concrate
             var userWithSamePhone = await _userManager.FindByPhoneAsync(mainPhone.Number);
             if (userWithSamePhone != null)
             {
-                throw new ApiException($"Phone '{mainPhone.Number}' is already taken.");
+                throw new ApiException(_localizer.GetString(LocalizationKeys.PHONE_ALREADY_TAKEN,mainPhone.Number));
             }
 
             mainPhone.IsConfirmed = true;
@@ -118,7 +118,7 @@ namespace ShaRide.Application.Services.Concrate
             }
             else
             {
-                throw new Exception("Error while creating user");
+                throw new ApiException("Error while creating user");
             }
         }
 
@@ -131,7 +131,7 @@ namespace ShaRide.Application.Services.Concrate
         {
             var userPhone = await _userManager.GetUserPhoneByPhoneNumber(phoneNumber);
             if (userPhone != null)
-                throw new ApiException($"{userPhone.Number} is already registered.");
+                throw new ApiException(_localizer.GetString(LocalizationKeys.PHONE_ALREADY_CONFIRMED,phoneNumber));
 
             var confirmationCode = ConfirmationCodeHelper.GenerateConfirmationCode();
             var content = $"ShaRide Kod - {confirmationCode}";

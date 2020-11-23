@@ -3,17 +3,20 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using AutoWrapper.Wrappers;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Localization;
+using ShaRide.Application.Attributes;
 using ShaRide.Application.DTOs.Account;
+using ShaRide.Application.Localize;
 using ShaRide.Application.Services.Interface;
 
 namespace ShaRide.WebApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [ApiKey]
     public class AccountController : ControllerBase
     {
         private readonly IAccountService _accountService;
-
         public AccountController(IAccountService accountService)
         {
             _accountService = accountService;
