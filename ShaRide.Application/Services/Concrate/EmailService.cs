@@ -1,10 +1,10 @@
 ﻿using System.Threading.Tasks;
+using AutoWrapper.Wrappers;
 using MailKit.Security;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MimeKit;
 using ShaRide.Application.DTOs.Email;
-using ShaRide.Application.Exceptions;
 using ShaRide.Application.Services.Interface;
 using ShaRide.Domain.Settings;
 using SmtpClient = MailKit.Net.Smtp.SmtpClient;

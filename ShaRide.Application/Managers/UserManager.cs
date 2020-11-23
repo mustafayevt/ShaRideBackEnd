@@ -36,8 +36,8 @@ namespace ShaRide.Application.Managers
         /// <returns></returns>
         public async Task<ApplicationUser> FindByPhoneAsync(string phone)
         {
-            return await _dbContext.Users.Include(x => x.Phones)
-                .FirstOrDefaultAsync(x => x.Phones.Any(y => y.Number == phone));
+            var userPhone =  await _dbContext.UserPhones.Include(x => x.User).FirstOrDefaultAsync(x => x.Number == phone);
+            return userPhone?.User;
         }
 
         /// <summary>

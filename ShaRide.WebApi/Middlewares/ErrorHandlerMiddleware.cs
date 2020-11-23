@@ -7,7 +7,6 @@ using AutoWrapper.Wrappers;
 using FluentValidation;
 using Microsoft.AspNetCore.Http;
 using ShaRide.Application.Wrappers;
-using ApiException = ShaRide.Application.Exceptions.ApiException;
 using ValidationException = System.ComponentModel.DataAnnotations.ValidationException;
 
 namespace ShaRide.WebApi.Middlewares

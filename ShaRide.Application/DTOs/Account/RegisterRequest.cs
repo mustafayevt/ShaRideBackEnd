@@ -21,9 +21,6 @@ namespace ShaRide.Application.DTOs.Account
         public string Password { get; set; }
 
         [Required]
-        public List<byte> Img { get; set; }
-
-        [Required]
-        public string ImgExtension { get; set; }
+        public AttachmentDto Attachment { get; set; }
     }
 }

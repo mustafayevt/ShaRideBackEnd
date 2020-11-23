@@ -36,7 +36,7 @@ namespace ShaRide.Application
                     b => b.MigrationsAssembly(typeof(ApplicationDbContext).Assembly.FullName)));
             }
             #region Services
-            services.AddTransient<UserManager>();
+            services.AddScoped<UserManager>();
             services.AddTransient<IAccountService, AccountService>();
             services.Configure<MailSettings>(configuration.GetSection("MailSettings"));
             services.AddTransient<IDateTimeService, DateTimeService>();

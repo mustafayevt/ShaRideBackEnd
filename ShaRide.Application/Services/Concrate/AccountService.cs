@@ -8,13 +8,12 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
+using AutoWrapper.Wrappers;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using ShaRide.Application.DTOs.Account;
-using ShaRide.Application.DTOs.Email;
-using ShaRide.Application.Exceptions;
 using ShaRide.Application.Helpers;
 using ShaRide.Application.Managers;
 using ShaRide.Application.Services.Interface;
@@ -58,7 +57,7 @@ namespace ShaRide.Application.Services.Concrate
             var user = await _userManager.FindByPhoneAsync(request.Phone);
             if (user == null)
             {
-                throw new ApiException($"No Accounts Registered with '{request.Phone}'.");
+                throw new ApiException($"Invalid Credentials for '{request.Phone}'.");
             }
 
             var result = await _userManager.PasswordSignInAsync(request.Phone, request.Password);
@@ -86,6 +85,7 @@ namespace ShaRide.Application.Services.Concrate
         /// </summary>
         /// <param name="request"></param>
         /// <param name="origin"></param>
+        /// <exception cref="ApiException"></exception>
         /// <returns></returns>
         /// <exception cref="ApiException"></exception>
         /// <exception cref="ValidationException"></exception>
@@ -99,7 +99,7 @@ namespace ShaRide.Application.Services.Concrate
             }
 
             var user = _mapper.Map<ApplicationUser>(request);
-            user.Img = request.Img.ToArray();
+            user.Img = request.Attachment.Content.ToArray();
             var result = await _userManager.CreateAsync(user, request.Password);
             if (result.Succeeded)
             {

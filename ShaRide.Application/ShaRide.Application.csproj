@@ -32,6 +32,7 @@
 
     <ItemGroup>
         <Folder Include="DTOs\Common" />
+        <Folder Include="Exceptions" />
         <Folder Include="Seeds" />
     </ItemGroup>
 

@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using AutoWrapper.Wrappers;
 using Microsoft.AspNetCore.Mvc;
 using ShaRide.Application.DTOs.Account;
-using ShaRide.Application.Exceptions;
 using ShaRide.Application.Services.Interface;
 
 namespace ShaRide.WebApi.Controllers
