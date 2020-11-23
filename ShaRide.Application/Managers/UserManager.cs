@@ -67,6 +67,16 @@ namespace ShaRide.Application.Managers
         }
 
         /// <summary>
+        /// Gets user phone by given phone number.
+        /// </summary>
+        /// <param name="phoneNumber"></param>
+        /// <returns></returns>
+        public async Task<UserPhone> GetUserPhoneByPhoneNumber(string phoneNumber)
+        {
+            return await _dbContext.UserPhones.FirstOrDefaultAsync(x => x.Number == phoneNumber);
+        }
+
+        /// <summary>
         /// Creates user and save to the database.
         /// </summary>
         /// <param name="user"></param>

@@ -30,18 +30,21 @@ namespace ShaRide.Application.Services.Concrate
         private readonly IEmailService _emailService;
         private readonly JWTSettings _jwtSettings;
         private readonly IDateTimeService _dateTimeService;
+        private readonly IVerificationCodeService _verificationCodeService;
         private readonly IMapper _mapper;
 
         public AccountService(UserManager userManager,
             IOptions<JWTSettings> jwtSettings,
             IDateTimeService dateTimeService,
             IEmailService emailService,
+            IVerificationCodeService verificationCodeService,
             IMapper mapper)
         {
             _userManager = userManager;
             _jwtSettings = jwtSettings.Value;
             _dateTimeService = dateTimeService;
-            this._emailService = emailService;
+            _emailService = emailService;
+            _verificationCodeService = verificationCodeService;
             _mapper = mapper;
         }
 
@@ -91,12 +94,14 @@ namespace ShaRide.Application.Services.Concrate
         /// <exception cref="ValidationException"></exception>
         public async Task<AuthenticationResponse> RegisterAsync(RegisterRequest request, string origin)
         {
-            var mainPhone = request.Phones.First().Number;
-            var userWithSamePhone = await _userManager.FindByPhoneAsync(mainPhone);
+            var mainPhone = request.Phones.First();
+            var userWithSamePhone = await _userManager.FindByPhoneAsync(mainPhone.Number);
             if (userWithSamePhone != null)
             {
                 throw new ApiException($"Phone '{mainPhone}' is already taken.");
             }
+
+            mainPhone.IsConfirmed = true;
 
             var user = _mapper.Map<ApplicationUser>(request);
             user.Img = request.Attachment.Content.ToArray();
@@ -118,6 +123,23 @@ namespace ShaRide.Application.Services.Concrate
             {
                 throw new Exception("Error while creating user");
             }
+        }
+
+        /// <summary>
+        /// Sends verification code to user and returns client to the code.
+        /// </summary>
+        /// <param name="phoneNumber"></param>
+        /// <returns></returns>
+        public async Task<string> GetVerificationCode(string phoneNumber)
+        {
+            var userPhone = await _userManager.GetUserPhoneByPhoneNumber(phoneNumber);
+            if (userPhone != null)
+                throw new ApiException($"{userPhone.Number} is already registered.");
+
+            var confirmationCode = ConfirmationCodeHelper.GenerateConfirmationCode();
+            var content = $"ShaRide Kod - {confirmationCode}";
+            var result = await _verificationCodeService.SendVerificationCode(phoneNumber, content);
+            return confirmationCode;
         }
 
         /// <summary>

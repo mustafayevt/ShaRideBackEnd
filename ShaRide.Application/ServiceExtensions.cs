@@ -10,6 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using ShaRide.Application.Contexts;
+using ShaRide.Application.Helpers;
 using ShaRide.Application.Managers;
 using ShaRide.Application.Services.Concrate;
 using ShaRide.Application.Services.Interface;
@@ -36,11 +37,14 @@ namespace ShaRide.Application
                     b => b.MigrationsAssembly(typeof(ApplicationDbContext).Assembly.FullName)));
             }
             #region Services
-            services.AddScoped<UserManager>();
+            services.AddHttpClient("HttpClient");
+            services.AddTransient<UserManager>();
             services.AddTransient<IAccountService, AccountService>();
             services.Configure<MailSettings>(configuration.GetSection("MailSettings"));
+            services.Configure<TheTexting>(configuration.GetSection("TheTexting"));
             services.AddTransient<IDateTimeService, DateTimeService>();
             services.AddTransient<IEmailService, EmailService>();
+            services.AddTransient<IVerificationCodeService, VerificationCodeService>();
             #endregion
 
             services.Configure<JWTSettings>(configuration.GetSection("JWTSettings"));

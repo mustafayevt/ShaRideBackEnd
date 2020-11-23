@@ -31,6 +31,12 @@ namespace ShaRide.WebApi.Controllers
             return new ApiResponse(await _accountService.RegisterAsync(request, origin));
         }
 
+        [HttpPost("get-verification-code")]
+        public async Task<ApiResponse> GetVerificationCodeAsync(string phoneNumber)
+        {
+            return new ApiResponse(await _accountService.GetVerificationCode(phoneNumber));
+        }
+
         private string GenerateIpAddress()
         {
             if (Request.Headers.ContainsKey("X-Forwarded-For"))
