@@ -2,6 +2,7 @@
 {
     public interface IAuthenticatedUserService
     {
-        int UserId { get; }
+        int? UserId { get; }
+        bool IsUserAuthenticate { get; }
     }
 }

@@ -8,11 +8,14 @@ namespace ShaRide.WebApi.Services
     {
         public AuthenticatedUserService(IHttpContextAccessor httpContextAccessor)
         {
-            var userId = 0;
-            int.TryParse(httpContextAccessor.HttpContext?.User?.FindFirstValue("uid"),out userId);
-            UserId = userId;
+            if (int.TryParse(httpContextAccessor.HttpContext?.User?.FindFirstValue("uid"), out var userId))
+            {
+                UserId = userId;
+            };
+            
         }
 
-        public int UserId { get; }
+        public int? UserId { get;}
+        public bool IsUserAuthenticate => UserId.HasValue;
     }
 }
