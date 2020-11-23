@@ -5,6 +5,7 @@ using System.Reflection;
 using FluentValidation.AspNetCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
+using ShaRide.WebApi.Services;
 using Swashbuckle.AspNetCore.Swagger;
 
 namespace ShaRide.WebApi.Extensions
@@ -83,6 +84,7 @@ namespace ShaRide.WebApi.Extensions
                 {
                     c.IncludeXmlComments(file);
                 }
+                c.OperationFilter<SwaggerLanguageHeaderService>();
                 c.AddFluentValidationRules();
             });
         }
