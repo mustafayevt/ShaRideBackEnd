@@ -98,7 +98,7 @@ namespace ShaRide.Application.Services.Concrate
             var userWithSamePhone = await _userManager.FindByPhoneAsync(mainPhone.Number);
             if (userWithSamePhone != null)
             {
-                throw new ApiException($"Phone '{mainPhone}' is already taken.");
+                throw new ApiException($"Phone '{mainPhone.Number}' is already taken.");
             }
 
             mainPhone.IsConfirmed = true;
@@ -108,9 +108,6 @@ namespace ShaRide.Application.Services.Concrate
             var result = await _userManager.CreateAsync(user, request.Password);
             if (result.Succeeded)
             {
-                //TODO: Attach Email Service here and configure it via appsettings
-                //var verificationUri = await SendVerificationEmail(user, origin);
-                //await _emailService.SendAsync(new EmailRequest() { From = "mail@codewithmukesh.com", To = user.Email, Body = $"Please confirm your account by visiting this URL {verificationUri}", Subject = "Confirm Registration" });
                 JwtSecurityToken jwtSecurityToken = await GenerateJWToken(user);
                 return new AuthenticationResponse
                 {
