@@ -1,6 +1,6 @@
 ﻿using System.Linq;
 using AutoMapper;
-using ShaRide.Application.DTOs.Account;
+using ShaRide.Application.DTO.Request;
 using ShaRide.Domain.Entities;
 
 namespace ShaRide.Application.Mappings
@@ -11,8 +11,7 @@ namespace ShaRide.Application.Mappings
         {
             #region UserPhone
 
-            CreateMap<UserPhone, PhoneDto>()
-                .ForMember(x => x.Id, opt => opt.MapFrom(y => y.Id))
+            CreateMap<UserPhone, PhoneRequest>()
                 .ForMember(x => x.Number, opt => opt.MapFrom(y => y.Number))
                 .ForMember(x => x.IsMain, opt => opt.MapFrom(y => y.IsMain))
                 .ForMember(x => x.IsConfirmed, opt => opt.MapFrom(y => y.IsConfirmed))

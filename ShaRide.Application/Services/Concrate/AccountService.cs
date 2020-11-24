@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
@@ -9,19 +8,17 @@ using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
 using AutoWrapper.Wrappers;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using ShaRide.Application.DTOs.Account;
+using ShaRide.Application.DTO.Request;
+using ShaRide.Application.DTO.Response;
 using ShaRide.Application.Helpers;
 using ShaRide.Application.Localize;
 using ShaRide.Application.Managers;
 using ShaRide.Application.Services.Interface;
-using ShaRide.Application.Wrappers;
 using ShaRide.Domain.Entities;
-using ShaRide.Domain.Enums;
 using ShaRide.Domain.Settings;
 
 namespace ShaRide.Application.Services.Concrate

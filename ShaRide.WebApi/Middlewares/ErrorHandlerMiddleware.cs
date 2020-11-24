@@ -1,13 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net;
-using System.Text.Json;
 using System.Threading.Tasks;
 using AutoWrapper.Wrappers;
-using FluentValidation;
 using Microsoft.AspNetCore.Http;
-using ShaRide.Application.Wrappers;
-using ValidationException = System.ComponentModel.DataAnnotations.ValidationException;
 
 namespace ShaRide.WebApi.Middlewares
 {

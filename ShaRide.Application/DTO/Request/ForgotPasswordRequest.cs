@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace ShaRide.Application.DTOs.Account
+namespace ShaRide.Application.DTO.Request
 {
     public class ForgotPasswordRequest
     {

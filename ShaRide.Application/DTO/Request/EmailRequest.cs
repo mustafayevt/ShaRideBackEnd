@@ -1,4 +1,4 @@
-﻿namespace ShaRide.Application.DTOs.Email
+﻿namespace ShaRide.Application.DTO.Request
 {
     public class EmailRequest
     {

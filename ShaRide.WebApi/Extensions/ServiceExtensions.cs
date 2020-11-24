@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Reflection;
-using FluentValidation.AspNetCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
 using ShaRide.WebApi.Services;
@@ -14,7 +12,6 @@ namespace ShaRide.WebApi.Extensions
     {
         public static void AddSwaggerExtension(this IServiceCollection services)
         {
-            services.AddControllers().AddFluentValidation();
             services.AddSwaggerGen(c =>
             {
                 // c.IncludeXmlComments(string.Format(@"{0}\WebApi.xml", System.AppDomain.CurrentDomain.BaseDirectory));
@@ -84,8 +81,8 @@ namespace ShaRide.WebApi.Extensions
                 {
                     c.IncludeXmlComments(file);
                 }
+
                 c.OperationFilter<SwaggerLanguageHeaderService>();
-                c.AddFluentValidationRules();
             });
         }
     }

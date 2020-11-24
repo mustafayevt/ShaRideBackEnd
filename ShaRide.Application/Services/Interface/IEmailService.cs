@@ -1,5 +1,5 @@
 ﻿using System.Threading.Tasks;
-using ShaRide.Application.DTOs.Email;
+using ShaRide.Application.DTO.Request;
 
 namespace ShaRide.Application.Services.Interface
 {

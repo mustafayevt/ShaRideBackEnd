@@ -1,14 +1,14 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using ShaRide.Application.Helpers;
 
-namespace ShaRide.Application.DTOs.Account
+namespace ShaRide.Application.DTO.Request
 {
-    public class PhoneDto
+    public class PhoneRequest
     {
-        public int Id { get; set; }
-        [Required]
-        [Phone]
+        [Phone(ErrorMessage = LocalizationKeys.INVALID_CREDENTIALS)]
         public string Number { get; set; }
         public bool IsConfirmed { get; set; }
         public bool IsMain { get; set; }
     }
+
 }

@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using AutoWrapper;
+using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Localization;
@@ -10,6 +11,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using ShaRide.Application;
+using ShaRide.Application.Localize;
 using ShaRide.Application.Services.Interface;
 using ShaRide.WebApi.Extensions;
 using ShaRide.WebApi.Services;
@@ -27,6 +29,7 @@ namespace ShaRide.WebApi
 
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddControllers().AddFluentValidation();
             services.AddApplicationLayer(Configuration);
             services.AddSwaggerExtension();
             services.AddHealthChecks();
@@ -35,7 +38,10 @@ namespace ShaRide.WebApi
             services.AddCors();
             services.AddMvc()
                 .AddViewLocalization(Microsoft.AspNetCore.Mvc.Razor.LanguageViewLocationExpanderFormat.Suffix)
-                .AddDataAnnotationsLocalization();
+                .AddDataAnnotationsLocalization(options =>
+                {
+                    options.DataAnnotationLocalizerProvider = (type, factory) => factory.Create(typeof(Resource));
+                });
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
