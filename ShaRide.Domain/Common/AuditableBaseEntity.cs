@@ -8,7 +8,7 @@ namespace ShaRide.Domain.Common
     {
         [ForeignKey("ApplicationUser")]
         public int CreatedBy { get; set; }
-        public virtual ApplicationUser ApplicationUser { get; set; }
+        public virtual User User { get; set; }
         public DateTime Created { get; set; }
         [ForeignKey("ApplicationUser")]
         public int LastModifiedBy { get; set; }

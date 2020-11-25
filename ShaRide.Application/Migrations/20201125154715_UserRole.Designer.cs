@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using ShaRide.Application.Contexts;
@@ -9,15 +10,46 @@ using ShaRide.Application.Contexts;
 namespace ShaRide.Application.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20201125154715_UserRole")]
+    partial class UserRole
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn)
                 .HasAnnotation("ProductVersion", "3.1.9")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
+
+            modelBuilder.Entity("ShaRide.Domain.Entities.ApplicationUser", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+
+                    b.Property<byte[]>("Img")
+                        .HasColumnType("bytea");
+
+                    b.Property<string>("ImgExtension")
+                        .HasColumnType("text");
+
+                    b.Property<bool>("IsRowActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("text");
+
+                    b.Property<string>("PasswordHash")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Surname")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("User");
+                });
 
             modelBuilder.Entity("ShaRide.Domain.Entities.Role", b =>
                 {
@@ -38,39 +70,6 @@ namespace ShaRide.Application.Migrations
                     b.ToTable("Roles");
                 });
 
-            modelBuilder.Entity("ShaRide.Domain.Entities.User", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
-
-                    b.Property<byte[]>("Img")
-                        .HasColumnType("bytea");
-
-                    b.Property<string>("ImgExtension")
-                        .HasColumnType("text");
-
-                    b.Property<bool>("IsRowActive")
-                        .HasColumnType("boolean");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("PasswordHash")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Surname")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("User");
-                });
-
             modelBuilder.Entity("ShaRide.Domain.Entities.UserPhone", b =>
                 {
                     b.Property<int>("Id")
@@ -88,7 +87,6 @@ namespace ShaRide.Application.Migrations
                         .HasColumnType("boolean");
 
                     b.Property<string>("Number")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<int>("UserId")
@@ -118,7 +116,7 @@ namespace ShaRide.Application.Migrations
 
             modelBuilder.Entity("ShaRide.Domain.Entities.UserPhone", b =>
                 {
-                    b.HasOne("ShaRide.Domain.Entities.User", "User")
+                    b.HasOne("ShaRide.Domain.Entities.ApplicationUser", "User")
                         .WithMany("Phones")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -133,7 +131,7 @@ namespace ShaRide.Application.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("ShaRide.Domain.Entities.User", "User")
+                    b.HasOne("ShaRide.Domain.Entities.ApplicationUser", "User")
                         .WithMany("UserRoleComposition")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)

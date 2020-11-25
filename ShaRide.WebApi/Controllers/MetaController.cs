@@ -1,11 +1,15 @@
 ﻿using System.Diagnostics;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.OpenApi.Extensions;
+using ShaRide.Domain.Enums;
 
 namespace ShaRide.WebApi.Controllers
 {
     public class MetaController : ControllerBase
     {
         [HttpGet("/info")]
+        [Authorize(Roles = "Admin")]
         public ActionResult<string> Info()
         {
             var assembly = typeof(Startup).Assembly;

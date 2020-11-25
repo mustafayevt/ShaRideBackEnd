@@ -5,9 +5,8 @@ namespace ShaRide.Application.DTO.Request
 {
     public class PhoneRequest
     {
-        [Phone(ErrorMessage = LocalizationKeys.INVALID_CREDENTIALS)]
+        [Phone()]
         public string Number { get; set; }
-        public bool IsConfirmed { get; set; }
         public bool IsMain { get; set; }
     }
 

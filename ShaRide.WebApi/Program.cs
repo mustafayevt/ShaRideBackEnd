@@ -9,6 +9,8 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Serilog;
 using Serilog.Events;
+using ShaRide.Application.Managers;
+using ShaRide.Application.Seeds;
 
 namespace ShaRide.WebApi
 {
@@ -38,6 +40,12 @@ namespace ShaRide.WebApi
                 var loggerFactory = services.GetRequiredService<ILoggerFactory>();
                 try
                 {
+                    Log.Information("Seeding Default Data Started");
+
+                    var userManager = services.GetRequiredService<UserManager>();
+
+                    await DefaultRoles.SeedAsync(userManager);
+                    await DefaultAdminUsers.SeedAsync(userManager);
 
                     Log.Information("Finished Seeding Default Data");
                     Log.Information("Application Starting");

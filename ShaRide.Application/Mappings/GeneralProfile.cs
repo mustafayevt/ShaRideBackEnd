@@ -14,14 +14,13 @@ namespace ShaRide.Application.Mappings
             CreateMap<UserPhone, PhoneRequest>()
                 .ForMember(x => x.Number, opt => opt.MapFrom(y => y.Number))
                 .ForMember(x => x.IsMain, opt => opt.MapFrom(y => y.IsMain))
-                .ForMember(x => x.IsConfirmed, opt => opt.MapFrom(y => y.IsConfirmed))
                 .ReverseMap();
 
             #endregion
 
             #region ApplicationUser
 
-            CreateMap<ApplicationUser, RegisterRequest>()
+            CreateMap<User, RegisterRequest>()
                 .ForMember(x => x.FirstName, opt => opt.MapFrom(y => y.Name))
                 .ForMember(x => x.LastName, opt => opt.MapFrom(y => y.Surname))
                 .ForMember(x => x.Phones, opt => opt.MapFrom(y => y.Phones))

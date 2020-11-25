@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
@@ -19,6 +20,7 @@ using ShaRide.Application.Localize;
 using ShaRide.Application.Managers;
 using ShaRide.Application.Services.Interface;
 using ShaRide.Domain.Entities;
+using ShaRide.Domain.Enums;
 using ShaRide.Domain.Settings;
 
 namespace ShaRide.Application.Services.Concrate
@@ -62,15 +64,15 @@ namespace ShaRide.Application.Services.Concrate
             var user = await _userManager.FindByPhoneAsync(request.Phone);
             if (user == null)
             {
-                throw new ApiException(_localizer.GetString(LocalizationKeys.INVALID_CREDENTIALS,request.Phone));
+                throw new ApiException(_localizer.GetString(LocalizationKeys.INVALID_CREDENTIALS, request.Phone));
             }
 
             var result = await _userManager.PasswordSignInAsync(request.Phone, request.Password);
             if (!result.Succeeded)
             {
-                throw new ApiException(_localizer.GetString(LocalizationKeys.INVALID_CREDENTIALS,request.Phone));
+                throw new ApiException(_localizer.GetString(LocalizationKeys.INVALID_CREDENTIALS, request.Phone));
             }
-            
+
             JwtSecurityToken jwtSecurityToken = await GenerateJWToken(user);
             AuthenticationResponse response = new AuthenticationResponse();
             response.Id = user.Id;
@@ -95,23 +97,30 @@ namespace ShaRide.Application.Services.Concrate
             var userWithSamePhone = await _userManager.FindByPhoneAsync(mainPhone.Number);
             if (userWithSamePhone != null)
             {
-                throw new ApiException(_localizer.GetString(LocalizationKeys.PHONE_ALREADY_TAKEN,mainPhone.Number));
+                throw new ApiException(_localizer.GetString(LocalizationKeys.PHONE_ALREADY_TAKEN, mainPhone.Number));
             }
 
-            mainPhone.IsConfirmed = true;
-
-            var user = _mapper.Map<ApplicationUser>(request);
+            var user = _mapper.Map<User>(request);
             user.Img = request.Attachment.Content.ToArray();
-            var result = await _userManager.CreateAsync(user, request.Password);
-            if (result.Succeeded)
+            var userResult = await _userManager.CreateAsync(user, request.Password);
+            if (userResult.Succeeded)
             {
-                JwtSecurityToken jwtSecurityToken = await GenerateJWToken(user);
-                return new AuthenticationResponse
+                var roleResult = await _userManager.AddToRoleAsync(user, Roles.Basic.ToString());
+
+                if (roleResult.Succeeded)
                 {
-                    Id = user.Id,
-                    IsVerified = false,
-                    JWToken = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken)
-                };
+                    JwtSecurityToken jwtSecurityToken = await GenerateJWToken(user);
+                    return new AuthenticationResponse
+                    {
+                        Id = user.Id,
+                        IsVerified = false,
+                        JWToken = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken)
+                    };
+                }
+                else
+                {
+                    throw new ApiException("Error while adding role to the user");
+                }
             }
             else
             {
@@ -128,7 +137,7 @@ namespace ShaRide.Application.Services.Concrate
         {
             var userPhone = await _userManager.GetUserPhoneByPhoneNumber(phoneNumber);
             if (userPhone != null)
-                throw new ApiException(_localizer.GetString(LocalizationKeys.PHONE_ALREADY_CONFIRMED,phoneNumber));
+                throw new ApiException(_localizer.GetString(LocalizationKeys.PHONE_ALREADY_CONFIRMED, phoneNumber));
 
             var confirmationCode = ConfirmationCodeHelper.GenerateConfirmationCode();
             var content = $"ShaRide Kod - {confirmationCode}";
@@ -141,16 +150,16 @@ namespace ShaRide.Application.Services.Concrate
         /// </summary>
         /// <param name="user"></param>
         /// <returns></returns>
-        private async Task<JwtSecurityToken> GenerateJWToken(ApplicationUser user)
+        private async Task<JwtSecurityToken> GenerateJWToken(User user)
         {
-            // var roles = await _userManager.GetRolesAsync(user);
+            var roles = await _userManager.GetRolesAsync(user);
 
-            // var roleClaims = new List<Claim>();
-            //
-            // for (int i = 0; i < roles.Count; i++)
-            // {
-            //     roleClaims.Add(new Claim("roles", roles[i]));
-            // }
+            var roleClaims = new List<Claim>();
+            
+            for (int i = 0; i < roles.Count; i++)
+            {
+                roleClaims.Add(new Claim("roles", roles[i]));
+            }
 
             string ipAddress = IpHelper.GetIpAddress();
 
@@ -160,8 +169,8 @@ namespace ShaRide.Application.Services.Concrate
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 new Claim("uid", user.Id.ToString()),
                 new Claim("ip", ipAddress)
-            };
-            // .Union(roleClaims);
+            }
+             .Union(roleClaims);
 
             var symmetricSecurityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.Key));
             var signingCredentials = new SigningCredentials(symmetricSecurityKey, SecurityAlgorithms.HmacSha256);
@@ -194,7 +203,7 @@ namespace ShaRide.Application.Services.Concrate
         /// <param name="user"></param>
         /// <param name="origin"></param>
         /// <returns></returns>
-        private async Task<string> SendVerificationSms(ApplicationUser user, string origin)
+        private async Task<string> SendVerificationSms(User user, string origin)
         {
             var code = 123.ToString();
             code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));

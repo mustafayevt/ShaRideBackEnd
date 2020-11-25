@@ -1,8 +1,6 @@
 ﻿using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using ShaRide.Application.Services.Interface;
 using ShaRide.Domain.Common;
@@ -14,7 +12,9 @@ namespace ShaRide.Application.Contexts
     {
         private readonly IDateTimeService _dateTime;
         private readonly IAuthenticatedUserService _authenticatedUser;
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options, IDateTimeService dateTime, IAuthenticatedUserService authenticatedUser) : base(options)
+
+        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options, IDateTimeService dateTime,
+            IAuthenticatedUserService authenticatedUser) : base(options)
         {
             ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
             _dateTime = dateTime;
@@ -39,8 +39,10 @@ namespace ShaRide.Application.Contexts
                         break;
                 }
             }
+
             return base.SaveChangesAsync(cancellationToken);
         }
+
         public override int SaveChanges()
         {
             foreach (var entry in ChangeTracker.Entries<AuditableBaseEntity>())
@@ -57,8 +59,10 @@ namespace ShaRide.Application.Contexts
                         break;
                 }
             }
+
             return base.SaveChanges();
         }
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             //All Decimals will have 18,6 Range
@@ -70,22 +74,33 @@ namespace ShaRide.Application.Contexts
             }
 
             base.OnModelCreating(builder);
-            builder.Entity<ApplicationUser>(entity =>
-            {
-                entity.ToTable(name: "User");
-            });
 
-            builder.Entity<ApplicationUser>()
+            #region Mapping
+
+            builder.Entity<User>(entity => { entity.ToTable(name: "User"); });
+
+            builder.Entity<User>()
                 .Property(e => e.Img)
                 .HasColumnType("bytea");
+
+            builder.Entity<UserRoleComposition>().HasKey(x => new {x.UserId, x.RoleId});
+
+            #endregion
         }
 
         #endregion
 
         #region DbSets
 
-        public DbSet<ApplicationUser> Users { get; set; }
+        public DbSet<User> Users { get; set; }
         public DbSet<UserPhone> UserPhones { get; set; }
+
+        public DbSet<Role> Roles { get; set; }
+        public DbSet<UserRoleComposition> UserRoleComposition { get; set; }
+
+        #endregion
+
+        #region Fluent Mapping
 
         #endregion
     }

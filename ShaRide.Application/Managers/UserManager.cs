@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using ShaRide.Application.Contexts;
 using ShaRide.Application.Services.Concrate;
 using ShaRide.Domain.Entities;
+using ShaRide.Domain.Enums;
 
 namespace ShaRide.Application.Managers
 {
@@ -18,14 +19,11 @@ namespace ShaRide.Application.Managers
     {
         private readonly ApplicationDbContext _dbContext;
 
+        public IQueryable<User> Users => _dbContext.Users.AsQueryable();
+
         public UserManager(ApplicationDbContext dbContext)
         {
             _dbContext = dbContext;
-        }
-
-        public async Task<ApplicationUser> FindByEmailAsync(string email)
-        {
-            throw new System.NotImplementedException();
         }
 
         /// <summary>
@@ -33,9 +31,10 @@ namespace ShaRide.Application.Managers
         /// </summary>
         /// <param name="phone"></param>
         /// <returns></returns>
-        public async Task<ApplicationUser> FindByPhoneAsync(string phone)
+        public async Task<User> FindByPhoneAsync(string phone)
         {
-            var userPhone =  await _dbContext.UserPhones.Include(x => x.User).FirstOrDefaultAsync(x => x.Number == phone);
+            var userPhone = await _dbContext.UserPhones.Include(x => x.User)
+                .FirstOrDefaultAsync(x => x.Number == phone);
             return userPhone?.User;
         }
 
@@ -81,7 +80,7 @@ namespace ShaRide.Application.Managers
         /// <param name="user"></param>
         /// <param name="password"></param>
         /// <returns></returns>
-        public async Task<IdentityResult> CreateAsync(ApplicationUser user, string password)
+        public async Task<IdentityResult> CreateAsync(User user, string password)
         {
             try
             {
@@ -95,6 +94,68 @@ namespace ShaRide.Application.Managers
             {
                 return IdentityResult.Failed();
             }
+        }
+
+        /// <summary>
+        /// Adds role to user.
+        /// </summary>
+        /// <param name="user"></param>
+        /// <param name="roleName"></param>
+        /// <returns></returns>
+        public async Task<IdentityResult> AddToRoleAsync(User user, string roleName)
+        {
+            if (!Enum.TryParse(typeof(Roles), roleName, false, out var roleEnum))
+                throw new ArgumentException("role name is not correct");
+
+            var dbUser = await FindByPhoneAsync(user.Phones.First().Number);
+            var dbRole = await _dbContext.Roles.FirstOrDefaultAsync(x => x.RoleName == roleEnum.ToString());
+
+            var composition = new UserRoleComposition(dbUser.Id, dbRole.Id);
+
+            await _dbContext.UserRoleComposition.AddAsync(composition);
+
+            await _dbContext.SaveChangesAsync();
+
+            return IdentityResult.Success;
+        }
+
+        /// <summary>
+        /// Adds role to the db.
+        /// </summary>
+        /// <param name="role"></param>
+        /// <returns></returns>
+        public async Task<IdentityResult> CreateRoleAsync(Role role)
+        {
+            if (await _dbContext.Roles.FirstOrDefaultAsync(x => x.RoleName == role.RoleName) != null)
+                return IdentityResult.Failed();
+
+            await _dbContext.Roles.AddAsync(role);
+            await _dbContext.SaveChangesAsync();
+
+            return IdentityResult.Success;
+        }
+
+        /// <summary>
+        /// Returns role by name.
+        /// </summary>
+        /// <param name="roleName"></param>
+        /// <returns></returns>
+        public async Task<Role> GetRoleByName(string roleName)
+        {
+            return await _dbContext.Roles.FirstOrDefaultAsync(x => x.RoleName == roleName);
+        }
+
+        /// <summary>
+        /// Gets user roles as string list.
+        /// </summary>
+        /// <param name="user"></param>
+        /// <returns></returns>
+        public async Task<List<string>> GetRolesAsync(User user)
+        {
+            return _dbContext.UserRoleComposition
+                .Include(x => x.Role)
+                .Where(x => x.UserId == user.Id)
+                .Select(x => x.Role.RoleName).ToList();
         }
     }
 }
