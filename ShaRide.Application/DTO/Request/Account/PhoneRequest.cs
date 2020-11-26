@@ -1,11 +1,11 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using ShaRide.Application.Helpers;
 
-namespace ShaRide.Application.DTO.Request
+namespace ShaRide.Application.DTO.Request.Account
 {
     public class PhoneRequest
     {
-        [Phone()]
+        [Phone]
+        [Required]
         public string Number { get; set; }
         public bool IsMain { get; set; }
     }

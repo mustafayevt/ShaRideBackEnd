@@ -1,6 +1,8 @@
 ﻿using System.Threading.Tasks;
 using ShaRide.Application.DTO.Request;
+using ShaRide.Application.DTO.Request.Account;
 using ShaRide.Application.DTO.Response;
+using ShaRide.Application.DTO.Response.Account;
 
 namespace ShaRide.Application.Services.Interface
 {

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace ShaRide.Application.DTO.Request
+namespace ShaRide.Application.DTO.Request.Account
 {
     public class AttachmentRequest
     {

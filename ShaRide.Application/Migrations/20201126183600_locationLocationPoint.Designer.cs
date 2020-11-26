@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using ShaRide.Application.Contexts;
@@ -9,9 +10,10 @@ using ShaRide.Application.Contexts;
 namespace ShaRide.Application.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20201126183600_locationLocationPoint")]
+    partial class locationLocationPoint
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -39,26 +41,20 @@ namespace ShaRide.Application.Migrations
 
             modelBuilder.Entity("ShaRide.Domain.Entities.LocationPoint", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("LocationId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer")
                         .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
-                    b.Property<bool>("IsRowActive")
-                        .HasColumnType("boolean");
-
-                    b.Property<int>("LocationId")
+                    b.Property<int?>("LocationId1")
                         .HasColumnType("integer");
 
                     b.Property<int>("LocationPointType")
                         .HasColumnType("integer");
 
-                    b.Property<string>("Name")
-                        .HasColumnType("text");
+                    b.HasKey("LocationId");
 
-                    b.HasKey("Id");
-
-                    b.HasIndex("LocationId");
+                    b.HasIndex("LocationId1");
 
                     b.ToTable("LocationPoints");
                 });
@@ -164,9 +160,7 @@ namespace ShaRide.Application.Migrations
                 {
                     b.HasOne("ShaRide.Domain.Entities.Location", "Location")
                         .WithMany("LocationPoints")
-                        .HasForeignKey("LocationId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("LocationId1");
                 });
 
             modelBuilder.Entity("ShaRide.Domain.Entities.UserPhone", b =>

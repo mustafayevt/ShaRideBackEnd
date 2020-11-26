@@ -1,4 +1,4 @@
-﻿namespace ShaRide.Application.DTO.Response
+﻿namespace ShaRide.Application.DTO.Response.Account
 {
     public class AuthenticationResponse
     {

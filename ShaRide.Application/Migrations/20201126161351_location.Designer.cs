@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using ShaRide.Application.Contexts;
@@ -9,9 +10,10 @@ using ShaRide.Application.Contexts;
 namespace ShaRide.Application.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20201126161351_location")]
+    partial class location
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -29,38 +31,20 @@ namespace ShaRide.Application.Migrations
                     b.Property<bool>("IsRowActive")
                         .HasColumnType("boolean");
 
+                    b.Property<int>("LocationType")
+                        .HasColumnType("integer");
+
                     b.Property<string>("Name")
                         .HasColumnType("text");
 
+                    b.Property<int?>("ParentId")
+                        .HasColumnType("integer");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("ParentId");
 
                     b.ToTable("Locations");
-                });
-
-            modelBuilder.Entity("ShaRide.Domain.Entities.LocationPoint", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
-
-                    b.Property<bool>("IsRowActive")
-                        .HasColumnType("boolean");
-
-                    b.Property<int>("LocationId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("LocationPointType")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("Name")
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("LocationId");
-
-                    b.ToTable("LocationPoints");
                 });
 
             modelBuilder.Entity("ShaRide.Domain.Entities.Role", b =>
@@ -160,13 +144,11 @@ namespace ShaRide.Application.Migrations
                     b.ToTable("UserRoleComposition");
                 });
 
-            modelBuilder.Entity("ShaRide.Domain.Entities.LocationPoint", b =>
+            modelBuilder.Entity("ShaRide.Domain.Entities.Location", b =>
                 {
-                    b.HasOne("ShaRide.Domain.Entities.Location", "Location")
-                        .WithMany("LocationPoints")
-                        .HasForeignKey("LocationId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.HasOne("ShaRide.Domain.Entities.Location", "Parent")
+                        .WithMany()
+                        .HasForeignKey("ParentId");
                 });
 
             modelBuilder.Entity("ShaRide.Domain.Entities.UserPhone", b =>

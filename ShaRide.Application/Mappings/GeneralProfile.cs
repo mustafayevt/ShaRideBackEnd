@@ -1,6 +1,10 @@
 ﻿using System.Linq;
 using AutoMapper;
 using ShaRide.Application.DTO.Request;
+using ShaRide.Application.DTO.Request.Account;
+using ShaRide.Application.DTO.Request.Location;
+using ShaRide.Application.DTO.Response;
+using ShaRide.Application.DTO.Response.Location;
 using ShaRide.Domain.Entities;
 
 namespace ShaRide.Application.Mappings
@@ -26,6 +30,19 @@ namespace ShaRide.Application.Mappings
                 .ForMember(x => x.Phones, opt => opt.MapFrom(y => y.Phones))
                 .ForMember(x => x.Attachment, opt => opt.Ignore())
                 .ReverseMap();
+
+            #endregion
+
+            #region Location
+
+            //Location Points
+            CreateMap<LocationPoint, InsertLocationPointRequest>().ReverseMap();
+            CreateMap<LocationPoint, UpdateLocationPointRequest>().ReverseMap();
+            CreateMap<LocationPoint, LocationPointResponse>().ReverseMap();
+
+            CreateMap<Location, InsertLocationRequest>().ReverseMap();
+            CreateMap<Location, UpdateLocationRequest>().ReverseMap();
+            CreateMap<Location, LocationResponse>().ReverseMap();
 
             #endregion
         }

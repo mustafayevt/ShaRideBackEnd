@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MimeKit;
 using ShaRide.Application.DTO.Request;
+using ShaRide.Application.DTO.Request.Account;
 using ShaRide.Application.Services.Interface;
 using ShaRide.Domain.Settings;
 using SmtpClient = MailKit.Net.Smtp.SmtpClient;

@@ -46,6 +46,8 @@ namespace ShaRide.Application
             services.AddTransient<IDateTimeService, DateTimeService>();
             services.AddTransient<IEmailService, EmailService>();
             services.AddTransient<IVerificationCodeService, VerificationCodeService>();
+            services.AddTransient<IVerificationCodeService, VerificationCodeService>();
+            services.AddTransient<ILocationService, LocationService>();
             #endregion
             
             services.Configure<JWTSettings>(configuration.GetSection("JWTSettings"));

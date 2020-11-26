@@ -97,6 +97,8 @@ namespace ShaRide.Application.Contexts
 
         public DbSet<Role> Roles { get; set; }
         public DbSet<UserRoleComposition> UserRoleComposition { get; set; }
+        public DbSet<Location> Locations { get; set; }
+        public DbSet<LocationPoint> LocationPoints { get; set; }
 
         #endregion
 

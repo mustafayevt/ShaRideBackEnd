@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using ShaRide.Application.Attributes;
 using ShaRide.Application.DTO.Request;
+using ShaRide.Application.DTO.Request.Account;
 using ShaRide.Application.Localize;
 using ShaRide.Application.Services.Interface;
 
