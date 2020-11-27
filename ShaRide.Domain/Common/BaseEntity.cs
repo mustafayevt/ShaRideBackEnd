@@ -4,7 +4,6 @@ namespace ShaRide.Domain.Common
 {
     public abstract class BaseEntity
     {
-        //Devops test commit
         public int Id { get; set; }
         [JsonIgnore]
         public bool IsRowActive { get; set; } = true;
