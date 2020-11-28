@@ -27,7 +27,6 @@
     <ItemGroup>
         <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="8.1.0" />
         <PackageReference Include="AutoWrapper.Core" Version="4.3.1" />
-        <PackageReference Include="FluentValidation.AspNetCore" Version="9.3.0" />
         <PackageReference Include="MailKit" Version="2.9.0" />
         <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="3.1.9" />
         <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="3.1.9" />
@@ -53,22 +52,24 @@
 
     <ItemGroup>
       <EmbeddedResource Update="Localize\Resource.az.resx">
-        <Generator>ResXFileCodeGenerator</Generator>
+        <Generator>PublicResXFileCodeGenerator</Generator>
         <LastGenOutput>Resource.az.Designer.cs</LastGenOutput>
         <DependentUpon>Resource.cs</DependentUpon>
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </EmbeddedResource>
       <EmbeddedResource Update="Localize\Resource.en.resx">
-        <Generator>ResXFileCodeGenerator</Generator>
+        <Generator>PublicResXFileCodeGenerator</Generator>
         <LastGenOutput>Resource.en.Designer.cs</LastGenOutput>
         <DependentUpon>Resource.cs</DependentUpon>
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </EmbeddedResource>
       <EmbeddedResource Update="Localize\Resource.az.resx">
-        <Generator>ResXFileCodeGenerator</Generator>
+        <Generator>PublicResXFileCodeGenerator</Generator>
         <LastGenOutput>Resource.az.Designer.cs</LastGenOutput>
         <DependentUpon>Resource.cs</DependentUpon>
       </EmbeddedResource>
       <EmbeddedResource Update="Localize\Resource.en.resx">
-        <Generator>ResXFileCodeGenerator</Generator>
+        <Generator>PublicResXFileCodeGenerator</Generator>
         <LastGenOutput>Resource.en.Designer.cs</LastGenOutput>
         <DependentUpon>Resource.cs</DependentUpon>
       </EmbeddedResource>

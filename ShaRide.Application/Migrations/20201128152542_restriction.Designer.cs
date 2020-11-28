@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using ShaRide.Application.Contexts;
@@ -9,82 +10,16 @@ using ShaRide.Application.Contexts;
 namespace ShaRide.Application.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20201128152542_restriction")]
+    partial class restriction
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn)
                 .HasAnnotation("ProductVersion", "3.1.9")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
-
-            modelBuilder.Entity("ShaRide.Domain.Entities.BanType", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
-
-                    b.Property<string>("AssetPath")
-                        .HasColumnType("text");
-
-                    b.Property<bool>("IsRowActive")
-                        .HasColumnType("boolean");
-
-                    b.Property<string>("Title")
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("BanTypes");
-                });
-
-            modelBuilder.Entity("ShaRide.Domain.Entities.CarBrand", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
-
-                    b.Property<bool>("IsRowActive")
-                        .HasColumnType("boolean");
-
-                    b.Property<string>("Title")
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("CarBrands");
-                });
-
-            modelBuilder.Entity("ShaRide.Domain.Entities.CarModel", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
-
-                    b.Property<int>("BanTypeId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("CarBrandId")
-                        .HasColumnType("integer");
-
-                    b.Property<bool>("IsRowActive")
-                        .HasColumnType("boolean");
-
-                    b.Property<string>("Title")
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("BanTypeId");
-
-                    b.HasIndex("CarBrandId");
-
-                    b.ToTable("CarModels");
-                });
 
             modelBuilder.Entity("ShaRide.Domain.Entities.Location", b =>
                 {
@@ -137,7 +72,7 @@ namespace ShaRide.Application.Migrations
                         .HasColumnType("integer")
                         .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
-                    b.Property<string>("AssetPath")
+                    b.Property<string>("AssertPath")
                         .HasColumnType("text");
 
                     b.Property<bool>("IsRowActive")
@@ -147,9 +82,6 @@ namespace ShaRide.Application.Migrations
                         .HasColumnType("text");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("Title")
-                        .IsUnique();
 
                     b.ToTable("Restrictions");
                 });
@@ -204,27 +136,6 @@ namespace ShaRide.Application.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Roles");
-                });
-
-            modelBuilder.Entity("ShaRide.Domain.Entities.Seat", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
-
-                    b.Property<bool>("IsRowActive")
-                        .HasColumnType("boolean");
-
-                    b.Property<short>("xCordinant")
-                        .HasColumnType("smallint");
-
-                    b.Property<short>("yCordinant")
-                        .HasColumnType("smallint");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Seats");
                 });
 
             modelBuilder.Entity("ShaRide.Domain.Entities.User", b =>
@@ -303,21 +214,6 @@ namespace ShaRide.Application.Migrations
                     b.HasIndex("RoleId");
 
                     b.ToTable("UserRoleComposition");
-                });
-
-            modelBuilder.Entity("ShaRide.Domain.Entities.CarModel", b =>
-                {
-                    b.HasOne("ShaRide.Domain.Entities.BanType", "BanType")
-                        .WithMany()
-                        .HasForeignKey("BanTypeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("ShaRide.Domain.Entities.CarBrand", "CarBrand")
-                        .WithMany()
-                        .HasForeignKey("CarBrandId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("ShaRide.Domain.Entities.LocationPoint", b =>

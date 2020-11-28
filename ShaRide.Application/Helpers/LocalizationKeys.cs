@@ -37,8 +37,42 @@
         public const string PHONE_ALREADY_CONFIRMED = "Exception.PhoneConfirmed";
 
         /// <summary>
-        /// User case : exception.
+        /// Use case : exception.
         /// </summary>
         public const string LOCATION_NOT_FOUND = "Exception.LocationNotFound";
+
+        /// <summary>
+        /// Use case : exception.
+        /// </summary>
+        public const string RESTRICTION_ALREADY_EXISTS = "Exception.RestrictionAlreadyExists";
+
+        /// <summary>
+        /// User case : exception.
+        /// Has id parameter.
+        /// </summary>
+        public const string RESTRICTOIN_NOT_FOUND = "Exception.RestrictionNotFound";
+
+        /// <summary>
+        /// Use case : validation error.
+        /// Has property name parameter.
+        /// </summary>
+        public const string REQUIRED = "Validation.Required";
+
+        /// <summary>
+        /// Use case: validation error.
+        /// Has property name parameter.
+        /// </summary>
+        public const string EMAIL = "Validation.Email";
+
+        /// <summary>
+        /// Use case : validation error.
+        /// Has property name parameter.
+        /// </summary>
+        public const string PHONE = "Validation.Phone";
+
+        /// <summary>
+        /// Use case: validation error.
+        /// </summary>
+        public const string PASSWORD = "Validation.Password";
     }
 }

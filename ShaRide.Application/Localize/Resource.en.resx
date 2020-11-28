@@ -27,4 +27,19 @@
     <data name="Exception.PhoneConfirmed" xml:space="preserve">
         <value>'{0}' is already confirmed</value>
     </data>
+    <data name="Exception.NotFound" xml:space="preserve">
+        <value>'{0}' not found</value>
+    </data>
+    <data name="Exception.RestrictionNotFound" xml:space="preserve">
+        <value>Restriction with '{0}' id was not found</value>
+    </data>
+    <data name="Validation.Required" xml:space="preserve">
+        <value>'{0}' field cannot be empty.</value>
+    </data>
+    <data name="Validation.Password" xml:space="preserve">
+        <value>Password is to weak</value>
+    </data>
+    <data name="Validation.Phone" xml:space="preserve">
+        <value>Phone Format is invalid</value>
+    </data>
 </root>

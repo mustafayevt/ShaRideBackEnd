@@ -77,13 +77,22 @@ namespace ShaRide.Application.Contexts
 
             #region Mapping
 
-            builder.Entity<User>(entity => { entity.ToTable(name: "User"); });
+            builder.Entity<User>(entity =>
+            {
+                entity.ToTable(name: "User");
+                entity.Property(e => e.Img)
+                    .HasColumnType("bytea");
+            });
 
             builder.Entity<User>()
                 .Property(e => e.Img)
                 .HasColumnType("bytea");
 
             builder.Entity<UserRoleComposition>().HasKey(x => new {x.UserId, x.RoleId});
+            
+            builder.Entity<RestrictionRideComposition>().HasKey(x => new {x.RestrictionId, x.RideId});
+
+            builder.Entity<Restriction>().HasIndex(x => x.Title).IsUnique();
 
             #endregion
         }
@@ -99,10 +108,13 @@ namespace ShaRide.Application.Contexts
         public DbSet<UserRoleComposition> UserRoleComposition { get; set; }
         public DbSet<Location> Locations { get; set; }
         public DbSet<LocationPoint> LocationPoints { get; set; }
-
-        #endregion
-
-        #region Fluent Mapping
+        public DbSet<Restriction> Restrictions { get; set; }
+        public DbSet<RestrictionRideComposition> RestrictionRideComposition { get; set; }
+        public DbSet<Ride> Rides { get; set; }
+        public DbSet<CarBrand> CarBrands { get; set; }
+        public DbSet<CarModel> CarModels { get; set; }
+        public DbSet<BanType> BanTypes { get; set; }
+        public DbSet<Seat> Seats { get; set; }
 
         #endregion
     }

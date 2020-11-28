@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using ShaRide.Application.Contexts;
@@ -39,6 +40,7 @@ namespace ShaRide.Application
             }
             #region Services
             services.AddHttpClient("HttpClient");
+            services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddTransient<UserManager>();
             services.AddTransient<IAccountService, AccountService>();
             services.Configure<MailSettings>(configuration.GetSection("MailSettings"));
@@ -48,6 +50,7 @@ namespace ShaRide.Application
             services.AddTransient<IVerificationCodeService, VerificationCodeService>();
             services.AddTransient<IVerificationCodeService, VerificationCodeService>();
             services.AddTransient<ILocationService, LocationService>();
+            services.AddTransient<IRestrictionService, RestrictionService>();
             #endregion
             
             services.Configure<JWTSettings>(configuration.GetSection("JWTSettings"));
@@ -80,7 +83,7 @@ namespace ShaRide.Application
                         {
                             c.Response.StatusCode = 401;
                             c.Response.ContentType = "application/json";
-                            var result = JsonConvert.SerializeObject(new ApiResponse("Your token has expired"));
+                            var result = JsonConvert.SerializeObject(new ApiError("Your token has expired"));
                             return c.Response.WriteAsync(result);
                         },
                         OnChallenge = context =>
@@ -88,14 +91,14 @@ namespace ShaRide.Application
                             context.HandleResponse();
                             context.Response.StatusCode = 401;
                             context.Response.ContentType = "application/json";
-                            var result = JsonConvert.SerializeObject(new ApiResponse("You are not Authorized"));
+                            var result = JsonConvert.SerializeObject(new ApiError("You are not Authorized"));
                             return context.Response.WriteAsync(result);
                         },
                         OnForbidden = context =>
                         {
                             context.Response.StatusCode = 403;
                             context.Response.ContentType = "application/json";
-                            var result = JsonConvert.SerializeObject(new ApiResponse("You are not authorized to access this resource"));
+                            var result = JsonConvert.SerializeObject(new ApiError("You are not authorized to access this resource"));
                             return context.Response.WriteAsync(result);
                         }
                     };

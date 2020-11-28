@@ -1,15 +1,12 @@
 using System.Collections.Generic;
 using System.Globalization;
 using AutoWrapper;
-using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Localization;
-using Microsoft.AspNetCore.Localization.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Options;
 using ShaRide.Application;
 using ShaRide.Application.Localize;
 using ShaRide.Application.Services.Interface;
@@ -29,7 +26,7 @@ namespace ShaRide.WebApi
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllers().AddFluentValidation();
+            services.AddControllers();
             services.AddApplicationLayer(Configuration);
             services.AddSwaggerExtension();
             services.AddHealthChecks();

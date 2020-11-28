@@ -7,6 +7,7 @@ using Microsoft.Extensions.Localization;
 using ShaRide.Application.Attributes;
 using ShaRide.Application.DTO.Request;
 using ShaRide.Application.DTO.Request.Account;
+using ShaRide.Application.DTO.Response.Account;
 using ShaRide.Application.Localize;
 using ShaRide.Application.Services.Interface;
 
@@ -28,9 +29,9 @@ namespace ShaRide.WebApi.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpPost("authenticate")]
-        public async Task<ApiResponse> AuthenticateAsync(AuthenticationRequest request)
+        public async Task<IActionResult> AuthenticateAsync(AuthenticationRequest request)
         {
-            return new ApiResponse(await _accountService.AuthenticateAsync(request, GenerateIpAddress()));
+            return Ok(await _accountService.AuthenticateAsync(request, GenerateIpAddress()));
         }
 
         /// <summary>
@@ -39,10 +40,11 @@ namespace ShaRide.WebApi.Controllers
         /// <param name="request"></param>
         /// <returns></returns>
         [HttpPost("register")]
-        public async Task<ApiResponse> RegisterAsync(RegisterRequest request)
+        [Produces(typeof(AuthenticationResponse))]
+        public async Task<IActionResult> RegisterAsync(RegisterRequest request)
         {
             var origin = Request.Headers["origin"];
-            return new ApiResponse(await _accountService.RegisterAsync(request, origin));
+            return Ok(await _accountService.RegisterAsync(request, origin));
         }
 
         /// <summary>
@@ -51,9 +53,10 @@ namespace ShaRide.WebApi.Controllers
         /// <param name="phoneNumber"></param>
         /// <returns></returns>
         [HttpPost("get-verification-code")]
-        public async Task<ApiResponse> GetVerificationCodeAsync(string phoneNumber)
+        [Produces(typeof(string))]
+        public async Task<IActionResult> GetVerificationCodeAsync(string phoneNumber)
         {
-            return new ApiResponse(await _accountService.GetVerificationCode(phoneNumber));
+            return Ok(await _accountService.GetVerificationCode(phoneNumber));
         }
 
         private string GenerateIpAddress()

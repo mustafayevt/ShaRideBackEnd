@@ -27,4 +27,19 @@
     <data name="Exception.PhoneConfirmed" xml:space="preserve">
         <value>'{0}' nömrə artıq təsdiqlənib. </value>
     </data>
+    <data name="Exception.NotFound" xml:space="preserve">
+        <value>'{0}' tapılmadı</value>
+    </data>
+    <data name="Exception.RestrictionNotFound" xml:space="preserve">
+        <value>'{0}' identifikasiyalı qadağa tapılmadı</value>
+    </data>
+    <data name="Validation.Required" xml:space="preserve">
+        <value>'{0}' xanası boş ola bilməz.</value>
+    </data>
+    <data name="Validation.Password" xml:space="preserve">
+        <value>Şifrə çox bəsitdir</value>
+    </data>
+    <data name="Validation.Phone" xml:space="preserve">
+        <value>Telefon formadı düzgün deyil.</value>
+    </data>
 </root>

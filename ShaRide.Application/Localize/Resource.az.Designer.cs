@@ -22,7 +22,7 @@ namespace ShaRide.Application.Localize {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class Resource_az {
+    public class Resource_az {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
@@ -36,7 +36,7 @@ namespace ShaRide.Application.Localize {
         ///   Returns the cached ResourceManager instance used by this class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Resources.ResourceManager ResourceManager {
+        public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
                     global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("ShaRide.Application.Localize.Resource.az", typeof(Resource_az).Assembly);
@@ -51,7 +51,7 @@ namespace ShaRide.Application.Localize {
         ///   resource lookups using this strongly typed resource class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Globalization.CultureInfo Culture {
+        public static global::System.Globalization.CultureInfo Culture {
             get {
                 return resourceCulture;
             }
@@ -63,16 +63,25 @@ namespace ShaRide.Application.Localize {
         /// <summary>
         ///   Looks up a localized string similar to &apos;{0}&apos; üçün giriş məlumatları səhvdir..
         /// </summary>
-        internal static string Exception_InvalidCredentials {
+        public static string Exception_InvalidCredentials {
             get {
                 return ResourceManager.GetString("Exception.InvalidCredentials", resourceCulture);
             }
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; tapılmadı.
+        /// </summary>
+        public static string Exception_NotFound {
+            get {
+                return ResourceManager.GetString("Exception.NotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to &apos;{0}&apos; nömrə artıq təsdiqlənib. .
         /// </summary>
-        internal static string Exception_PhoneConfirmed {
+        public static string Exception_PhoneConfirmed {
             get {
                 return ResourceManager.GetString("Exception.PhoneConfirmed", resourceCulture);
             }
@@ -81,9 +90,45 @@ namespace ShaRide.Application.Localize {
         /// <summary>
         ///   Looks up a localized string similar to &apos;{0}&apos; nömrə artıq istifadə olunur..
         /// </summary>
-        internal static string Exception_PhoneTaken {
+        public static string Exception_PhoneTaken {
             get {
                 return ResourceManager.GetString("Exception.PhoneTaken", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; identifikasiyalı qadağa tapılmadı.
+        /// </summary>
+        public static string Exception_RestrictionNotFound {
+            get {
+                return ResourceManager.GetString("Exception.RestrictionNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Şifrə çox bəsitdir.
+        /// </summary>
+        public static string Validation_Password {
+            get {
+                return ResourceManager.GetString("Validation.Password", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Telefon formadı düzgün deyil..
+        /// </summary>
+        public static string Validation_Phone {
+            get {
+                return ResourceManager.GetString("Validation.Phone", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; xanası boş ola bilməz..
+        /// </summary>
+        public static string Validation_Required {
+            get {
+                return ResourceManager.GetString("Validation.Required", resourceCulture);
             }
         }
     }

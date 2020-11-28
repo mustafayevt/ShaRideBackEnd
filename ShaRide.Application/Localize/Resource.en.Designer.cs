@@ -22,7 +22,7 @@ namespace ShaRide.Application.Localize {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class Resource_en {
+    public class Resource_en {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
@@ -36,7 +36,7 @@ namespace ShaRide.Application.Localize {
         ///   Returns the cached ResourceManager instance used by this class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Resources.ResourceManager ResourceManager {
+        public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
                     global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("ShaRide.Application.Localize.Resource.en", typeof(Resource_en).Assembly);
@@ -51,7 +51,7 @@ namespace ShaRide.Application.Localize {
         ///   resource lookups using this strongly typed resource class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Globalization.CultureInfo Culture {
+        public static global::System.Globalization.CultureInfo Culture {
             get {
                 return resourceCulture;
             }
@@ -63,16 +63,25 @@ namespace ShaRide.Application.Localize {
         /// <summary>
         ///   Looks up a localized string similar to Invalid Credentials for &apos;{0}&apos;..
         /// </summary>
-        internal static string Exception_InvalidCredentials {
+        public static string Exception_InvalidCredentials {
             get {
                 return ResourceManager.GetString("Exception.InvalidCredentials", resourceCulture);
             }
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; not found.
+        /// </summary>
+        public static string Exception_NotFound {
+            get {
+                return ResourceManager.GetString("Exception.NotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to &apos;{0}&apos; is already confirmed.
         /// </summary>
-        internal static string Exception_PhoneConfirmed {
+        public static string Exception_PhoneConfirmed {
             get {
                 return ResourceManager.GetString("Exception.PhoneConfirmed", resourceCulture);
             }
@@ -81,9 +90,45 @@ namespace ShaRide.Application.Localize {
         /// <summary>
         ///   Looks up a localized string similar to Phone &apos;{0}&apos; is already taken..
         /// </summary>
-        internal static string Exception_PhoneTaken {
+        public static string Exception_PhoneTaken {
             get {
                 return ResourceManager.GetString("Exception.PhoneTaken", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Restriction with &apos;{0}&apos; id was not found.
+        /// </summary>
+        public static string Exception_RestrictionNotFound {
+            get {
+                return ResourceManager.GetString("Exception.RestrictionNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Password is to weak.
+        /// </summary>
+        public static string Validation_Password {
+            get {
+                return ResourceManager.GetString("Validation.Password", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Phone Format is invalid.
+        /// </summary>
+        public static string Validation_Phone {
+            get {
+                return ResourceManager.GetString("Validation.Phone", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; field cannot be empty..
+        /// </summary>
+        public static string Validation_Required {
+            get {
+                return ResourceManager.GetString("Validation.Required", resourceCulture);
             }
         }
     }

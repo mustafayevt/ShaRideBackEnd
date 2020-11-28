@@ -90,7 +90,7 @@ namespace ShaRide.Application.Services.Concrate
 
         public async Task<LocationResponse> UpdateLocation(UpdateLocationRequest request)
         {
-            var updatedLocation = await _dbContext.Locations.FirstOrDefaultAsync(x => x.Id == request.Id);
+            var updatedLocation = await _dbContext.Locations.AsTracking().FirstOrDefaultAsync(x => x.Id == request.Id);
             
             if(updatedLocation== null)
                 throw new ApiException(_localizer[LocalizationKeys.NOT_FOUND]);
@@ -104,7 +104,7 @@ namespace ShaRide.Application.Services.Concrate
 
         public async Task<LocationPointResponse> UpdateLocationPoint(UpdateLocationPointRequest request)
         {
-            var updatedLocationPoint = await _dbContext.LocationPoints.FirstOrDefaultAsync(x => x.LocationId == request.LocationId);
+            var updatedLocationPoint = await _dbContext.LocationPoints.AsTracking().FirstOrDefaultAsync(x => x.LocationId == request.LocationId);
 
             
             if(updatedLocationPoint== null)
