@@ -3,10 +3,12 @@ using AutoMapper;
 using ShaRide.Application.DTO.Request;
 using ShaRide.Application.DTO.Request.Account;
 using ShaRide.Application.DTO.Request.BanType;
+using ShaRide.Application.DTO.Request.CarBrand;
 using ShaRide.Application.DTO.Request.Location;
 using ShaRide.Application.DTO.Request.Restriction;
 using ShaRide.Application.DTO.Response;
 using ShaRide.Application.DTO.Response.BanType;
+using ShaRide.Application.DTO.Response.CarBrand;
 using ShaRide.Application.DTO.Response.Location;
 using ShaRide.Application.DTO.Response.Restriction;
 using ShaRide.Domain.Entities;
@@ -63,6 +65,14 @@ namespace ShaRide.Application.Mappings
             CreateMap<BanType, InsertBanTypeRequest>().ReverseMap();
             CreateMap<BanType, UpdateBanTypeRequest>().ReverseMap();
             CreateMap<BanType, BanTypeResponse>().ReverseMap();
+
+            #endregion
+
+            #region CarBrand
+
+            CreateMap<CarBrand, InsertCarBrandRequest>().ReverseMap();
+            CreateMap<CarBrand, UpdateCarBrandRequest>().ReverseMap();
+            CreateMap<CarBrand, CarBrandResponse>().ReverseMap();
 
             #endregion
         }

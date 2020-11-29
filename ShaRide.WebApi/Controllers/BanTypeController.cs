@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -53,7 +54,7 @@ namespace ShaRide.WebApi.Controllers
         /// <param name="request"></param>
         /// <returns></returns>
         [HttpPost("InsertBanType")]
-        [ProducesResponseType(typeof(BanTypeResponse),200)]
+        [ProducesResponseType(typeof(BanTypeResponse),201)]
         public async Task<IActionResult> InsertBanType(InsertBanTypeRequest request)
         {
             return Ok(await _banTypeService.InsertBanType(request));
