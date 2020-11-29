@@ -7,6 +7,6 @@ namespace ShaRide.Domain.Entities
     public class Location : BaseEntity
     {
         public string Name { get; set; }
-        public ICollection<LocationPoint> LocationPoints { get;}
+        public ICollection<LocationPoint> LocationPoints { get; set; }
     }
 }
