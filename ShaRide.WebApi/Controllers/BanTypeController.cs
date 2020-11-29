@@ -32,7 +32,7 @@ namespace ShaRide.WebApi.Controllers
         [ProducesResponseType(typeof(ICollection<BanTypeResponse>),200)]
         public async Task<IActionResult> GetBanTypes()
         {
-            return Ok(await _banTypeService.GetBanTypes());
+            return Ok(await _banTypeService.GetBanTypesAsync());
         }
 
         /// <summary>
@@ -45,7 +45,7 @@ namespace ShaRide.WebApi.Controllers
         [ProducesResponseType(typeof(BanTypeResponse),200)]
         public async Task<IActionResult> GetBanTypeById(int id)
         {
-            return Ok(await _banTypeService.GetBanTypeById(id));
+            return Ok(await _banTypeService.GetBanTypeByIdAsync(id));
         }
 
         /// <summary>
@@ -57,7 +57,7 @@ namespace ShaRide.WebApi.Controllers
         [ProducesResponseType(typeof(BanTypeResponse),201)]
         public async Task<IActionResult> InsertBanType(InsertBanTypeRequest request)
         {
-            return Ok(await _banTypeService.InsertBanType(request));
+            return Ok(await _banTypeService.InsertBanTypeAsync(request));
         }
 
         /// <summary>
@@ -69,7 +69,7 @@ namespace ShaRide.WebApi.Controllers
         [ProducesResponseType(typeof(ICollection<BanTypeResponse>),200)]
         public async Task<IActionResult> InsertBanTypes(ICollection<InsertBanTypeRequest> request)
         {
-            return Ok(await _banTypeService.InsertBanTypes(request));
+            return Ok(await _banTypeService.InsertBanTypesAsync(request));
         }
         
         /// <summary>
@@ -81,7 +81,7 @@ namespace ShaRide.WebApi.Controllers
         [ProducesResponseType(typeof(BanTypeResponse),200)]
         public async Task<IActionResult> UpdateBanType(UpdateBanTypeRequest request)
         {
-            return Ok(await _banTypeService.UpdateBanType(request));
+            return Ok(await _banTypeService.UpdateBanTypeAsync(request));
         }
 
         /// <summary>
@@ -92,7 +92,7 @@ namespace ShaRide.WebApi.Controllers
         [HttpDelete("DeleteBanType/{id}")]
         public async Task<IActionResult> DeleteBanType(int id)
         {
-            await _banTypeService.DeleteBanType(id);
+            await _banTypeService.DeleteBanTypeAsync(id);
             return Ok();
         }
     }

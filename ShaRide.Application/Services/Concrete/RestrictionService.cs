@@ -28,14 +28,14 @@ namespace ShaRide.Application.Services.Concrete
             _localizer = localizer;
         }
 
-        public async Task<ICollection<RestrictionResponse>> GetRestrictions()
+        public async Task<ICollection<RestrictionResponse>> GetRestrictionsAsync()
         {
             var restrictions = await _dbContext.Restrictions.Where(x=>x.IsRowActive).ToListAsync();
 
             return _mapper.Map<ICollection<RestrictionResponse>>(restrictions);
         }
 
-        public async Task<RestrictionResponse> GetRestrictionById(int request)
+        public async Task<RestrictionResponse> GetRestrictionByIdAsync(int request)
         {
             var restriction = await _dbContext.Restrictions.Where(x=>x.IsRowActive).FirstOrDefaultAsync(x => x.Id == request);
 
@@ -45,7 +45,7 @@ namespace ShaRide.Application.Services.Concrete
             return _mapper.Map<RestrictionResponse>(restriction);
         }
 
-        public async Task<RestrictionResponse> InsertRestriction(InsertRestrictionRequest request)
+        public async Task<RestrictionResponse> InsertRestrictionAsync(InsertRestrictionRequest request)
         {
             //validation
             if(_dbContext.Restrictions.Where(x=>x.IsRowActive).Any(x=>x.Title == request.Title))
@@ -60,7 +60,7 @@ namespace ShaRide.Application.Services.Concrete
             return _mapper.Map<RestrictionResponse>(insertedRestriction.Entity);
         }
 
-        public async Task<ICollection<RestrictionResponse>> InsertRestrictions(ICollection<InsertRestrictionRequest> request)
+        public async Task<ICollection<RestrictionResponse>> InsertRestrictionsAsync(ICollection<InsertRestrictionRequest> request)
         {
             ICollection<Restriction> insertedRestrictions = new List<Restriction>();
 
@@ -82,7 +82,7 @@ namespace ShaRide.Application.Services.Concrete
             return _mapper.Map<ICollection<RestrictionResponse>>(insertedRestrictions);
         }
 
-        public async Task<RestrictionResponse> UpdateRestriction(UpdateRestrictionRequest request)
+        public async Task<RestrictionResponse> UpdateRestrictionAsync(UpdateRestrictionRequest request)
         {
             var updatedRestriction = await _dbContext.Restrictions.Where(x=>x.IsRowActive).AsTracking().FirstOrDefaultAsync(x => x.Id == request.Id);
 
@@ -97,7 +97,7 @@ namespace ShaRide.Application.Services.Concrete
             return _mapper.Map<RestrictionResponse>(updatedRestriction);
         }
 
-        public async Task DeleteRestriction(int request)
+        public async Task DeleteRestrictionAsync(int request)
         {
             var deleteRestriction = await _dbContext.Restrictions.Where(x=>x.IsRowActive).AsTracking().FirstOrDefaultAsync(x => x.Id == request);
 

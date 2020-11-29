@@ -7,11 +7,11 @@ namespace ShaRide.Application.Services.Interface
 {
     public interface IBanTypeService
     {
-        Task<ICollection<BanTypeResponse>> GetBanTypes();
-        Task<BanTypeResponse> GetBanTypeById(int request);
-        Task<BanTypeResponse> InsertBanType(InsertBanTypeRequest request);
-        Task<ICollection<BanTypeResponse>> InsertBanTypes(ICollection<InsertBanTypeRequest> request);
-        Task<BanTypeResponse> UpdateBanType(UpdateBanTypeRequest request);
-        Task DeleteBanType(int request);
+        Task<ICollection<BanTypeResponse>> GetBanTypesAsync();
+        Task<BanTypeResponse> GetBanTypeByIdAsync(int request);
+        Task<BanTypeResponse> InsertBanTypeAsync(InsertBanTypeRequest request);
+        Task<ICollection<BanTypeResponse>> InsertBanTypesAsync(ICollection<InsertBanTypeRequest> request);
+        Task<BanTypeResponse> UpdateBanTypeAsync(UpdateBanTypeRequest request);
+        Task DeleteBanTypeAsync(int request);
     }
 }

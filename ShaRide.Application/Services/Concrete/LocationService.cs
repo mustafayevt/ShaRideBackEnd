@@ -28,7 +28,7 @@ namespace ShaRide.Application.Services.Concrete
             _localizer = localizer;
         }
 
-        public async Task<ICollection<LocationResponse>> GetLocations()
+        public async Task<ICollection<LocationResponse>> GetLocationsAsync()
         {
             var locations = await _dbContext.Locations.Where(x=>x.IsRowActive).ToListAsync();
             
@@ -40,21 +40,21 @@ namespace ShaRide.Application.Services.Concrete
             return _mapper.Map<ICollection<LocationResponse>>(locations);
         }
 
-        public async Task<ICollection<LocationPointResponse>> GetLocationPoints()
+        public async Task<ICollection<LocationPointResponse>> GetLocationPointsAsync()
         {
             var locationPoints = await _dbContext.LocationPoints.Where(x=>x.IsRowActive).ToListAsync();
 
             return _mapper.Map<ICollection<LocationPointResponse>>(locationPoints);
         }
 
-        public async Task<ICollection<LocationPointResponse>> GetLocationPointsByLocationId(int request)
+        public async Task<ICollection<LocationPointResponse>> GetLocationPointsByLocationIdAsync(int request)
         {
             var locationPoints = await _dbContext.LocationPoints.Where(x => x.LocationId == request && x.IsRowActive).ToListAsync();
 
             return _mapper.Map<ICollection<LocationPointResponse>>(locationPoints);
         }
 
-        public async Task<LocationResponse> GetLocationById(int request)
+        public async Task<LocationResponse> GetLocationByIdAsync(int request)
         {
             var location = await _dbContext.Locations.Where(x=>x.IsRowActive).AsTracking().FirstOrDefaultAsync(x => x.Id == request);
 
@@ -64,7 +64,7 @@ namespace ShaRide.Application.Services.Concrete
             return _mapper.Map<LocationResponse>(location);
         }
 
-        public async Task<LocationResponse> InsertLocation(InsertLocationRequest request)
+        public async Task<LocationResponse> InsertLocationAsync(InsertLocationRequest request)
         {
             var location = _mapper.Map<Location>(request);
 
@@ -75,7 +75,7 @@ namespace ShaRide.Application.Services.Concrete
             return _mapper.Map<LocationResponse>(insertedLocation.Entity);
         }
 
-        public async Task<LocationPointResponse> InsertLocationPoint(InsertLocationPointRequest request)
+        public async Task<LocationPointResponse> InsertLocationPointAsync(InsertLocationPointRequest request)
         {
             if (!_dbContext.Locations.Where(x => x.IsRowActive).Any(x => x.Id == request.LocationId))
                 throw new ApiException(_localizer[LocalizationKeys.NOT_FOUND,request.LocationId]);
@@ -89,7 +89,7 @@ namespace ShaRide.Application.Services.Concrete
             return _mapper.Map<LocationPointResponse>(insertedLocationPoint.Entity);
         }
 
-        public async Task<LocationResponse> UpdateLocation(UpdateLocationRequest request)
+        public async Task<LocationResponse> UpdateLocationAsync(UpdateLocationRequest request)
         {
             var updatedLocation = await _dbContext.Locations.Where(x=>x.IsRowActive).AsTracking().FirstOrDefaultAsync(x => x.Id == request.Id);
             
@@ -103,7 +103,7 @@ namespace ShaRide.Application.Services.Concrete
             return _mapper.Map<LocationResponse>(updatedLocation);
         }
 
-        public async Task<LocationPointResponse> UpdateLocationPoint(UpdateLocationPointRequest request)
+        public async Task<LocationPointResponse> UpdateLocationPointAsync(UpdateLocationPointRequest request)
         {
             var updatedLocationPoint = await _dbContext.LocationPoints.Where(x=>x.IsRowActive).AsTracking().FirstOrDefaultAsync(x => x.LocationId == request.LocationId);
 
@@ -126,7 +126,7 @@ namespace ShaRide.Application.Services.Concrete
             return _mapper.Map<LocationPointResponse>(updatedLocationPoint);
         }
 
-        public async Task DeleteLocation(int request)
+        public async Task DeleteLocationAsync(int request)
         {
             var deletedLocation = await _dbContext.Locations.Where(x=>x.IsRowActive).AsTracking().FirstOrDefaultAsync(x => x.Id == request);
             
@@ -138,7 +138,7 @@ namespace ShaRide.Application.Services.Concrete
             await _dbContext.SaveChangesAsync();
         }
 
-        public async Task DeleteLocationPoint(int request)
+        public async Task DeleteLocationPointAsync(int request)
         {
             var deletedLocationPoint = await _dbContext.LocationPoints.Where(x=>x.IsRowActive).AsTracking().FirstOrDefaultAsync(x => x.Id == request);
             

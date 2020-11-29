@@ -28,14 +28,14 @@ namespace ShaRide.Application.Services.Concrete
             _localizer = localizer;
         }
 
-        public async Task<ICollection<CarBrandResponse>> GetCarBrands()
+        public async Task<ICollection<CarBrandResponse>> GetCarBrandsAsync()
         {
             var carBrands = await _dbContext.CarBrands.ToListAsync();
 
             return _mapper.Map<ICollection<CarBrandResponse>>(carBrands);
         }
 
-        public async Task<CarBrandResponse> GetCarBrandById(int request)
+        public async Task<CarBrandResponse> GetCarBrandByIdAsync(int request)
         {
             var carBrand = await _dbContext.CarBrands.Where(x=>x.IsRowActive).FirstOrDefaultAsync(x => x.Id == request);
 
@@ -45,7 +45,7 @@ namespace ShaRide.Application.Services.Concrete
             return _mapper.Map<CarBrandResponse>(carBrand);
         }
 
-        public async Task<CarBrandResponse> InsertCarBrand(InsertCarBrandRequest request)
+        public async Task<CarBrandResponse> InsertCarBrandAsync(InsertCarBrandRequest request)
         {
             var carBrand = _mapper.Map<CarBrand>(request);
 
@@ -60,7 +60,7 @@ namespace ShaRide.Application.Services.Concrete
             return _mapper.Map<CarBrandResponse>(insertedCarBrand.Entity);
         }
 
-        public async Task<ICollection<CarBrandResponse>> InsertCarBrands(ICollection<InsertCarBrandRequest> request)
+        public async Task<ICollection<CarBrandResponse>> InsertCarBrandsAsync(ICollection<InsertCarBrandRequest> request)
         {
             ICollection<CarBrand> insertedCarBrands = new List<CarBrand>();
 
@@ -82,7 +82,7 @@ namespace ShaRide.Application.Services.Concrete
             return _mapper.Map<ICollection<CarBrandResponse>>(insertedCarBrands);
         }
 
-        public async Task<CarBrandResponse> UpdateCarBrand(UpdateCarBrandRequest request)
+        public async Task<CarBrandResponse> UpdateCarBrandAsync(UpdateCarBrandRequest request)
         {
             var updatedCarBrand = await _dbContext.CarBrands.Where(x=>x.IsRowActive).AsTracking().FirstOrDefaultAsync(x => x.Id == request.Id);
 
@@ -96,7 +96,7 @@ namespace ShaRide.Application.Services.Concrete
             return _mapper.Map<CarBrandResponse>(updatedCarBrand);
         }
 
-        public async Task DeleteCarBrand(int request)
+        public async Task DeleteCarBrandAsync(int request)
         {
             var deleteCarBrand = await _dbContext.CarBrands.Where(x=>x.IsRowActive).AsTracking().FirstOrDefaultAsync(x => x.Id == request);
 

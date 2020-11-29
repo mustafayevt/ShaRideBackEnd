@@ -32,7 +32,7 @@ namespace ShaRide.WebApi.Controllers
         [ProducesResponseType(typeof(ICollection<CarBrandResponse>),200)]
         public async Task<IActionResult> GetCarBrands()
         {
-            return Ok(await _carBrandService.GetCarBrands());
+            return Ok(await _carBrandService.GetCarBrandsAsync());
         }
 
         /// <summary>
@@ -45,7 +45,7 @@ namespace ShaRide.WebApi.Controllers
         [ProducesResponseType(typeof(CarBrandResponse),200)]
         public async Task<IActionResult> GetCarBrandById(int id)
         {
-            return Ok(await _carBrandService.GetCarBrandById(id));
+            return Ok(await _carBrandService.GetCarBrandByIdAsync(id));
         }
 
         /// <summary>
@@ -57,7 +57,7 @@ namespace ShaRide.WebApi.Controllers
         [ProducesResponseType(typeof(CarBrandResponse),201)]
         public async Task<IActionResult> InsertCarBrand(InsertCarBrandRequest request)
         {
-            return Ok(await _carBrandService.InsertCarBrand(request));
+            return Ok(await _carBrandService.InsertCarBrandAsync(request));
         }
 
         /// <summary>
@@ -69,7 +69,7 @@ namespace ShaRide.WebApi.Controllers
         [ProducesResponseType(typeof(ICollection<CarBrandResponse>),200)]
         public async Task<IActionResult> InsertCarBrands(ICollection<InsertCarBrandRequest> request)
         {
-            return Ok(await _carBrandService.InsertCarBrands(request));
+            return Ok(await _carBrandService.InsertCarBrandsAsync(request));
         }
         
         /// <summary>
@@ -81,7 +81,7 @@ namespace ShaRide.WebApi.Controllers
         [ProducesResponseType(typeof(CarBrandResponse),200)]
         public async Task<IActionResult> UpdateCarBrand(UpdateCarBrandRequest request)
         {
-            return Ok(await _carBrandService.UpdateCarBrand(request));
+            return Ok(await _carBrandService.UpdateCarBrandAsync(request));
         }
 
         /// <summary>
@@ -92,7 +92,7 @@ namespace ShaRide.WebApi.Controllers
         [HttpDelete("DeleteCarBrand/{id}")]
         public async Task<IActionResult> DeleteCarBrand(int id)
         {
-            await _carBrandService.DeleteCarBrand(id);
+            await _carBrandService.DeleteCarBrandAsync(id);
             return Ok();
         }
     }

@@ -7,11 +7,11 @@ namespace ShaRide.Application.Services.Interface
 {
     public interface ICarModelService
     {
-        Task<ICollection<CarModelResponse>> GetCarModels();
-        Task<CarModelResponse> GetCarModelById(int request);
-        Task<CarModelResponse> InsertCarModel(InsertCarModelRequest request);
-        Task<ICollection<CarModelResponse>> InsertCarModels(ICollection<InsertCarModelRequest> request);
-        Task<CarModelResponse> UpdateCarModel(UpdateCarModelRequest request);
-        Task DeleteCarModel(int request);
+        Task<ICollection<CarModelResponse>> GetCarModelsAsync();
+        Task<CarModelResponse> GetCarModelByIdAsync(int request);
+        Task<CarModelResponse> InsertCarModelAsync(InsertCarModelRequest request);
+        Task<ICollection<CarModelResponse>> InsertCarModelsAsync(ICollection<InsertCarModelRequest> request);
+        Task<CarModelResponse> UpdateCarModelAsync(UpdateCarModelRequest request);
+        Task DeleteCarModelAsync(int request);
     }
 }

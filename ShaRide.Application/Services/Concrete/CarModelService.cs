@@ -30,7 +30,7 @@ namespace ShaRide.Application.Services.Concrete
             _localizer = localizer;
         }
 
-        public async Task<ICollection<CarModelResponse>> GetCarModels()
+        public async Task<ICollection<CarModelResponse>> GetCarModelsAsync()
         {
             var carModels = await _dbContext.CarModels
                 .Where(x => x.IsRowActive)
@@ -47,7 +47,7 @@ namespace ShaRide.Application.Services.Concrete
             return _mapper.Map<ICollection<CarModelResponse>>(carModels);
         }
 
-        public async Task<CarModelResponse> GetCarModelById(int request)
+        public async Task<CarModelResponse> GetCarModelByIdAsync(int request)
         {
             var carModel = await _dbContext.CarModels
                 .Where(x => x.IsRowActive)
@@ -64,7 +64,7 @@ namespace ShaRide.Application.Services.Concrete
             return _mapper.Map<CarModelResponse>(carModel);
         }
 
-        public async Task<CarModelResponse> InsertCarModel(InsertCarModelRequest request)
+        public async Task<CarModelResponse> InsertCarModelAsync(InsertCarModelRequest request)
         {
             var carModel = _mapper.Map<CarModel>(request);
 
@@ -90,7 +90,7 @@ namespace ShaRide.Application.Services.Concrete
             return _mapper.Map<CarModelResponse>(insertedCarModel.Entity);
         }
 
-        public async Task<ICollection<CarModelResponse>> InsertCarModels(ICollection<InsertCarModelRequest> request)
+        public async Task<ICollection<CarModelResponse>> InsertCarModelsAsync(ICollection<InsertCarModelRequest> request)
         {
             ICollection<CarModel> insertedCarModels = new List<CarModel>();
 
@@ -131,7 +131,7 @@ namespace ShaRide.Application.Services.Concrete
             return _mapper.Map<ICollection<CarModelResponse>>(insertedCarModels);
         }
 
-        public async Task<CarModelResponse> UpdateCarModel(UpdateCarModelRequest request)
+        public async Task<CarModelResponse> UpdateCarModelAsync(UpdateCarModelRequest request)
         {
             var updatedCarModel = await _dbContext.CarModels.Where(x => x.IsRowActive).AsTracking()
                 .FirstOrDefaultAsync(x => x.Id == request.Id);
@@ -152,7 +152,7 @@ namespace ShaRide.Application.Services.Concrete
             return _mapper.Map<CarModelResponse>(updatedCarModel);
         }
 
-        public async Task DeleteCarModel(int request)
+        public async Task DeleteCarModelAsync(int request)
         {
             var deleteCarModel = await _dbContext.CarModels.Where(x => x.IsRowActive).AsTracking()
                 .FirstOrDefaultAsync(x => x.Id == request);

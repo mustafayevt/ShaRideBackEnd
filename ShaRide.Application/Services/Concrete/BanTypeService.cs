@@ -28,14 +28,14 @@ namespace ShaRide.Application.Services.Concrete
             _localizer = localizer;
         }
 
-        public async Task<ICollection<BanTypeResponse>> GetBanTypes()
+        public async Task<ICollection<BanTypeResponse>> GetBanTypesAsync()
         {
             var banTypes = await _dbContext.BanTypes.Where(x => x.IsRowActive).ToListAsync();
 
             return _mapper.Map<ICollection<BanTypeResponse>>(banTypes);
         }
 
-        public async Task<BanTypeResponse> GetBanTypeById(int request)
+        public async Task<BanTypeResponse> GetBanTypeByIdAsync(int request)
         {
             var banType = await _dbContext.BanTypes.Where(x => x.IsRowActive).FirstOrDefaultAsync(x => x.Id == request);
 
@@ -45,7 +45,7 @@ namespace ShaRide.Application.Services.Concrete
             return _mapper.Map<BanTypeResponse>(banType);
         }
 
-        public async Task<BanTypeResponse> InsertBanType(InsertBanTypeRequest request)
+        public async Task<BanTypeResponse> InsertBanTypeAsync(InsertBanTypeRequest request)
         {
             var banType = _mapper.Map<BanType>(request);
 
@@ -60,7 +60,7 @@ namespace ShaRide.Application.Services.Concrete
             return _mapper.Map<BanTypeResponse>(insertedBanType.Entity);
         }
 
-        public async Task<ICollection<BanTypeResponse>> InsertBanTypes(ICollection<InsertBanTypeRequest> request)
+        public async Task<ICollection<BanTypeResponse>> InsertBanTypesAsync(ICollection<InsertBanTypeRequest> request)
         {
             ICollection<BanType> insertedBanTypes = new List<BanType>();
 
@@ -82,7 +82,7 @@ namespace ShaRide.Application.Services.Concrete
             return _mapper.Map<ICollection<BanTypeResponse>>(insertedBanTypes);
         }
 
-        public async Task<BanTypeResponse> UpdateBanType(UpdateBanTypeRequest request)
+        public async Task<BanTypeResponse> UpdateBanTypeAsync(UpdateBanTypeRequest request)
         {
             var updatedBanType = await _dbContext.BanTypes.Where(x => x.IsRowActive).AsTracking()
                 .FirstOrDefaultAsync(x => x.Id == request.Id);
@@ -98,7 +98,7 @@ namespace ShaRide.Application.Services.Concrete
             return _mapper.Map<BanTypeResponse>(updatedBanType);
         }
 
-        public async Task DeleteBanType(int request)
+        public async Task DeleteBanTypeAsync(int request)
         {
             var deleteBanType = await _dbContext.BanTypes.Where(x=>x.IsRowActive).AsTracking().FirstOrDefaultAsync(x => x.Id == request);
 

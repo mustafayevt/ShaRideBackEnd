@@ -32,7 +32,7 @@ namespace ShaRide.WebApi.Controllers
         [Produces(typeof(ICollection<LocationResponse>))]
         public async Task<IActionResult> GetLocations()
         {
-            return Ok(await _locationService.GetLocations());
+            return Ok(await _locationService.GetLocationsAsync());
         }
 
         /// <summary>
@@ -44,7 +44,7 @@ namespace ShaRide.WebApi.Controllers
         [Produces(typeof(LocationResponse))]
         public async Task<IActionResult> GetLocationPoints()
         {
-            return Ok(await _locationService.GetLocationPoints());
+            return Ok(await _locationService.GetLocationPointsAsync());
         }
 
         /// <summary>
@@ -57,7 +57,7 @@ namespace ShaRide.WebApi.Controllers
         [Produces(typeof(ICollection<LocationResponse>))]
         public async Task<IActionResult> GetLocationPointsByLocationId(int locationId)
         {
-            return Ok(await _locationService.GetLocationPointsByLocationId(locationId));
+            return Ok(await _locationService.GetLocationPointsByLocationIdAsync(locationId));
         }
 
         /// <summary>
@@ -70,7 +70,7 @@ namespace ShaRide.WebApi.Controllers
         [Produces(typeof(LocationResponse))]
         public async Task<IActionResult> GetLocationById(int id)
         {
-            return Ok(await _locationService.GetLocationById(id));
+            return Ok(await _locationService.GetLocationByIdAsync(id));
         }
 
         /// <summary>
@@ -82,7 +82,7 @@ namespace ShaRide.WebApi.Controllers
         [Produces(typeof(LocationResponse))]
         public async Task<IActionResult> InsertLocation(InsertLocationRequest locationRequest)
         {
-            return Ok(await _locationService.InsertLocation(locationRequest));
+            return Ok(await _locationService.InsertLocationAsync(locationRequest));
         }
 
         /// <summary>
@@ -94,7 +94,7 @@ namespace ShaRide.WebApi.Controllers
         [Produces(typeof(LocationPointResponse))]
         public async Task<IActionResult> InsertLocationPoint(InsertLocationPointRequest locationPointRequest)
         {
-            return Ok(await _locationService.InsertLocationPoint(locationPointRequest));
+            return Ok(await _locationService.InsertLocationPointAsync(locationPointRequest));
         }
 
         /// <summary>
@@ -106,7 +106,7 @@ namespace ShaRide.WebApi.Controllers
         [Produces(typeof(LocationResponse))]
         public async Task<IActionResult> UpdateLocation(UpdateLocationRequest locationRequest)
         {
-            return Ok(await _locationService.UpdateLocation(locationRequest));
+            return Ok(await _locationService.UpdateLocationAsync(locationRequest));
         }
 
         /// <summary>
@@ -118,7 +118,7 @@ namespace ShaRide.WebApi.Controllers
         [Produces(typeof(LocationPointResponse))]
         public async Task<IActionResult> UpdateLocationPoint(UpdateLocationPointRequest locationPointRequest)
         {
-            return Ok(await _locationService.UpdateLocationPoint(locationPointRequest));
+            return Ok(await _locationService.UpdateLocationPointAsync(locationPointRequest));
         }
 
         /// <summary>
@@ -130,7 +130,7 @@ namespace ShaRide.WebApi.Controllers
         [ProducesResponseType(200)]
         public async Task<IActionResult> DeleteLocation(int locationId)
         {
-            await _locationService.DeleteLocation(locationId);
+            await _locationService.DeleteLocationAsync(locationId);
 
             return Ok();
         }
@@ -144,7 +144,7 @@ namespace ShaRide.WebApi.Controllers
         [ProducesResponseType(200)]
         public async Task<IActionResult> DeleteLocationPoint(int id)
         {
-            await _locationService.DeleteLocationPoint(id);
+            await _locationService.DeleteLocationPointAsync(id);
 
             return Ok();
         }

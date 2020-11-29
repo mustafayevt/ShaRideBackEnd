@@ -31,7 +31,7 @@ namespace ShaRide.WebApi.Controllers
         [ProducesResponseType(typeof(ICollection<RestrictionResponse>),200)]
         public async Task<IActionResult> GetRestrictions()
         {
-            return Ok(await _restrictionService.GetRestrictions());
+            return Ok(await _restrictionService.GetRestrictionsAsync());
         }
 
         /// <summary>
@@ -44,7 +44,7 @@ namespace ShaRide.WebApi.Controllers
         [ProducesResponseType(typeof(RestrictionResponse),200)]
         public async Task<IActionResult> GetRestrictionById(int id)
         {
-            return Ok(await _restrictionService.GetRestrictionById(id));
+            return Ok(await _restrictionService.GetRestrictionByIdAsync(id));
         }
 
         /// <summary>
@@ -56,7 +56,7 @@ namespace ShaRide.WebApi.Controllers
         [ProducesResponseType(typeof(RestrictionResponse),200)]
         public async Task<IActionResult> InsertRestriction(InsertRestrictionRequest request)
         {
-            return Ok(await _restrictionService.InsertRestriction(request));
+            return Ok(await _restrictionService.InsertRestrictionAsync(request));
         }
 
         /// <summary>
@@ -68,7 +68,7 @@ namespace ShaRide.WebApi.Controllers
         [ProducesResponseType(typeof(ICollection<RestrictionResponse>),200)]
         public async Task<IActionResult> InsertRestrictions(ICollection<InsertRestrictionRequest> request)
         {
-            return Ok(await _restrictionService.InsertRestrictions(request));
+            return Ok(await _restrictionService.InsertRestrictionsAsync(request));
         }
         
         /// <summary>
@@ -80,7 +80,7 @@ namespace ShaRide.WebApi.Controllers
         [ProducesResponseType(typeof(RestrictionResponse),200)]
         public async Task<IActionResult> UpdateRestriction(UpdateRestrictionRequest request)
         {
-            return Ok(await _restrictionService.UpdateRestriction(request));
+            return Ok(await _restrictionService.UpdateRestrictionAsync(request));
         }
 
         /// <summary>
@@ -91,7 +91,7 @@ namespace ShaRide.WebApi.Controllers
         [HttpDelete("DeleteRestriction/{id}")]
         public async Task<IActionResult> DeleteRestriction(int id)
         {
-            await _restrictionService.DeleteRestriction(id);
+            await _restrictionService.DeleteRestrictionAsync(id);
             return Ok();
         }
     }

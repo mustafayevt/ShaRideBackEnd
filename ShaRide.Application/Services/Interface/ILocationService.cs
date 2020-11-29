@@ -10,16 +10,16 @@ namespace ShaRide.Application.Services.Interface
 {
     public interface ILocationService
     {
-        Task<ICollection<LocationResponse>> GetLocations();
-        Task<ICollection<LocationPointResponse>> GetLocationPoints();
-        Task<ICollection<LocationPointResponse>> GetLocationPointsByLocationId(int request);
-        Task<LocationResponse> GetLocationById(int request);
-        Task<LocationResponse> InsertLocation(InsertLocationRequest request);
-        Task<LocationPointResponse> InsertLocationPoint(InsertLocationPointRequest request);
-        Task<LocationResponse> UpdateLocation(UpdateLocationRequest request);
-        Task<LocationPointResponse> UpdateLocationPoint(UpdateLocationPointRequest request);
-        Task DeleteLocation(int request);
-        Task DeleteLocationPoint(int request);
+        Task<ICollection<LocationResponse>> GetLocationsAsync();
+        Task<ICollection<LocationPointResponse>> GetLocationPointsAsync();
+        Task<ICollection<LocationPointResponse>> GetLocationPointsByLocationIdAsync(int request);
+        Task<LocationResponse> GetLocationByIdAsync(int request);
+        Task<LocationResponse> InsertLocationAsync(InsertLocationRequest request);
+        Task<LocationPointResponse> InsertLocationPointAsync(InsertLocationPointRequest request);
+        Task<LocationResponse> UpdateLocationAsync(UpdateLocationRequest request);
+        Task<LocationPointResponse> UpdateLocationPointAsync(UpdateLocationPointRequest request);
+        Task DeleteLocationAsync(int request);
+        Task DeleteLocationPointAsync(int request);
     }
 
 }
