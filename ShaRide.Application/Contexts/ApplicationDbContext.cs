@@ -92,7 +92,7 @@ namespace ShaRide.Application.Contexts
             
             builder.Entity<RestrictionRideComposition>().HasKey(x => new {x.RestrictionId, x.RideId});
 
-            builder.Entity<Restriction>().HasIndex(x => x.Title).IsUnique();
+            builder.Entity<Restriction>().HasIndex(x => x.Title);
 
             #endregion
         }

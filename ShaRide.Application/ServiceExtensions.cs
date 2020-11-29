@@ -52,6 +52,7 @@ namespace ShaRide.Application
             services.AddTransient<ILocationService, LocationService>();
             services.AddTransient<IRestrictionService, RestrictionService>();
             services.AddTransient<IBanTypeService, BanTypeService>();
+            services.AddTransient<ICarBrandService, CarBrandService>();
             #endregion
             
             services.Configure<JWTSettings>(configuration.GetSection("JWTSettings"));

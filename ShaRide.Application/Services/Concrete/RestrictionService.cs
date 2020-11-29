@@ -30,14 +30,14 @@ namespace ShaRide.Application.Services.Concrete
 
         public async Task<ICollection<RestrictionResponse>> GetRestrictions()
         {
-            var restrictions = await _dbContext.Restrictions.ToListAsync();
+            var restrictions = await _dbContext.Restrictions.Where(x=>x.IsRowActive).ToListAsync();
 
             return _mapper.Map<ICollection<RestrictionResponse>>(restrictions);
         }
 
         public async Task<RestrictionResponse> GetRestrictionById(int request)
         {
-            var restriction = await _dbContext.Restrictions.FirstOrDefaultAsync(x => x.Id == request);
+            var restriction = await _dbContext.Restrictions.Where(x=>x.IsRowActive).FirstOrDefaultAsync(x => x.Id == request);
 
             if (restriction == null)
                 throw new ApiException(_localizer[LocalizationKeys.RESTRICTOIN_NOT_FOUND,request]);
@@ -47,11 +47,11 @@ namespace ShaRide.Application.Services.Concrete
 
         public async Task<RestrictionResponse> InsertRestriction(InsertRestrictionRequest request)
         {
-            var restriction = _mapper.Map<Restriction>(request);
-
             //validation
-            if(_dbContext.Restrictions.Any(x=>x.Title == request.Title))
+            if(_dbContext.Restrictions.Where(x=>x.IsRowActive).Any(x=>x.Title == request.Title))
                 throw new ApiException(_localizer[LocalizationKeys.RESTRICTION_ALREADY_EXISTS]);
+            
+            var restriction = _mapper.Map<Restriction>(request);
             
             var insertedRestriction = await _dbContext.Restrictions.AddAsync(restriction);
 
@@ -67,7 +67,7 @@ namespace ShaRide.Application.Services.Concrete
             foreach (var insertRestrictionRequest in request)
             {
                 // passes through from existing restriction.
-                if(_dbContext.Restrictions.Any(x=>x.Title == insertRestrictionRequest.Title))
+                if(_dbContext.Restrictions.Where(x=>x.IsRowActive).Any(x=>x.Title == insertRestrictionRequest.Title))
                     continue;
                 
                 var restriction = _mapper.Map<Restriction>(insertRestrictionRequest);
@@ -84,7 +84,7 @@ namespace ShaRide.Application.Services.Concrete
 
         public async Task<RestrictionResponse> UpdateRestriction(UpdateRestrictionRequest request)
         {
-            var updatedRestriction = await _dbContext.Restrictions.AsTracking().FirstOrDefaultAsync(x => x.Id == request.Id);
+            var updatedRestriction = await _dbContext.Restrictions.Where(x=>x.IsRowActive).AsTracking().FirstOrDefaultAsync(x => x.Id == request.Id);
 
             if (updatedRestriction == null)
                 throw new ApiException(_localizer[LocalizationKeys.RESTRICTOIN_NOT_FOUND,request.Id]);
@@ -99,12 +99,12 @@ namespace ShaRide.Application.Services.Concrete
 
         public async Task DeleteRestriction(int request)
         {
-            var deleteRestriction = await _dbContext.Restrictions.FirstOrDefaultAsync(x => x.Id == request);
+            var deleteRestriction = await _dbContext.Restrictions.Where(x=>x.IsRowActive).AsTracking().FirstOrDefaultAsync(x => x.Id == request);
 
             if (deleteRestriction == null)
                 throw new ApiException(_localizer[LocalizationKeys.RESTRICTOIN_NOT_FOUND,request]);
 
-            _dbContext.Restrictions.Remove(deleteRestriction);
+            deleteRestriction.IsRowActive = false;
 
             await _dbContext.SaveChangesAsync();
         }

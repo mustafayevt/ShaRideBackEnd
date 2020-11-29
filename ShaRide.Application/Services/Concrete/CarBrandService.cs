@@ -37,7 +37,7 @@ namespace ShaRide.Application.Services.Concrete
 
         public async Task<CarBrandResponse> GetCarBrandById(int request)
         {
-            var carBrand = await _dbContext.CarBrands.FirstOrDefaultAsync(x => x.Id == request);
+            var carBrand = await _dbContext.CarBrands.Where(x=>x.IsRowActive).FirstOrDefaultAsync(x => x.Id == request);
 
             if (carBrand == null)
                 throw new ApiException(_localizer[LocalizationKeys.NOT_FOUND,request]);
@@ -50,7 +50,7 @@ namespace ShaRide.Application.Services.Concrete
             var carBrand = _mapper.Map<CarBrand>(request);
 
             //validation
-            if(_dbContext.CarBrands.Any(x=>x.Title == request.Title))
+            if(_dbContext.CarBrands.Where(x=>x.IsRowActive).Any(x=>x.Title == request.Title))
                 throw new ApiException(_localizer[LocalizationKeys.ALREADY_EXISTS,request.Title]);
             
             var insertedCarBrand = await _dbContext.CarBrands.AddAsync(carBrand);
@@ -67,7 +67,7 @@ namespace ShaRide.Application.Services.Concrete
             foreach (var insertCarBrandRequest in request)
             {
                 // passes through from existing carBrand.
-                if(_dbContext.CarBrands.Any(x=>x.Title == insertCarBrandRequest.Title))
+                if(_dbContext.CarBrands.Where(x=>x.IsRowActive).Any(x=>x.Title == insertCarBrandRequest.Title))
                     continue;
                 
                 var carBrand = _mapper.Map<CarBrand>(insertCarBrandRequest);
@@ -84,7 +84,7 @@ namespace ShaRide.Application.Services.Concrete
 
         public async Task<CarBrandResponse> UpdateCarBrand(UpdateCarBrandRequest request)
         {
-            var updatedCarBrand = await _dbContext.CarBrands.AsTracking().FirstOrDefaultAsync(x => x.Id == request.Id);
+            var updatedCarBrand = await _dbContext.CarBrands.Where(x=>x.IsRowActive).AsTracking().FirstOrDefaultAsync(x => x.Id == request.Id);
 
             if (updatedCarBrand == null)
                 throw new ApiException(_localizer[LocalizationKeys.NOT_FOUND,request.Id]);
@@ -98,12 +98,12 @@ namespace ShaRide.Application.Services.Concrete
 
         public async Task DeleteCarBrand(int request)
         {
-            var deleteCarBrand = await _dbContext.CarBrands.FirstOrDefaultAsync(x => x.Id == request);
+            var deleteCarBrand = await _dbContext.CarBrands.Where(x=>x.IsRowActive).AsTracking().FirstOrDefaultAsync(x => x.Id == request);
 
             if (deleteCarBrand == null)
                 throw new ApiException(_localizer[LocalizationKeys.NOT_FOUND,request]);
 
-            _dbContext.CarBrands.Remove(deleteCarBrand);
+            deleteCarBrand.IsRowActive = false;
 
             await _dbContext.SaveChangesAsync();
         }

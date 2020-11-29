@@ -30,17 +30,17 @@ namespace ShaRide.Application.Services.Concrete
 
         public async Task<ICollection<BanTypeResponse>> GetBanTypes()
         {
-            var banTypes = await _dbContext.BanTypes.ToListAsync();
+            var banTypes = await _dbContext.BanTypes.Where(x => x.IsRowActive).ToListAsync();
 
             return _mapper.Map<ICollection<BanTypeResponse>>(banTypes);
         }
 
         public async Task<BanTypeResponse> GetBanTypeById(int request)
         {
-            var banType = await _dbContext.BanTypes.FirstOrDefaultAsync(x => x.Id == request);
+            var banType = await _dbContext.BanTypes.Where(x => x.IsRowActive).FirstOrDefaultAsync(x => x.Id == request);
 
             if (banType == null)
-                throw new ApiException(_localizer[LocalizationKeys.NOT_FOUND,request]);
+                throw new ApiException(_localizer[LocalizationKeys.NOT_FOUND, request]);
 
             return _mapper.Map<BanTypeResponse>(banType);
         }
@@ -50,9 +50,9 @@ namespace ShaRide.Application.Services.Concrete
             var banType = _mapper.Map<BanType>(request);
 
             //validation
-            if(_dbContext.BanTypes.Any(x=>x.Title == request.Title))
-                throw new ApiException(_localizer[LocalizationKeys.ALREADY_EXISTS,request.Title]);
-            
+            if (_dbContext.BanTypes.Where(x => x.IsRowActive).Any(x => x.Title == request.Title))
+                throw new ApiException(_localizer[LocalizationKeys.ALREADY_EXISTS, request.Title]);
+
             var insertedBanType = await _dbContext.BanTypes.AddAsync(banType);
 
             await _dbContext.SaveChangesAsync();
@@ -67,13 +67,13 @@ namespace ShaRide.Application.Services.Concrete
             foreach (var insertBanTypeRequest in request)
             {
                 // passes through from existing banType.
-                if(_dbContext.BanTypes.Any(x=>x.Title == insertBanTypeRequest.Title))
+                if (_dbContext.BanTypes.Where(x => x.IsRowActive).Any(x => x.Title == insertBanTypeRequest.Title))
                     continue;
-                
+
                 var banType = _mapper.Map<BanType>(insertBanTypeRequest);
 
                 var insertedBanType = await _dbContext.BanTypes.AddAsync(banType);
-                
+
                 insertedBanTypes.Add(insertedBanType.Entity);
             }
 
@@ -84,10 +84,11 @@ namespace ShaRide.Application.Services.Concrete
 
         public async Task<BanTypeResponse> UpdateBanType(UpdateBanTypeRequest request)
         {
-            var updatedBanType = await _dbContext.BanTypes.AsTracking().FirstOrDefaultAsync(x => x.Id == request.Id);
+            var updatedBanType = await _dbContext.BanTypes.Where(x => x.IsRowActive).AsTracking()
+                .FirstOrDefaultAsync(x => x.Id == request.Id);
 
             if (updatedBanType == null)
-                throw new ApiException(_localizer[LocalizationKeys.NOT_FOUND,request.Id]);
+                throw new ApiException(_localizer[LocalizationKeys.NOT_FOUND, request.Id]);
 
             updatedBanType.Title = request.Title;
             updatedBanType.AssetPath = request.AssetPath;
@@ -99,12 +100,12 @@ namespace ShaRide.Application.Services.Concrete
 
         public async Task DeleteBanType(int request)
         {
-            var deleteBanType = await _dbContext.BanTypes.FirstOrDefaultAsync(x => x.Id == request);
+            var deleteBanType = await _dbContext.BanTypes.Where(x=>x.IsRowActive).AsTracking().FirstOrDefaultAsync(x => x.Id == request);
 
             if (deleteBanType == null)
-                throw new ApiException(_localizer[LocalizationKeys.NOT_FOUND,request]);
+                throw new ApiException(_localizer[LocalizationKeys.NOT_FOUND, request]);
 
-            _dbContext.BanTypes.Remove(deleteBanType);
+            deleteBanType.IsRowActive = false;
 
             await _dbContext.SaveChangesAsync();
         }

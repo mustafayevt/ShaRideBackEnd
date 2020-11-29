@@ -37,21 +37,21 @@ namespace ShaRide.Application.Services.Concrete
 
         public async Task<ICollection<LocationPointResponse>> GetLocationPoints()
         {
-            var locationPoints = await _dbContext.LocationPoints.ToListAsync();
+            var locationPoints = await _dbContext.LocationPoints.Where(x=>x.IsRowActive).ToListAsync();
 
             return _mapper.Map<ICollection<LocationPointResponse>>(locationPoints);
         }
 
         public async Task<ICollection<LocationPointResponse>> GetLocationPointsByLocationId(int request)
         {
-            var locationPoints = await _dbContext.LocationPoints.Where(x => x.LocationId == request).ToListAsync();
+            var locationPoints = await _dbContext.LocationPoints.Where(x => x.LocationId == request && x.IsRowActive).ToListAsync();
 
             return _mapper.Map<ICollection<LocationPointResponse>>(locationPoints);
         }
 
         public async Task<LocationResponse> GetLocationById(int request)
         {
-            var location = await _dbContext.Locations.FirstOrDefaultAsync(x => x.Id == request);
+            var location = await _dbContext.Locations.Where(x=>x.IsRowActive).FirstOrDefaultAsync(x => x.Id == request);
 
             if (location == null)
                 throw new ApiException(_localizer[LocalizationKeys.NOT_FOUND]);
@@ -72,9 +72,10 @@ namespace ShaRide.Application.Services.Concrete
 
         public async Task<LocationPointResponse> InsertLocationPoint(InsertLocationPointRequest request)
         {
+            if (!_dbContext.Locations.Where(x => x.IsRowActive).Any(x => x.Id == request.LocationId))
+                throw new ApiException(_localizer[LocalizationKeys.NOT_FOUND,request.LocationId]);
+            
             var locationPoint = _mapper.Map<LocationPoint>(request);
-
-            var location = await GetLocationById(request.LocationId);
 
             var insertedLocationPoint = await _dbContext.LocationPoints.AddAsync(locationPoint);
 
@@ -85,7 +86,7 @@ namespace ShaRide.Application.Services.Concrete
 
         public async Task<LocationResponse> UpdateLocation(UpdateLocationRequest request)
         {
-            var updatedLocation = await _dbContext.Locations.AsTracking().FirstOrDefaultAsync(x => x.Id == request.Id);
+            var updatedLocation = await _dbContext.Locations.Where(x=>x.IsRowActive).AsTracking().FirstOrDefaultAsync(x => x.Id == request.Id);
             
             if(updatedLocation== null)
                 throw new ApiException(_localizer[LocalizationKeys.NOT_FOUND]);
@@ -99,14 +100,14 @@ namespace ShaRide.Application.Services.Concrete
 
         public async Task<LocationPointResponse> UpdateLocationPoint(UpdateLocationPointRequest request)
         {
-            var updatedLocationPoint = await _dbContext.LocationPoints.AsTracking().FirstOrDefaultAsync(x => x.LocationId == request.LocationId);
+            var updatedLocationPoint = await _dbContext.LocationPoints.Where(x=>x.IsRowActive).AsTracking().FirstOrDefaultAsync(x => x.LocationId == request.LocationId);
 
             
             if(updatedLocationPoint== null)
                 throw new ApiException(_localizer[LocalizationKeys.NOT_FOUND]);
             
             
-            var location = await _dbContext.Locations.FirstOrDefaultAsync(x => x.Id == request.LocationId);
+            var location = await _dbContext.Locations.Where(x=>x.IsRowActive).FirstOrDefaultAsync(x => x.Id == request.LocationId);
 
             if (location == null)
                 throw new ApiException(_localizer[LocalizationKeys.NOT_FOUND]);
@@ -122,24 +123,24 @@ namespace ShaRide.Application.Services.Concrete
 
         public async Task DeleteLocation(int request)
         {
-            var deletedLocation = await _dbContext.Locations.FirstOrDefaultAsync(x => x.Id == request);
+            var deletedLocation = await _dbContext.Locations.Where(x=>x.IsRowActive).AsTracking().FirstOrDefaultAsync(x => x.Id == request);
             
             if(deletedLocation == null)
                 throw new ApiException(_localizer[LocalizationKeys.NOT_FOUND]);
 
-            _dbContext.Locations.Remove(deletedLocation);
+            deletedLocation.IsRowActive = false;
 
             await _dbContext.SaveChangesAsync();
         }
 
         public async Task DeleteLocationPoint(int request)
         {
-            var deletedLocationPoint = await _dbContext.LocationPoints.FirstOrDefaultAsync(x => x.Id == request);
+            var deletedLocationPoint = await _dbContext.LocationPoints.Where(x=>x.IsRowActive).AsTracking().FirstOrDefaultAsync(x => x.Id == request);
             
             if(deletedLocationPoint == null)
                 throw new ApiException(_localizer[LocalizationKeys.NOT_FOUND]);
 
-            _dbContext.LocationPoints.Remove(deletedLocationPoint);
+            deletedLocationPoint.IsRowActive = false;
 
             await _dbContext.SaveChangesAsync();
         }
