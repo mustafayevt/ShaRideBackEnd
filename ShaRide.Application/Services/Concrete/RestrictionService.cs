@@ -13,7 +13,7 @@ using ShaRide.Application.Localize;
 using ShaRide.Application.Services.Interface;
 using ShaRide.Domain.Entities;
 
-namespace ShaRide.Application.Services.Concrate
+namespace ShaRide.Application.Services.Concrete
 {
     public class RestrictionService : IRestrictionService
     {

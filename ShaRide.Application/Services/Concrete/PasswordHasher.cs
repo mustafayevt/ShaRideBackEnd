@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Security.Cryptography;
 using System.Text;
-using Microsoft.AspNetCore.Identity;
-using ShaRide.Application.Services.Interface;
 
-namespace ShaRide.Application.Services.Concrate
+namespace ShaRide.Application.Services.Concrete
 {
     public static class PasswordHasher
     {

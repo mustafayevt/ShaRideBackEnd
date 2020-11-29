@@ -13,9 +13,7 @@ using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using ShaRide.Application.DTO.Request;
 using ShaRide.Application.DTO.Request.Account;
-using ShaRide.Application.DTO.Response;
 using ShaRide.Application.DTO.Response.Account;
 using ShaRide.Application.Helpers;
 using ShaRide.Application.Localize;
@@ -25,7 +23,7 @@ using ShaRide.Domain.Entities;
 using ShaRide.Domain.Enums;
 using ShaRide.Domain.Settings;
 
-namespace ShaRide.Application.Services.Concrate
+namespace ShaRide.Application.Services.Concrete
 {
     public class AccountService : IAccountService
     {
@@ -169,6 +167,7 @@ namespace ShaRide.Application.Services.Concrate
             {
                 new Claim(JwtRegisteredClaimNames.Sub, user.Phones.FirstOrDefault(x => x.IsMain).Number),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                new Claim(JwtRegisteredClaimNames.NameId, string.Concat(user.Name," - ", user.Surname)),
                 new Claim("uid", user.Id.ToString()),
                 new Claim("ip", ipAddress)
             }

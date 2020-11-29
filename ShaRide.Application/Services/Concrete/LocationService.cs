@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -7,18 +6,14 @@ using AutoWrapper.Wrappers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Localization;
 using ShaRide.Application.Contexts;
-using ShaRide.Application.DTO.Request;
 using ShaRide.Application.DTO.Request.Location;
-using ShaRide.Application.DTO.Response;
 using ShaRide.Application.DTO.Response.Location;
 using ShaRide.Application.Helpers;
 using ShaRide.Application.Localize;
-using ShaRide.Application.Migrations;
 using ShaRide.Application.Services.Interface;
 using ShaRide.Domain.Entities;
-using ShaRide.Domain.Enums;
 
-namespace ShaRide.Application.Services.Concrate
+namespace ShaRide.Application.Services.Concrete
 {
     public class LocationService : ILocationService
     {

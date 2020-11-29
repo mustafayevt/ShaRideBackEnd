@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using ShaRide.Application.Contexts;
-using ShaRide.Application.Services.Concrate;
+using ShaRide.Application.Services.Concrete;
 using ShaRide.Domain.Entities;
 using ShaRide.Domain.Enums;
 

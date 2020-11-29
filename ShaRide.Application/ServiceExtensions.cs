@@ -15,7 +15,7 @@ using ShaRide.Application.Contexts;
 using ShaRide.Application.DTO.Request;
 using ShaRide.Application.Helpers;
 using ShaRide.Application.Managers;
-using ShaRide.Application.Services.Concrate;
+using ShaRide.Application.Services.Concrete;
 using ShaRide.Application.Services.Interface;
 using ShaRide.Domain.Settings;
 
@@ -51,6 +51,7 @@ namespace ShaRide.Application
             services.AddTransient<IVerificationCodeService, VerificationCodeService>();
             services.AddTransient<ILocationService, LocationService>();
             services.AddTransient<IRestrictionService, RestrictionService>();
+            services.AddTransient<IBanTypeService, BanTypeService>();
             #endregion
             
             services.Configure<JWTSettings>(configuration.GetSection("JWTSettings"));

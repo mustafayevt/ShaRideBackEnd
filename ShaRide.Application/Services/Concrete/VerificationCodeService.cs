@@ -1,11 +1,10 @@
-﻿using System;
-using System.Net.Http;
+﻿using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using ShaRide.Application.Helpers;
 using ShaRide.Application.Services.Interface;
 
-namespace ShaRide.Application.Services.Concrate
+namespace ShaRide.Application.Services.Concrete
 {
     public class VerificationCodeService : IVerificationCodeService
     {

@@ -42,4 +42,7 @@
     <data name="Validation.Phone" xml:space="preserve">
         <value>Telefon formadı düzgün deyil.</value>
     </data>
+    <data name="Exception.AlreadyExists" xml:space="preserve">
+        <value>'{0}' artıq mövcuddur.</value>
+    </data>
 </root>

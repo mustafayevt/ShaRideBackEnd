@@ -27,13 +27,18 @@ namespace ShaRide.WebApi
             //Initialize Logger
             Log.Logger = new LoggerConfiguration()
                 .Enrich.FromLogContext()
-                .WriteTo.Console()  
-                .WriteTo.PostgreSQL(config.GetConnectionString("DefaultConnection"),"Logs",needAutoCreateTable:true,restrictedToMinimumLevel:LogEventLevel.Warning)
-                .WriteTo.Debug(outputTemplate:DateTime.Now.ToString(CultureInfo.InvariantCulture))
-                .WriteTo.File("../logs/log.txt",rollingInterval:RollingInterval.Day)
+                .WriteTo.Console()
+                .WriteTo.PostgreSQL(
+                    connectionString: config.GetConnectionString("DefaultConnection"),
+                    tableName: "logs",
+                    restrictedToMinimumLevel:LogEventLevel.Information,
+                    needAutoCreateTable:true
+                )
+                .WriteTo.Debug(outputTemplate: DateTime.Now.ToString(CultureInfo.InvariantCulture))
+                .WriteTo.File("../logs/log.txt", rollingInterval: RollingInterval.Day)
                 .CreateLogger();
             Serilog.Debugging.SelfLog.Enable(Console.Error);
-            
+
             var host = CreateHostBuilder(args).Build();
             using (var scope = host.Services.CreateScope())
             {
@@ -58,14 +63,16 @@ namespace ShaRide.WebApi
                     Log.Warning(ex, "An error occurred seeding the DB");
                 }
             }
+
             await host.RunAsync();
         }
+
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
-            .UseSerilog() //Uses Serilog instead of default .NET Logger
+                .UseSerilog() //Uses Serilog instead of default .NET Logger
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
-                    webBuilder.UseStartup<Startup>().UseUrls("https://localhost:4242","http://localhost:4243");
+                    webBuilder.UseStartup<Startup>().UseUrls("https://localhost:4242", "http://localhost:4243");
                 });
     }
 }

@@ -61,6 +61,15 @@ namespace ShaRide.Application.Localize {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; artıq mövcuddur..
+        /// </summary>
+        public static string Exception_AlreadyExists {
+            get {
+                return ResourceManager.GetString("Exception.AlreadyExists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to &apos;{0}&apos; üçün giriş məlumatları səhvdir..
         /// </summary>
         public static string Exception_InvalidCredentials {

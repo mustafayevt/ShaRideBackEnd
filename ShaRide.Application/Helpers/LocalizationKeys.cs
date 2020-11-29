@@ -13,6 +13,12 @@
         public const string NOT_FOUND = "Exception.NotFound";
 
         /// <summary>
+        /// Use case : exception.
+        /// Has 'already existing field' parameter.
+        /// </summary>
+        public const string ALREADY_EXISTS = "Exception.AlreadyExists";
+
+        /// <summary>
         /// User case: exception.
         /// Parent id cannot be null
         /// </summary>

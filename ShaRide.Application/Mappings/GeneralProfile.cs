@@ -2,9 +2,11 @@
 using AutoMapper;
 using ShaRide.Application.DTO.Request;
 using ShaRide.Application.DTO.Request.Account;
+using ShaRide.Application.DTO.Request.BanType;
 using ShaRide.Application.DTO.Request.Location;
 using ShaRide.Application.DTO.Request.Restriction;
 using ShaRide.Application.DTO.Response;
+using ShaRide.Application.DTO.Response.BanType;
 using ShaRide.Application.DTO.Response.Location;
 using ShaRide.Application.DTO.Response.Restriction;
 using ShaRide.Domain.Entities;
@@ -53,6 +55,14 @@ namespace ShaRide.Application.Mappings
             CreateMap<Restriction, InsertRestrictionRequest>().ReverseMap();
             CreateMap<Restriction, UpdateRestrictionRequest>().ReverseMap();
             CreateMap<Restriction, RestrictionResponse>().ReverseMap();
+
+            #endregion
+
+            #region BanType
+
+            CreateMap<BanType, InsertBanTypeRequest>().ReverseMap();
+            CreateMap<BanType, UpdateBanTypeRequest>().ReverseMap();
+            CreateMap<BanType, BanTypeResponse>().ReverseMap();
 
             #endregion
         }
