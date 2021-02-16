@@ -45,4 +45,7 @@
     <data name="Exception.AlreadyExists" xml:space="preserve">
         <value>'{0}' artıq mövcuddur.</value>
     </data>
+    <data name="Validation.Range" xml:space="preserve">
+        <value>'{0}' xanası yalnız {1} - {2} arasında ola bilər.</value>
+    </data>
 </root>

@@ -6,9 +6,14 @@
     public enum LocationPointType
     {
         /// <summary>
-        /// Start-Finish point.
+        /// Start point.
         /// </summary>
-        StartFinishPoint,
+        StartPoint,
+        
+        /// <summary>
+        /// Finish point.
+        /// </summary>
+        FinishPoint,
         
         /// <summary>
         /// Rest point.

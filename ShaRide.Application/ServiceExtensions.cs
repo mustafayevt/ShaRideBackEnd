@@ -45,15 +45,17 @@ namespace ShaRide.Application
             services.AddTransient<IAccountService, AccountService>();
             services.Configure<MailSettings>(configuration.GetSection("MailSettings"));
             services.Configure<TheTexting>(configuration.GetSection("TheTexting"));
-            services.AddTransient<IDateTimeService, DateTimeService>();
-            services.AddTransient<IEmailService, EmailService>();
-            services.AddTransient<IVerificationCodeService, VerificationCodeService>();
-            services.AddTransient<IVerificationCodeService, VerificationCodeService>();
-            services.AddTransient<ILocationService, LocationService>();
-            services.AddTransient<IRestrictionService, RestrictionService>();
-            services.AddTransient<IBanTypeService, BanTypeService>();
-            services.AddTransient<ICarBrandService, CarBrandService>();
-            services.AddTransient<ICarModelService, CarModelService>();
+            services.AddScoped<IDateTimeService, DateTimeService>();
+            services.AddScoped<IEmailService, EmailService>();
+            services.AddScoped<IVerificationCodeService, VerificationCodeService>();
+            services.AddScoped<IVerificationCodeService, VerificationCodeService>();
+            services.AddScoped<ILocationService, LocationService>();
+            services.AddScoped<IRestrictionService, RestrictionService>();
+            services.AddScoped<IBanTypeService, BanTypeService>();
+            services.AddScoped<ICarBrandService, CarBrandService>();
+            services.AddScoped<ICarModelService, CarModelService>();
+            services.AddScoped<IRideService, RideService>();
+            services.AddScoped<ICarService, CarService>();
             #endregion
             
             services.Configure<JWTSettings>(configuration.GetSection("JWTSettings"));

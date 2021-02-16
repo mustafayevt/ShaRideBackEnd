@@ -31,7 +31,7 @@ namespace ShaRide.WebApi
             services.AddApplicationLayer(Configuration);
             services.AddSwaggerExtension();
             services.AddHealthChecks();
-            services.AddScoped<IAuthenticatedUserService, AuthenticatedUserService>();
+            services.AddTransient<IAuthenticatedUserService, AuthenticatedUserService>();
             services.AddLocalization();
             services.AddCors();
             services.AddMvc()
@@ -66,7 +66,8 @@ namespace ShaRide.WebApi
                 ShowIsErrorFlagForSuccessfulResponse = true,
                 EnableResponseLogging = true,
                 LogRequestDataOnException = true,
-                IgnoreNullValue = true
+                IgnoreNullValue = true,
+                IsApiOnly = false
             });
             var cultures = new List<CultureInfo> {
                 new CultureInfo("en"),
@@ -78,6 +79,7 @@ namespace ShaRide.WebApi
                 options.SupportedUICultures = cultures;
             });
             app.UseHttpsRedirection();
+            app.UseStaticFiles();
             app.UseRouting();
             app.UseCors("CorsPolicy");
             app.UseAuthentication();

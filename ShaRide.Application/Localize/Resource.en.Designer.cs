@@ -133,6 +133,15 @@ namespace ShaRide.Application.Localize {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; field can only be between {1} - {2}..
+        /// </summary>
+        public static string Validation_Range {
+            get {
+                return ResourceManager.GetString("Validation.Range", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to &apos;{0}&apos; field cannot be empty..
         /// </summary>
         public static string Validation_Required {

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using ShaRide.Application.Attributes;
+using ShaRide.Application.DTO.Request.Common;
 using ShaRide.Application.Helpers;
 
 namespace ShaRide.Application.DTO.Request.Account

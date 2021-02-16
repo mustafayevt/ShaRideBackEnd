@@ -42,7 +42,7 @@ namespace ShaRide.Application.Services.Concrete
 
         public async Task<ICollection<LocationPointResponse>> GetLocationPointsAsync()
         {
-            var locationPoints = await _dbContext.LocationPoints.Where(x=>x.IsRowActive).ToListAsync();
+            var locationPoints = await _dbContext.LocationPoints.Include(x=>x.Location).Where(x=>x.IsRowActive).ToListAsync();
 
             return _mapper.Map<ICollection<LocationPointResponse>>(locationPoints);
         }
@@ -59,7 +59,7 @@ namespace ShaRide.Application.Services.Concrete
             var location = await _dbContext.Locations.Where(x=>x.IsRowActive).AsTracking().FirstOrDefaultAsync(x => x.Id == request);
 
             if (location == null)
-                throw new ApiException(_localizer[LocalizationKeys.NOT_FOUND]);
+                throw new ApiException(_localizer[LocalizationKeys.NOT_FOUND,request]);
 
             return _mapper.Map<LocationResponse>(location);
         }
@@ -119,7 +119,6 @@ namespace ShaRide.Application.Services.Concrete
 
             updatedLocationPoint.Name = request.Name;
             updatedLocationPoint.LocationId = request.LocationId;
-            updatedLocationPoint.LocationPointType = request.LocationPointType;
 
             await _dbContext.SaveChangesAsync();
 

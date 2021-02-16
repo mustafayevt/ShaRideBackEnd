@@ -19,7 +19,7 @@
         public const string ALREADY_EXISTS = "Exception.AlreadyExists";
 
         /// <summary>
-        /// User case: exception.
+        /// Use case: exception.
         /// Parent id cannot be null
         /// </summary>
         public const string PARENT_ID_NOT_PROVIDED = "Exception.ParentIdNotProvided";
@@ -80,5 +80,10 @@
         /// Use case: validation error.
         /// </summary>
         public const string PASSWORD = "Validation.Password";
+
+        /// <summary>
+        /// Use case : validation error.
+        /// </summary>
+        public const string RANGE_VALIDATION = "Validation.Range";
     }
 }

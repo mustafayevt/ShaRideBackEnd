@@ -61,5 +61,43 @@
     </Compile>
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="wwwroot" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="wwwroot\images\footer-bg.svg" />
+    <_ContentIncludedByDefault Remove="wwwroot\images\hero-bg-bottom.svg" />
+    <_ContentIncludedByDefault Remove="wwwroot\images\hero-bg-top.svg" />
+    <_ContentIncludedByDefault Remove="wwwroot\images\iphone-feature-01.png" />
+    <_ContentIncludedByDefault Remove="wwwroot\images\iphone-feature-02.png" />
+    <_ContentIncludedByDefault Remove="wwwroot\images\iphone-feature-03.png" />
+    <_ContentIncludedByDefault Remove="wwwroot\images\iphone-feature-04.png" />
+    <_ContentIncludedByDefault Remove="wwwroot\images\iphone-feature-bg-01.svg" />
+    <_ContentIncludedByDefault Remove="wwwroot\images\iphone-feature-bg-02.svg" />
+    <_ContentIncludedByDefault Remove="wwwroot\images\iphone-feature-bg-03.svg" />
+    <_ContentIncludedByDefault Remove="wwwroot\images\iphone-feature-bg-04.svg" />
+    <_ContentIncludedByDefault Remove="wwwroot\images\iphone-hero-bg.svg" />
+    <_ContentIncludedByDefault Remove="wwwroot\images\iphone-hero.png" />
+    <_ContentIncludedByDefault Remove="wwwroot\images\logo.svg" />
+    <_ContentIncludedByDefault Remove="wwwroot\scss\abstracts\_functions.scss" />
+    <_ContentIncludedByDefault Remove="wwwroot\scss\abstracts\_include-media.scss" />
+    <_ContentIncludedByDefault Remove="wwwroot\scss\abstracts\_mixins.scss" />
+    <_ContentIncludedByDefault Remove="wwwroot\scss\abstracts\_variables.scss" />
+    <_ContentIncludedByDefault Remove="wwwroot\scss\base\_base.scss" />
+    <_ContentIncludedByDefault Remove="wwwroot\scss\base\_helpers.scss" />
+    <_ContentIncludedByDefault Remove="wwwroot\scss\base\_typography.scss" />
+    <_ContentIncludedByDefault Remove="wwwroot\scss\components\_buttons.scss" />
+    <_ContentIncludedByDefault Remove="wwwroot\scss\layout\_cta.scss" />
+    <_ContentIncludedByDefault Remove="wwwroot\scss\layout\_features-extended.scss" />
+    <_ContentIncludedByDefault Remove="wwwroot\scss\layout\_footer.scss" />
+    <_ContentIncludedByDefault Remove="wwwroot\scss\layout\_header.scss" />
+    <_ContentIncludedByDefault Remove="wwwroot\scss\layout\_hero.scss" />
+    <_ContentIncludedByDefault Remove="wwwroot\scss\layout\_main.scss" />
+    <_ContentIncludedByDefault Remove="wwwroot\scss\layout\_mockups.scss" />
+    <_ContentIncludedByDefault Remove="wwwroot\scss\style.scss" />
+    <_ContentIncludedByDefault Remove="wwwroot\scss\_normalize.scss" />
+  </ItemGroup>
+
 
 </Project>

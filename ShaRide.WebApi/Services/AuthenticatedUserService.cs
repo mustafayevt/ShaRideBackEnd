@@ -1,6 +1,8 @@
 ﻿using System.Security.Claims;
 using Microsoft.AspNetCore.Http;
+using ShaRide.Application.Contexts;
 using ShaRide.Application.Services.Interface;
+using ShaRide.Domain.Entities;
 
 namespace ShaRide.WebApi.Services
 {

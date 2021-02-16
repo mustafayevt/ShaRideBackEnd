@@ -45,4 +45,7 @@
     <data name="Exception.AlreadyExists" xml:space="preserve">
         <value>'{0}' already exists</value>
     </data>
+    <data name="Validation.Range" xml:space="preserve">
+        <value>'{0}' field can only be between {1} - {2}.</value>
+    </data>
 </root>

@@ -1,5 +1,8 @@
-﻿namespace ShaRide.Domain.Entities
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace ShaRide.Domain.Entities
 {
+    [Table(nameof(RestrictionRideComposition),Schema = "Ride")]
     public class RestrictionRideComposition
     {
         public int RideId { get; set; }

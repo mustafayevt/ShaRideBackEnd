@@ -6,6 +6,5 @@ namespace ShaRide.Application.DTO.Request.Location
     {
         public int LocationId { get; set; }
         public string Name { get; set; }
-        public LocationPointType LocationPointType { get; set; }
     }
 }

@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using ShaRide.Application.Helpers;
 
-namespace ShaRide.Application.DTO.Request.Account
+namespace ShaRide.Application.DTO.Request.Common
 {
     public class AttachmentRequest
     {

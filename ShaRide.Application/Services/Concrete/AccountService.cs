@@ -10,9 +10,11 @@ using System.Threading.Tasks;
 using AutoMapper;
 using AutoWrapper.Wrappers;
 using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using ShaRide.Application.Contexts;
 using ShaRide.Application.DTO.Request.Account;
 using ShaRide.Application.DTO.Response.Account;
 using ShaRide.Application.Helpers;
@@ -34,6 +36,7 @@ namespace ShaRide.Application.Services.Concrete
         private readonly IVerificationCodeService _verificationCodeService;
         private readonly IMapper _mapper;
         private readonly IStringLocalizer _localizer;
+        private readonly ApplicationDbContext _dbContext;
 
         public AccountService(UserManager userManager,
             IOptions<JWTSettings> jwtSettings,
@@ -41,7 +44,8 @@ namespace ShaRide.Application.Services.Concrete
             IEmailService emailService,
             IVerificationCodeService verificationCodeService,
             IMapper mapper,
-            IStringLocalizer<Resource> localizer)
+            IStringLocalizer<Resource> localizer,
+            ApplicationDbContext dbContext)
         {
             _userManager = userManager;
             _jwtSettings = jwtSettings.Value;
@@ -50,6 +54,7 @@ namespace ShaRide.Application.Services.Concrete
             _verificationCodeService = verificationCodeService;
             _mapper = mapper;
             _localizer = localizer;
+            _dbContext = dbContext;
         }
 
         /// <summary>
@@ -101,7 +106,14 @@ namespace ShaRide.Application.Services.Concrete
             }
 
             var user = _mapper.Map<User>(request);
-            user.Img = request.Attachment.Content.ToArray();
+            user.UserImages = new List<UserImage>
+            {
+                new UserImage
+                {
+                    Image = request.Attachment.Content.ToArray(),
+                    Extension = request.Attachment.Extension
+                }
+            };
             var userResult = await _userManager.CreateAsync(user, request.Password);
             if (userResult.Succeeded)
             {
@@ -146,6 +158,21 @@ namespace ShaRide.Application.Services.Concrete
         }
 
         /// <summary>
+        /// Gets user thumbnail photo.
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        /// <exception cref="ApiException"></exception>
+        public async Task<UserImage> GetUserThumbnailPhoto(int userId)
+        {
+            var userImage = await _dbContext.Users.Where(x => x.IsRowActive).Include(x=>x.UserImages).FirstOrDefaultAsync(x => x.Id == userId);
+            if(!_dbContext.Users.Where(x=>x.IsRowActive).Any(x=>x.Id == userId))
+                throw new ApiException(_localizer[LocalizationKeys.NOT_FOUND]);
+
+            return userImage.UserImages.FirstOrDefault(x => x.IsRowActive);
+        }
+
+        /// <summary>
         /// Generates jwt  
         /// </summary>
         /// <param name="user"></param>
@@ -155,7 +182,7 @@ namespace ShaRide.Application.Services.Concrete
             var roles = await _userManager.GetRolesAsync(user);
 
             var roleClaims = new List<Claim>();
-            
+
             for (int i = 0; i < roles.Count; i++)
             {
                 roleClaims.Add(new Claim("roles", roles[i]));
@@ -164,14 +191,14 @@ namespace ShaRide.Application.Services.Concrete
             string ipAddress = IpHelper.GetIpAddress();
 
             var claims = new[]
-            {
-                new Claim(JwtRegisteredClaimNames.Sub, user.Phones.FirstOrDefault(x => x.IsMain).Number),
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                new Claim(JwtRegisteredClaimNames.NameId, string.Concat(user.Name," - ", user.Surname)),
-                new Claim("uid", user.Id.ToString()),
-                new Claim("ip", ipAddress)
-            }
-             .Union(roleClaims);
+                {
+                    new Claim(JwtRegisteredClaimNames.Sub, user.Phones.FirstOrDefault(x => x.IsMain).Number),
+                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                    new Claim(JwtRegisteredClaimNames.NameId, string.Concat(user.Name, " - ", user.Surname)),
+                    new Claim("uid", user.Id.ToString()),
+                    new Claim("ip", ipAddress)
+                }
+                .Union(roleClaims);
 
             var symmetricSecurityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.Key));
             var signingCredentials = new SigningCredentials(symmetricSecurityKey, SecurityAlgorithms.HmacSha256);

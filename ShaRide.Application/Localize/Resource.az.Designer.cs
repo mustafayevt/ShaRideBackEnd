@@ -133,6 +133,15 @@ namespace ShaRide.Application.Localize {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; xanası yalnız {1} - {2} arasında ola bilər..
+        /// </summary>
+        public static string Validation_Range {
+            get {
+                return ResourceManager.GetString("Validation.Range", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to &apos;{0}&apos; xanası boş ola bilməz..
         /// </summary>
         public static string Validation_Required {

@@ -1,18 +1,20 @@
 ﻿using System.Linq;
 using AutoMapper;
-using ShaRide.Application.DTO.Request;
 using ShaRide.Application.DTO.Request.Account;
 using ShaRide.Application.DTO.Request.BanType;
+using ShaRide.Application.DTO.Request.Car;
 using ShaRide.Application.DTO.Request.CarBrand;
 using ShaRide.Application.DTO.Request.CarModel;
+using ShaRide.Application.DTO.Request.Common;
 using ShaRide.Application.DTO.Request.Location;
 using ShaRide.Application.DTO.Request.Restriction;
-using ShaRide.Application.DTO.Response;
+using ShaRide.Application.DTO.Request.Ride;
 using ShaRide.Application.DTO.Response.BanType;
 using ShaRide.Application.DTO.Response.CarBrand;
 using ShaRide.Application.DTO.Response.CarModel;
 using ShaRide.Application.DTO.Response.Location;
 using ShaRide.Application.DTO.Response.Restriction;
+using ShaRide.Application.DTO.Response.Ride;
 using ShaRide.Domain.Entities;
 
 namespace ShaRide.Application.Mappings
@@ -83,6 +85,57 @@ namespace ShaRide.Application.Mappings
             CreateMap<CarModel, InsertCarModelRequest>().ReverseMap();
             CreateMap<CarModel, UpdateCarModelRequest>().ReverseMap();
             CreateMap<CarModel, CarModelResponse>().ReverseMap();
+
+            #endregion
+
+            #region Ride
+
+            CreateMap<RideLocationPointComposition, RideLocationPointRequest>()
+                .ForMember(x => x.LocationPointId, opt => opt.MapFrom(y => y.LocationPointId))
+                .ForMember(x => x.LocationPointType, opt => opt.MapFrom(y => y.LocationPointType))
+                .ReverseMap();
+
+            CreateMap<RestrictionRideComposition, RideRestrictionRequest>()
+                .ForMember(x => x.IsPossible, opt => opt.MapFrom(y => y.IsPossible))
+                .ForMember(x => x.RestrictionId, opt => opt.MapFrom(y => y.RestrictionId))
+                .ReverseMap();
+
+            CreateMap<Ride, InsertRideRequest>()
+                .ForMember(x => x.DriverId, opt => opt.MapFrom(y => y.DriverId))
+                .ForMember(x => x.StartDate, opt => opt.MapFrom(y => y.StartDate))
+                .ForMember(x => x.PricePerSeat, opt => opt.MapFrom(y => y.PricePerSeat))
+                .ForMember(x => x.Note, opt => opt.MapFrom(y => y.Note))
+                .ForMember(x => x.RideState, opt => opt.MapFrom(y => y.RideState))
+                .ForMember(x => x.RideLocationPoints, opt => opt.MapFrom(y => y.RideLocationPointComposition))
+                .ForMember(x => x.RideRestrictions, opt => opt.MapFrom(y => y.RestrictionRideComposition))
+                .ForMember(x => x.RideSeatRequests, opt => opt.Ignore())
+                .ReverseMap();
+
+            CreateMap<Ride, RideResponse>()
+                .ForMember(x=>x.Id,opt=>opt.MapFrom(y=>y.Id))
+                .ReverseMap();
+            
+            #endregion
+
+            #region Car
+
+            CreateMap<CarImage, AttachmentRequest>()
+                .ForMember(x => x.Content, opt => opt.MapFrom(y => y.Image.ToList()))
+                .ForMember(x => x.Extension, opt => opt.MapFrom(y => y.Extension));
+            CreateMap<AttachmentRequest, CarImage>()
+                .ForMember(x => x.Image, opt => opt.MapFrom(y => y.Content.ToArray()))
+                .ForMember(x => x.Extension, opt => opt.MapFrom(y => y.Extension));
+
+            CreateMap<CarSeatComposition, InsertCarSeatCompositionRequest>()
+                .ForMember(x => x.Id, opt => opt.MapFrom(y => y.SeatId))
+                .ReverseMap();
+            
+            CreateMap<Car, InsertCarRequest>()
+                .ForMember(x => x.ModelId, opt => opt.MapFrom(y => y.CarModelId))
+                .ForMember(x => x.RegisterNumber, opt => opt.MapFrom(y => y.RegisterNumber))
+                .ForMember(x => x.CarImages, opt => opt.MapFrom(y => y.CarImages))
+                .ForMember(x => x.CarSeats, opt => opt.MapFrom(y => y.CarSeatComposition))
+                .ReverseMap();
 
             #endregion
         }

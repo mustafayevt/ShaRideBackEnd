@@ -12,9 +12,9 @@ namespace ShaRide.Domain.Entities
         public string Surname { get; set; }
         [Required]
         public string PasswordHash { get; set; }
-        public List<UserPhone> Phones { get; set; }
-        public byte[] Img { get; set; }
-        public string ImgExtension { get; set; }
-        public List<UserRoleComposition> UserRoleComposition { get; set; }
+        public short Rating { get; set; }
+        public ICollection<UserPhone> Phones { get; set; }
+        public ICollection<UserRoleComposition> UserRoleComposition { get; set; }
+        public ICollection<UserImage> UserImages { get; set; }
     }
 }

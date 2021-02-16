@@ -40,6 +40,29 @@ namespace ShaRide.Application.Migrations
                     b.ToTable("BanTypes");
                 });
 
+            modelBuilder.Entity("ShaRide.Domain.Entities.Car", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+
+                    b.Property<int>("CarModelId")
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("IsRowActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("RegisterNumber")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CarModelId");
+
+                    b.ToTable("Cars");
+                });
+
             modelBuilder.Entity("ShaRide.Domain.Entities.CarBrand", b =>
                 {
                     b.Property<int>("Id")
@@ -56,6 +79,32 @@ namespace ShaRide.Application.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("CarBrands");
+                });
+
+            modelBuilder.Entity("ShaRide.Domain.Entities.CarImage", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+
+                    b.Property<int>("CarId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Extension")
+                        .HasColumnType("text");
+
+                    b.Property<byte[]>("Image")
+                        .HasColumnType("bytea");
+
+                    b.Property<bool>("IsRowActive")
+                        .HasColumnType("boolean");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CarId");
+
+                    b.ToTable("CarImages");
                 });
 
             modelBuilder.Entity("ShaRide.Domain.Entities.CarModel", b =>
@@ -84,6 +133,37 @@ namespace ShaRide.Application.Migrations
                     b.HasIndex("CarBrandId");
 
                     b.ToTable("CarModels");
+                });
+
+            modelBuilder.Entity("ShaRide.Domain.Entities.CarSeatComposition", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+
+                    b.Property<int>("CarId")
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("IsRowActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("SeatId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("SeatRotate")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("SeatType")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CarId");
+
+                    b.HasIndex("SeatId");
+
+                    b.ToTable("CarSeatComposition","Ride");
                 });
 
             modelBuilder.Entity("ShaRide.Domain.Entities.Location", b =>
@@ -115,9 +195,6 @@ namespace ShaRide.Application.Migrations
                         .HasColumnType("boolean");
 
                     b.Property<int>("LocationId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("LocationPointType")
                         .HasColumnType("integer");
 
                     b.Property<string>("Name")
@@ -168,7 +245,7 @@ namespace ShaRide.Application.Migrations
 
                     b.HasIndex("RideId");
 
-                    b.ToTable("RestrictionRideComposition");
+                    b.ToTable("RestrictionRideComposition","Ride");
                 });
 
             modelBuilder.Entity("ShaRide.Domain.Entities.Ride", b =>
@@ -178,12 +255,80 @@ namespace ShaRide.Application.Migrations
                         .HasColumnType("integer")
                         .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
+                    b.Property<int>("DriverId")
+                        .HasColumnType("integer");
+
                     b.Property<bool>("IsRowActive")
                         .HasColumnType("boolean");
 
+                    b.Property<string>("Note")
+                        .HasColumnType("text");
+
+                    b.Property<decimal>("PricePerSeat")
+                        .HasColumnType("decimal(18,6)");
+
+                    b.Property<int>("RideState")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("timestamp without time zone");
+
                     b.HasKey("Id");
 
-                    b.ToTable("Rides");
+                    b.HasIndex("DriverId");
+
+                    b.ToTable("Rides","Ride");
+                });
+
+            modelBuilder.Entity("ShaRide.Domain.Entities.RideCarSeatComposition", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+
+                    b.Property<int?>("CarSeatCompositionId")
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("IsRowActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<int?>("PassengerId")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("RideId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("SeatStatus")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CarSeatCompositionId");
+
+                    b.HasIndex("PassengerId");
+
+                    b.HasIndex("RideId");
+
+                    b.ToTable("RideCarSeatComposition","Ride");
+                });
+
+            modelBuilder.Entity("ShaRide.Domain.Entities.RideLocationPointComposition", b =>
+                {
+                    b.Property<int>("RideId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("LocationPointId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("LocationPointType")
+                        .HasColumnType("integer");
+
+                    b.HasKey("RideId", "LocationPointId");
+
+                    b.HasIndex("LocationPointId");
+
+                    b.ToTable("RideLocationPointComposition");
                 });
 
             modelBuilder.Entity("ShaRide.Domain.Entities.Role", b =>
@@ -233,12 +378,6 @@ namespace ShaRide.Application.Migrations
                         .HasColumnType("integer")
                         .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
-                    b.Property<byte[]>("Img")
-                        .HasColumnType("bytea");
-
-                    b.Property<string>("ImgExtension")
-                        .HasColumnType("text");
-
                     b.Property<bool>("IsRowActive")
                         .HasColumnType("boolean");
 
@@ -250,6 +389,11 @@ namespace ShaRide.Application.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<short>("Rating")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("smallint")
+                        .HasDefaultValue((short)5);
+
                     b.Property<string>("Surname")
                         .IsRequired()
                         .HasColumnType("text");
@@ -257,6 +401,32 @@ namespace ShaRide.Application.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("User");
+                });
+
+            modelBuilder.Entity("ShaRide.Domain.Entities.UserImage", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+
+                    b.Property<string>("Extension")
+                        .HasColumnType("text");
+
+                    b.Property<byte[]>("Image")
+                        .HasColumnType("bytea");
+
+                    b.Property<bool>("IsRowActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserImage");
                 });
 
             modelBuilder.Entity("ShaRide.Domain.Entities.UserPhone", b =>
@@ -304,6 +474,24 @@ namespace ShaRide.Application.Migrations
                     b.ToTable("UserRoleComposition");
                 });
 
+            modelBuilder.Entity("ShaRide.Domain.Entities.Car", b =>
+                {
+                    b.HasOne("ShaRide.Domain.Entities.CarModel", "CarModel")
+                        .WithMany()
+                        .HasForeignKey("CarModelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("ShaRide.Domain.Entities.CarImage", b =>
+                {
+                    b.HasOne("ShaRide.Domain.Entities.Car", "Car")
+                        .WithMany("CarImages")
+                        .HasForeignKey("CarId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("ShaRide.Domain.Entities.CarModel", b =>
                 {
                     b.HasOne("ShaRide.Domain.Entities.BanType", "BanType")
@@ -315,6 +503,21 @@ namespace ShaRide.Application.Migrations
                     b.HasOne("ShaRide.Domain.Entities.CarBrand", "CarBrand")
                         .WithMany()
                         .HasForeignKey("CarBrandId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("ShaRide.Domain.Entities.CarSeatComposition", b =>
+                {
+                    b.HasOne("ShaRide.Domain.Entities.Car", "Car")
+                        .WithMany("CarSeatComposition")
+                        .HasForeignKey("CarId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ShaRide.Domain.Entities.Seat", "Seat")
+                        .WithMany()
+                        .HasForeignKey("SeatId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
@@ -337,8 +540,56 @@ namespace ShaRide.Application.Migrations
                         .IsRequired();
 
                     b.HasOne("ShaRide.Domain.Entities.Ride", "Ride")
-                        .WithMany()
+                        .WithMany("RestrictionRideComposition")
                         .HasForeignKey("RideId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("ShaRide.Domain.Entities.Ride", b =>
+                {
+                    b.HasOne("ShaRide.Domain.Entities.User", "Driver")
+                        .WithMany()
+                        .HasForeignKey("DriverId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("ShaRide.Domain.Entities.RideCarSeatComposition", b =>
+                {
+                    b.HasOne("ShaRide.Domain.Entities.CarSeatComposition", "CarSeatComposition")
+                        .WithMany()
+                        .HasForeignKey("CarSeatCompositionId");
+
+                    b.HasOne("ShaRide.Domain.Entities.User", "Passenger")
+                        .WithMany()
+                        .HasForeignKey("PassengerId");
+
+                    b.HasOne("ShaRide.Domain.Entities.Ride", null)
+                        .WithMany("RideCarSeatComposition")
+                        .HasForeignKey("RideId");
+                });
+
+            modelBuilder.Entity("ShaRide.Domain.Entities.RideLocationPointComposition", b =>
+                {
+                    b.HasOne("ShaRide.Domain.Entities.LocationPoint", "LocationPoint")
+                        .WithMany()
+                        .HasForeignKey("LocationPointId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ShaRide.Domain.Entities.Ride", "Ride")
+                        .WithMany("RideLocationPointComposition")
+                        .HasForeignKey("RideId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("ShaRide.Domain.Entities.UserImage", b =>
+                {
+                    b.HasOne("ShaRide.Domain.Entities.User", "User")
+                        .WithMany("UserImages")
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

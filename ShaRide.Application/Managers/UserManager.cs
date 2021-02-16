@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using ShaRide.Application.Contexts;
 using ShaRide.Application.Services.Concrete;
+using ShaRide.Application.Services.Interface;
 using ShaRide.Domain.Entities;
 using ShaRide.Domain.Enums;
 
@@ -17,13 +18,15 @@ namespace ShaRide.Application.Managers
     /// </summary>
     public class UserManager
     {
+        private readonly IAuthenticatedUserService _authenticatedUserService;
         private readonly ApplicationDbContext _dbContext;
 
         public IQueryable<User> Users => _dbContext.Users.AsQueryable();
 
-        public UserManager(ApplicationDbContext dbContext)
+        public UserManager(ApplicationDbContext dbContext, IAuthenticatedUserService authenticatedUserService)
         {
             _dbContext = dbContext;
+            _authenticatedUserService = authenticatedUserService;
         }
 
         /// <summary>
@@ -156,6 +159,27 @@ namespace ShaRide.Application.Managers
                 .Include(x => x.Role)
                 .Where(x => x.UserId == user.Id)
                 .Select(x => x.Role.RoleName).ToList();
+        }
+
+        /// <summary>
+        /// Gets current logged in user from db.
+        /// </summary>
+        /// <returns></returns>
+        public async Task<User> GetCurrentUser()
+        {
+            return await _dbContext.Users.FindAsync(_authenticatedUserService.UserId);
+        }
+
+        /// <summary>
+        /// Gets user by id from db.
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="user"></param>
+        /// <returns></returns>
+        public bool TryGetUserById(int userId, out User user )
+        {
+            user = _dbContext.Users.FirstOrDefault(x => x.Id.Equals(userId));
+            return user != null;
         }
     }
 }

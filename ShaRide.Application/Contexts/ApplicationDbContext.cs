@@ -80,17 +80,24 @@ namespace ShaRide.Application.Contexts
             builder.Entity<User>(entity =>
             {
                 entity.ToTable(name: "User");
-                entity.Property(e => e.Img)
-                    .HasColumnType("bytea");
+                entity.Property(x => x.Rating).HasDefaultValue(5);
             });
 
-            builder.Entity<User>()
-                .Property(e => e.Img)
-                .HasColumnType("bytea");
+            builder.Entity<UserImage>(entity =>
+            {
+                entity.Property(x => x.Image).HasColumnType("bytea");
+            });
+
+            builder.Entity<CarImage>(entity =>
+            {
+                entity.Property(x => x.Image).HasColumnType("bytea");
+            });
 
             builder.Entity<UserRoleComposition>().HasKey(x => new {x.UserId, x.RoleId});
             
             builder.Entity<RestrictionRideComposition>().HasKey(x => new {x.RestrictionId, x.RideId});
+            
+            builder.Entity<RideLocationPointComposition>().HasKey(x => new {x.RideId,x.LocationPointId});
 
             builder.Entity<Restriction>().HasIndex(x => x.Title);
 
@@ -115,6 +122,8 @@ namespace ShaRide.Application.Contexts
         public DbSet<CarModel> CarModels { get; set; }
         public DbSet<BanType> BanTypes { get; set; }
         public DbSet<Seat> Seats { get; set; }
+        public DbSet<CarImage> CarImages { get; set; }
+        public DbSet<Car> Cars { get; set; }
 
         #endregion
     }

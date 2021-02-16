@@ -1,14 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using AutoWrapper.Wrappers;
+﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Localization;
 using ShaRide.Application.Attributes;
-using ShaRide.Application.DTO.Request;
 using ShaRide.Application.DTO.Request.Account;
 using ShaRide.Application.DTO.Response.Account;
-using ShaRide.Application.Localize;
 using ShaRide.Application.Services.Interface;
 
 namespace ShaRide.WebApi.Controllers
@@ -57,6 +51,16 @@ namespace ShaRide.WebApi.Controllers
         public async Task<IActionResult> GetVerificationCodeAsync(string phoneNumber)
         {
             return Ok(await _accountService.GetVerificationCode(phoneNumber));
+        }
+
+        [HttpGet("get-user-thumbnail-photo")]
+        [Produces(typeof(byte[]))]
+        public async Task<IActionResult> GetUserThumbnailPhoto(int userId)
+        {
+            var image = await _accountService.GetUserThumbnailPhoto(userId);
+            var data = image.Image;
+            var filename = image.Id + image.Extension;
+            return File(data, "application/force-download", filename);
         }
 
         private string GenerateIpAddress()
