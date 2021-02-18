@@ -19,7 +19,7 @@ body{
     bottom: -40px;
     width: auto;
     height: auto;
-    background-image: url(https://konachan.com/sample/6db29ba9be15bf08a1192142e23052ff/Konachan.com%20-%20165420%20sample.jpg);
+    background-image: url(../images/login_background.jpg);
     background-size: cover;
     -webkit-filter: blur(5px);
     z-index: 0;
