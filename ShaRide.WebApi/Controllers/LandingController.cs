@@ -2,6 +2,7 @@
 
 namespace ShaRide.WebApi.Controllers
 {
+    [ApiExplorerSettings(IgnoreApi = true)]
     public class LandingController : Controller
     {
         [HttpGet("")]
