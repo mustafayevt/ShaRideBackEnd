@@ -3,6 +3,7 @@ using System.Reflection;
 using System.Text;
 using AutoMapper;
 using AutoWrapper.Wrappers;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
@@ -17,6 +18,7 @@ using ShaRide.Application.Helpers;
 using ShaRide.Application.Managers;
 using ShaRide.Application.Services.Concrete;
 using ShaRide.Application.Services.Interface;
+using ShaRide.Application.ViewModels;
 using ShaRide.Domain.Settings;
 
 namespace ShaRide.Application
@@ -59,14 +61,21 @@ namespace ShaRide.Application
             #endregion
             
             services.Configure<JWTSettings>(configuration.GetSection("JWTSettings"));
+            services.Configure<AdminAuthorizationRequest>(configuration.GetSection("AdminAuthorization"));
 
             #region Authentication
 
-            services.AddAuthentication(options =>
-            {
-                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            })
+            services.AddAuthentication(options => {
+                    options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+                })
+                .AddCookie(options =>
+                {
+                    options.LoginPath = "/Admin/Login";
+                    options.AccessDeniedPath = "/Admin/Login";
+                })
                 .AddJwtBearer(o =>
                 {
                     o.RequireHttpsMetadata = false;

@@ -1,0 +1,25 @@
+﻿@model ShaRide.Application.ViewModels.AdminAuthorizationRequest
+
+@{
+    ViewBag.Title = "Login page for staff";
+    Layout = "_Layout";
+}
+
+
+<link href="~/dist/css/admin_login_style.css" rel="stylesheet"/>
+
+<div class="body"></div>
+<div class="grad"></div>
+<div class="header">
+    <div>Sha<span>Ride</span></div>
+</div>
+<br>
+<form asp-action="Login" asp-controller="Admin" method="post">
+    <div class="login">
+        @Html.ValidationSummary()
+        <div asp-validation-summary="All"></div>
+        <input type="text" placeholder="username" name="username" asp-for="Model.Username"/><br/>
+        <input type="password" placeholder="password" name="password" asp-for="Model.Password"/><br/>
+        <input type="submit" value="Login">
+    </div>
+</form>
