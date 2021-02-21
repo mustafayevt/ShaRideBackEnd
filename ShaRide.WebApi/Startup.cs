@@ -13,7 +13,6 @@ using ShaRide.Application;
 using ShaRide.Application.Localize;
 using ShaRide.Application.Services.Interface;
 using ShaRide.WebApi.Extensions;
-using ShaRide.WebApi.Middlewares;
 using ShaRide.WebApi.Services;
 
 namespace ShaRide.WebApi
