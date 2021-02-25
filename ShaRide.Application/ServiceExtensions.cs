@@ -46,6 +46,7 @@ namespace ShaRide.Application
             services.AddTransient<UserManager>();
             services.AddTransient<IAccountService, AccountService>();
             services.AddTransient<ISmsService, SmsService>();
+            services.AddTransient<ICounterService, CounterService>();
             services.Configure<MailSettings>(configuration.GetSection("MailSettings"));
             services.Configure<TheTexting>(configuration.GetSection("TheTexting"));
             services.AddScoped<IDateTimeService, DateTimeService>();

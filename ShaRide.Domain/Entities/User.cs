@@ -12,6 +12,8 @@ namespace ShaRide.Domain.Entities
         public string Surname { get; set; }
         [Required]
         public string PasswordHash { get; set; }
+
+        public string UserUniqueKey { get; set; }
         public short Rating { get; set; }
         public ICollection<UserPhone> Phones { get; set; }
         public ICollection<UserRoleComposition> UserRoleComposition { get; set; }

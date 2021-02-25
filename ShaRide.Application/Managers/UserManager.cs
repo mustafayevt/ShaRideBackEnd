@@ -5,6 +5,7 @@ using System.Security.Authentication;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using ShaRide.Application.Constants;
 using ShaRide.Application.Contexts;
 using ShaRide.Application.Services.Concrete;
 using ShaRide.Application.Services.Interface;
@@ -19,14 +20,16 @@ namespace ShaRide.Application.Managers
     public class UserManager
     {
         private readonly IAuthenticatedUserService _authenticatedUserService;
+        private readonly ICounterService _counterService;
         private readonly ApplicationDbContext _dbContext;
 
         public IQueryable<User> Users => _dbContext.Users.AsQueryable();
 
-        public UserManager(ApplicationDbContext dbContext, IAuthenticatedUserService authenticatedUserService)
+        public UserManager(ApplicationDbContext dbContext, IAuthenticatedUserService authenticatedUserService, ICounterService counterService)
         {
             _dbContext = dbContext;
             _authenticatedUserService = authenticatedUserService;
+            _counterService = counterService;
         }
 
         /// <summary>
@@ -39,6 +42,16 @@ namespace ShaRide.Application.Managers
             var userPhone = await _dbContext.UserPhones.Include(x => x.User)
                 .FirstOrDefaultAsync(x => x.Number == phone);
             return userPhone?.User;
+        }
+
+        /// <summary>
+        /// Returns user by unique key.
+        /// </summary>
+        /// <param name="uniqueKey"></param>
+        /// <returns></returns>
+        public async Task<User> FindByUniqueKey(string uniqueKey)
+        {
+            return await _dbContext.Users.FirstOrDefaultAsync(x => x.UserUniqueKey == uniqueKey && x.IsRowActive);
         }
 
         /// <summary>
@@ -89,6 +102,7 @@ namespace ShaRide.Application.Managers
             {
                 var passwordHash = PasswordHasher.HashPassword(password);
                 user.PasswordHash = passwordHash;
+                user.UserUniqueKey = await GetNewUserUniqueKey();
                 await _dbContext.Users.AddAsync(user);
                 await _dbContext.SaveChangesAsync();
                 return IdentityResult.Success;
@@ -180,6 +194,18 @@ namespace ShaRide.Application.Managers
         {
             user = _dbContext.Users.FirstOrDefault(x => x.Id.Equals(userId));
             return user != null;
+        }
+
+        public async Task<string> GetNewUserUniqueKey()
+        {
+            var nextCounter = await _counterService.GetNextCounter(CounterConstants.USER_UNIQUE_KEY_COUNTER);
+
+            return FormatUserUniqueKey(nextCounter);
+        }
+
+        private string FormatUserUniqueKey(int counter)
+        {
+            return $"SH{counter}";
         }
     }
 }

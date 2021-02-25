@@ -1,12 +1,8 @@
 ﻿using System;
 using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using AutoWrapper.Wrappers;
-using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
-using ShaRide.Application.Contexts;
 using ShaRide.Application.DTO.Request.Sms;
 using ShaRide.Application.Helpers;
 using ShaRide.Application.Services.Interface;
@@ -15,13 +11,11 @@ namespace ShaRide.Application.Services.Concrete
 {
     public class SmsService : ISmsService
     {
-        private readonly ApplicationDbContext _dbContext;
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly IOptions<TheTexting> _textingOption;
 
-        public SmsService(ApplicationDbContext dbContext, IOptions<TheTexting> textingOption, IHttpClientFactory httpClientFactory)
+        public SmsService(IOptions<TheTexting> textingOption, IHttpClientFactory httpClientFactory)
         {
-            _dbContext = dbContext;
             _textingOption = textingOption;
             _httpClientFactory = httpClientFactory;
         }

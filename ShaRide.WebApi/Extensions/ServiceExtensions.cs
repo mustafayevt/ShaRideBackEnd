@@ -61,6 +61,14 @@ namespace ShaRide.WebApi.Extensions
                     In = ParameterLocation.Header,
                     Type = SecuritySchemeType.ApiKey,
                 });
+                c.AddSecurityDefinition("x-api-yigim-key", new OpenApiSecurityScheme
+                {
+                    Description =
+                        "Api Key for 'YIGIM' for authorize to the API",
+                    Name = "x-api-yigim-key",
+                    In = ParameterLocation.Header,
+                    Type = SecuritySchemeType.ApiKey,
+                });
                 c.AddSecurityRequirement(new OpenApiSecurityRequirement()
                 {
                     {
@@ -72,6 +80,22 @@ namespace ShaRide.WebApi.Extensions
                                 Id = "x-api-key"
                             },
                             Name = "x-api-key",
+                            In = ParameterLocation.Header,
+                        },
+                        new List<string>()
+                    }
+                });
+                c.AddSecurityRequirement(new OpenApiSecurityRequirement()
+                {
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference
+                            {
+                                Type = ReferenceType.SecurityScheme,
+                                Id = "x-api-yigim-key"
+                            },
+                            Name = "x-api-yigim-key",
                             In = ParameterLocation.Header,
                         },
                         new List<string>()

@@ -51,6 +51,7 @@ namespace ShaRide.WebApi
                     var userManager = services.GetRequiredService<UserManager>();
                     var dbContext = services.GetRequiredService<ApplicationDbContext>();
 
+                    await DefaultCounters.SeedAsync(dbContext);
                     await DefaultRoles.SeedAsync(userManager);
                     await DefaultAdminUsers.SeedAsync(userManager);
                     await DefaultSeats.SeedAsync(dbContext);
