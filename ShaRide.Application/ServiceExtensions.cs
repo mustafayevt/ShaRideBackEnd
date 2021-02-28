@@ -41,7 +41,7 @@ namespace ShaRide.Application
                     b => b.MigrationsAssembly(typeof(ApplicationDbContext).Assembly.FullName)));
             }
             #region Services
-            services.AddHttpClient("HttpClient");
+            services.AddHttpClient();
             services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddTransient<UserManager>();
             services.AddTransient<IAccountService, AccountService>();

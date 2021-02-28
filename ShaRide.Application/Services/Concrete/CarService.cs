@@ -30,7 +30,14 @@ namespace ShaRide.Application.Services.Concrete
 
         public async Task<ICollection<CarResponse>> GetCarsAsync()
         {
-            var cars = await _dbContext.Cars.Where(x => x.IsRowActive).ToListAsync();
+            var cars = await _dbContext.Cars
+                .Include(x=>x.CarImages)
+                .Include(x=>x.CarModel)
+                .ThenInclude(x=> x.CarBrand)
+                .Include(x=>x.CarModel)
+                .ThenInclude(x=>x.BanType)
+                .Where(x => x.IsRowActive)
+                .ToListAsync();
 
             return _mapper.Map<ICollection<CarResponse>>(cars);
         }

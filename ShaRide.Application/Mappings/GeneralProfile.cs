@@ -10,6 +10,7 @@ using ShaRide.Application.DTO.Request.Location;
 using ShaRide.Application.DTO.Request.Restriction;
 using ShaRide.Application.DTO.Request.Ride;
 using ShaRide.Application.DTO.Response.BanType;
+using ShaRide.Application.DTO.Response.Car;
 using ShaRide.Application.DTO.Response.CarBrand;
 using ShaRide.Application.DTO.Response.CarModel;
 using ShaRide.Application.DTO.Response.Location;
@@ -129,12 +130,27 @@ namespace ShaRide.Application.Mappings
             CreateMap<CarSeatComposition, InsertCarSeatCompositionRequest>()
                 .ForMember(x => x.Id, opt => opt.MapFrom(y => y.SeatId))
                 .ReverseMap();
+
+            CreateMap<CarSeatComposition, CarSeatCompositionResponse>()
+                .ForMember(x => x.Id, opt => opt.MapFrom(y => y.SeatId))
+                .ForMember(x => x.xCordinant, opt => opt.MapFrom(y => y.Seat.xCordinant))
+                .ForMember(x => x.yCordinant, opt => opt.MapFrom(y => y.Seat.yCordinant))
+                .ForMember(x => x.SeatType, opt => opt.MapFrom(y => y.SeatType))
+                .ReverseMap();
             
             CreateMap<Car, InsertCarRequest>()
                 .ForMember(x => x.ModelId, opt => opt.MapFrom(y => y.CarModelId))
                 .ForMember(x => x.RegisterNumber, opt => opt.MapFrom(y => y.RegisterNumber))
                 .ForMember(x => x.CarImages, opt => opt.MapFrom(y => y.CarImages))
                 .ForMember(x => x.CarSeats, opt => opt.MapFrom(y => y.CarSeatComposition))
+                .ReverseMap();
+            
+            CreateMap<Car, CarResponse>()
+                .ForMember(x => x.Id, opt => opt.MapFrom(y => y.CarModelId))
+                .ForMember(x => x.RegisterNumber, opt => opt.MapFrom(y => y.RegisterNumber))
+                .ForMember(x => x.CarImageIds, opt => opt.MapFrom(x=>x.CarImages.Select(x=>x.Id)))
+                .ForMember(x => x.CarSeats, opt => opt.MapFrom(y => y.CarSeatComposition))
+                .ForMember(x => x.Model, opt => opt.MapFrom(y => y.CarModel))
                 .ReverseMap();
 
             #endregion
