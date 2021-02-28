@@ -30,12 +30,12 @@ namespace ShaRide.Application.Contexts
                 switch (entry.State)
                 {
                     case EntityState.Added:
-                        entry.Entity.Created = _dateTime.NowUtc;
-                        entry.Entity.CreatedBy = _authenticatedUser.UserId.Value;
+                        entry.Entity.CreatedTimestamp = _dateTime.NowUtc;
+                        entry.Entity.CreatedByUserId = _authenticatedUser.UserId.Value;
                         break;
                     case EntityState.Modified:
-                        entry.Entity.LastModified = _dateTime.NowUtc;
-                        entry.Entity.LastModifiedBy = _authenticatedUser.UserId.Value;
+                        entry.Entity.LastModifiedTimestamp = _dateTime.NowUtc;
+                        entry.Entity.LastModifiedByUserId = _authenticatedUser.UserId.Value;
                         break;
                 }
             }
@@ -50,12 +50,12 @@ namespace ShaRide.Application.Contexts
                 switch (entry.State)
                 {
                     case EntityState.Added:
-                        entry.Entity.Created = _dateTime.NowUtc;
-                        entry.Entity.CreatedBy = _authenticatedUser.UserId.Value;
+                        entry.Entity.CreatedTimestamp = _dateTime.NowUtc;
+                        entry.Entity.CreatedByUserId = _authenticatedUser.UserId.Value;
                         break;
                     case EntityState.Modified:
-                        entry.Entity.LastModified = _dateTime.NowUtc;
-                        entry.Entity.LastModifiedBy = _authenticatedUser.UserId.Value;
+                        entry.Entity.LastModifiedTimestamp = _dateTime.NowUtc;
+                        entry.Entity.LastModifiedByUserId = _authenticatedUser.UserId.Value;
                         break;
                 }
             }
@@ -125,6 +125,7 @@ namespace ShaRide.Application.Contexts
         public DbSet<CarImage> CarImages { get; set; }
         public DbSet<Car> Cars { get; set; }
         public DbSet<Counter> Counters { get; set; }
+        public DbSet<Invoice> Invoices { get; set; }
 
         #endregion
     }

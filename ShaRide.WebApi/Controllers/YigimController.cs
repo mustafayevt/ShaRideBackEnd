@@ -4,8 +4,10 @@ using AutoWrapper.Wrappers;
 using Microsoft.AspNetCore.Mvc;
 using ShaRide.Application.Attributes;
 using ShaRide.Application.Contexts;
+using ShaRide.Application.DTO.Request.Invoice;
 using ShaRide.Application.DTO.Response.Yigim;
 using ShaRide.Application.Managers;
+using ShaRide.Application.Services.Interface;
 
 namespace ShaRide.WebApi.Controllers
 {
@@ -16,11 +18,13 @@ namespace ShaRide.WebApi.Controllers
     {
         private readonly ApplicationDbContext _applicationDbContext;
         private readonly UserManager _userManager;
+        private readonly IInvoiceService _invoiceService;
 
-        public YigimController(UserManager userManager, ApplicationDbContext applicationDbContext)
+        public YigimController(UserManager userManager, ApplicationDbContext applicationDbContext, IInvoiceService invoiceService)
         {
             _userManager = userManager;
             _applicationDbContext = applicationDbContext;
+            _invoiceService = invoiceService;
         }
 
         [HttpGet("GetDebt")]
@@ -37,6 +41,18 @@ namespace ShaRide.WebApi.Controllers
             var response = new UserInfoResponse(user.Name, user.Surname, debtOfUser);
 
             return Ok(response);
+        }
+
+        [HttpPost("RegisterPayment")]
+        public async Task<ActionResult> RegisterPayment(RegisterInvoiceRequest request)
+        {
+            return Ok(await _invoiceService.RegisterInvoice(request));
+        }
+
+        [HttpGet("GetPaymentDetails")]
+        public async Task<ActionResult> GetPaymentDetails([Required] string invoiceNumber)
+        {
+            return Ok(await _invoiceService.GetInvoiceDetail(invoiceNumber));
         }
     }
 }

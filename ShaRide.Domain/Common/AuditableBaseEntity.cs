@@ -7,11 +7,12 @@ namespace ShaRide.Domain.Common
     public abstract class AuditableBaseEntity : BaseEntity
     {
         [ForeignKey("ApplicationUser")]
-        public int CreatedBy { get; set; }
-        public virtual User User { get; set; }
-        public DateTime Created { get; set; }
+        public int CreatedByUserId { get; set; }
+        public virtual User CreatedByUser { get; set; }
+        public DateTime CreatedTimestamp { get; set; }
         [ForeignKey("ApplicationUser")]
-        public int LastModifiedBy { get; set; }
-        public DateTime? LastModified { get; set; }
+        public int LastModifiedByUserId { get; set; }
+        public virtual User LastModifiedByUser { get; set; }
+        public DateTime? LastModifiedTimestamp { get; set; }
     }
 }

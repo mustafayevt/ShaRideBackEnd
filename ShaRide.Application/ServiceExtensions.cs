@@ -60,6 +60,7 @@ namespace ShaRide.Application
             services.AddScoped<ICarModelService, CarModelService>();
             services.AddScoped<IRideService, RideService>();
             services.AddScoped<ICarService, CarService>();
+            services.AddScoped<IInvoiceService, InvoiceService>();
             #endregion
             
             services.Configure<JWTSettings>(configuration.GetSection("JWTSettings"));

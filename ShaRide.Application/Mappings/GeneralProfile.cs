@@ -6,6 +6,7 @@ using ShaRide.Application.DTO.Request.Car;
 using ShaRide.Application.DTO.Request.CarBrand;
 using ShaRide.Application.DTO.Request.CarModel;
 using ShaRide.Application.DTO.Request.Common;
+using ShaRide.Application.DTO.Request.Invoice;
 using ShaRide.Application.DTO.Request.Location;
 using ShaRide.Application.DTO.Request.Restriction;
 using ShaRide.Application.DTO.Request.Ride;
@@ -13,6 +14,7 @@ using ShaRide.Application.DTO.Response.BanType;
 using ShaRide.Application.DTO.Response.Car;
 using ShaRide.Application.DTO.Response.CarBrand;
 using ShaRide.Application.DTO.Response.CarModel;
+using ShaRide.Application.DTO.Response.Invoice;
 using ShaRide.Application.DTO.Response.Location;
 using ShaRide.Application.DTO.Response.Restriction;
 using ShaRide.Application.DTO.Response.Ride;
@@ -148,9 +150,26 @@ namespace ShaRide.Application.Mappings
             CreateMap<Car, CarResponse>()
                 .ForMember(x => x.Id, opt => opt.MapFrom(y => y.CarModelId))
                 .ForMember(x => x.RegisterNumber, opt => opt.MapFrom(y => y.RegisterNumber))
-                .ForMember(x => x.CarImageIds, opt => opt.MapFrom(x=>x.CarImages.Select(x=>x.Id)))
+                .ForMember(x => x.CarImageIds, opt => opt.MapFrom(x=>x.CarImages.Select(carImage=>carImage.Id)))
                 .ForMember(x => x.CarSeats, opt => opt.MapFrom(y => y.CarSeatComposition))
                 .ForMember(x => x.Model, opt => opt.MapFrom(y => y.CarModel))
+                .ReverseMap();
+
+            #endregion
+
+            #region Invoice
+
+            CreateMap<Invoice, InvoiceResponse>()
+                .ForMember(x=>x.UserId,opt=>opt.MapFrom(y=>y.User.UserUniqueKey))
+                .ForMember(x=>x.Name,opt=>opt.MapFrom(y=>y.User.Name))
+                .ForMember(x=>x.Surname,opt=>opt.MapFrom(y=>y.User.Surname))
+                .ReverseMap();
+            CreateMap<Invoice, RegisterInvoiceRequest>()
+                .ForMember(x => x.UserId, opt => opt.Ignore());
+            CreateMap<RegisterInvoiceRequest, Invoice>()
+                .ForMember(x => x.User, opt => opt.Ignore())
+                .ForMember(x => x.UserId, opt => opt.Ignore());
+            CreateMap<RegisterInvoiceRequest, InvoiceResponse>()
                 .ReverseMap();
 
             #endregion
