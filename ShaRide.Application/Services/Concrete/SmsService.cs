@@ -1,4 +1,6 @@
 ﻿using System;
+using System.IO;
+using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using AutoWrapper.Wrappers;
@@ -26,12 +28,12 @@ namespace ShaRide.Application.Services.Concrete
             {
                 using var httpClient = _httpClientFactory.CreateClient();
                 httpClient.BaseAddress = new Uri(_textingOption.Value.BaseUrl);
-
+                
                 var url =
                     $"rest/sms/json/Message/Send?api_key={_textingOption.Value.ApiKey}&api_secret={_textingOption.Value.ApiSecret}&from={_textingOption.Value.From}&to={request.PhoneNumber.Replace("+","")}&text={request.MessageBody}&type=text";
-
-                var response = await httpClient.PostAsync(url,null);
-
+                
+                var response = await httpClient.GetAsync(url);
+                
                 var result = await response.Content.ReadAsStringAsync();
             }
             catch (Exception e)

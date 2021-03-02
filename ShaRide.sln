@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShaRide.Domain", "ShaRide.D
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShaRide.Application", "ShaRide.Application\ShaRide.Application.csproj", "{19EBC8B4-C209-4233-BE7A-139DD0EB9364}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShaRide.Test", "ShaRide.Test\ShaRide.Test.csproj", "{35F6CD34-6A04-437C-8EDA-966266F2C044}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{19EBC8B4-C209-4233-BE7A-139DD0EB9364}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{19EBC8B4-C209-4233-BE7A-139DD0EB9364}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{19EBC8B4-C209-4233-BE7A-139DD0EB9364}.Release|Any CPU.Build.0 = Release|Any CPU
+		{35F6CD34-6A04-437C-8EDA-966266F2C044}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{35F6CD34-6A04-437C-8EDA-966266F2C044}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{35F6CD34-6A04-437C-8EDA-966266F2C044}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{35F6CD34-6A04-437C-8EDA-966266F2C044}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

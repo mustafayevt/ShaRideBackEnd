@@ -30,7 +30,7 @@ namespace ShaRide.Application.Services.Concrete
 
         public async Task<ICollection<LocationResponse>> GetLocationsAsync()
         {
-            var locations = await _dbContext.Locations.Where(x=>x.IsRowActive).ToListAsync();
+            var locations = await _dbContext.Locations.Include(x=>x.LocationPoints).Where(x=>x.IsRowActive).ToListAsync();
             
             locations.ForEach(x =>
             {
