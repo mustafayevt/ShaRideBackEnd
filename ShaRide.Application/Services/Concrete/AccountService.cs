@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
 using AutoWrapper.Wrappers;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Localization;
@@ -16,6 +17,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using ShaRide.Application.Contexts;
 using ShaRide.Application.DTO.Request.Account;
+using ShaRide.Application.DTO.Request.Sms;
 using ShaRide.Application.DTO.Response.Account;
 using ShaRide.Application.Helpers;
 using ShaRide.Application.Localize;
@@ -33,7 +35,7 @@ namespace ShaRide.Application.Services.Concrete
         private readonly IEmailService _emailService;
         private readonly JWTSettings _jwtSettings;
         private readonly IDateTimeService _dateTimeService;
-        private readonly IVerificationCodeService _verificationCodeService;
+        private readonly ISmsService _smsService;
         private readonly IMapper _mapper;
         private readonly IStringLocalizer _localizer;
         private readonly ApplicationDbContext _dbContext;
@@ -42,19 +44,18 @@ namespace ShaRide.Application.Services.Concrete
             IOptions<JWTSettings> jwtSettings,
             IDateTimeService dateTimeService,
             IEmailService emailService,
-            IVerificationCodeService verificationCodeService,
             IMapper mapper,
             IStringLocalizer<Resource> localizer,
-            ApplicationDbContext dbContext)
+            ApplicationDbContext dbContext, ISmsService smsService)
         {
             _userManager = userManager;
             _jwtSettings = jwtSettings.Value;
             _dateTimeService = dateTimeService;
             _emailService = emailService;
-            _verificationCodeService = verificationCodeService;
             _mapper = mapper;
             _localizer = localizer;
             _dbContext = dbContext;
+            _smsService = smsService;
         }
 
         /// <summary>
@@ -141,19 +142,67 @@ namespace ShaRide.Application.Services.Concrete
         }
 
         /// <summary>
-        /// Sends verification code to user and returns client to the code.
+        /// Resets user password by phone.
+        /// </summary>
+        /// <param name="phone"></param>
+        /// <param name="newPassword"></param>
+        /// <returns></returns>
+        public async Task<int> ResetUserPassword(string phone, string newPassword)
+        {
+            User user = await _userManager.GetUserByPhoneNumber(phone);
+
+            return await _userManager.ResetPassword(user, newPassword) == IdentityResult.Success ? 0 : -1;
+        }
+
+        /// <summary>
+        /// Sends verification code to user for phone confirmation and returns code to the client.
         /// </summary>
         /// <param name="phoneNumber"></param>
         /// <returns></returns>
-        public async Task<string> GetVerificationCode(string phoneNumber)
+        public async Task<string> SendPhoneVerificationSms(string phoneNumber)
         {
             var userPhone = await _userManager.GetUserPhoneByPhoneNumber(phoneNumber);
             if (userPhone != null)
                 throw new ApiException(_localizer.GetString(LocalizationKeys.PHONE_ALREADY_CONFIRMED, phoneNumber));
 
+            return await SendVerificationSmsToUser(phoneNumber);
+        }
+
+        /// <summary>
+        /// Sends verification code to user for password reset and returns code to the client.
+        /// </summary>
+        /// <param name="phoneNumber"></param>
+        /// <returns></returns>
+        /// <exception cref="ApiException"></exception>
+        public async Task<string> SendPasswordResetSms(string phoneNumber)
+        {
+            var userPhone = await _userManager.GetUserPhoneByPhoneNumber(phoneNumber);
+            if (userPhone is null)
+                throw new ApiException(_localizer.GetString(LocalizationKeys.PHONE_NOT_FOUND, phoneNumber));
+
+            return await SendVerificationSmsToUser(phoneNumber);
+        }
+
+        /// <summary>
+        /// Generates new code for verification.
+        /// </summary>
+        /// <returns></returns>
+        private string GenerateConfirmationCode()
+        {
             var confirmationCode = ConfirmationCodeHelper.GenerateConfirmationCode();
-            var content = $"ShaRide Kod - {confirmationCode}";
-            var result = await _verificationCodeService.SendVerificationCode(phoneNumber, content);
+            return confirmationCode;
+        }
+
+        /// <summary>
+        /// Sends verification sms to user with localization.
+        /// </summary>
+        /// <param name="phoneNumber"></param>
+        /// <returns></returns>
+        private async Task<string> SendVerificationSmsToUser(string phoneNumber)
+        {
+            var confirmationCode = GenerateConfirmationCode();
+            var smsBody = _localizer.GetString(LocalizationKeys.CONFIRMATION_SMS, confirmationCode);
+            var result = await _smsService.SendSms(new SendSmsRequest(phoneNumber, smsBody));
             return confirmationCode;
         }
 
@@ -224,85 +273,5 @@ namespace ShaRide.Application.Services.Concrete
             // convert random bytes to hex string
             return BitConverter.ToString(randomBytes).Replace("-", "");
         }
-
-        /// <summary>
-        /// Sends verification email to user email
-        /// </summary>
-        /// <param name="user"></param>
-        /// <param name="origin"></param>
-        /// <returns></returns>
-        private async Task<string> SendVerificationSms(User user, string origin)
-        {
-            var code = 123.ToString();
-            code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
-            var route = "api/account/confirm-email/";
-            var endpointUri = new Uri(string.Concat($"{origin}/", route));
-            var verificationUri = QueryHelpers.AddQueryString(endpointUri.ToString(), "userId", user.Id.ToString());
-            verificationUri = QueryHelpers.AddQueryString(verificationUri, "code", code);
-            //Email Service Call Here
-            return verificationUri;
-        }
-
-        // /// <summary>
-        // /// Generates refresh token
-        // /// </summary>
-        // /// <param name="ipAddress"></param>
-        // /// <returns></returns>
-        // private RefreshToken GenerateRefreshToken(string ipAddress)
-        // {
-        //     return new RefreshToken
-        //     {
-        //         Token = RandomTokenString(),
-        //         Expires = DateTime.UtcNow.AddDays(7),
-        //         Created = DateTime.UtcNow,
-        //         CreatedByIp = ipAddress
-        //     };
-        // }
-
-        // /// <summary>
-        // /// Forgot user password operation
-        // /// </summary>
-        // /// <param name="model"></param>
-        // /// <param name="origin"></param>
-        // /// <returns></returns>
-        // public async Task ForgotPassword(ForgotPasswordRequest model, string origin)
-        // {
-        //     var account = await _userManager.FindByEmailAsync(model.Email);
-        //
-        //     // always return ok response to prevent email enumeration
-        //     if (account == null) return;
-        //
-        //     var code = await _userManager.GeneratePasswordResetTokenAsync(account);
-        //     var route = "api/account/reset-password/";
-        //     var _enpointUri = new Uri(string.Concat($"{origin}/", route));
-        //     var emailRequest = new EmailRequest()
-        //     {
-        //         Body = $"You reset token is - {code}",
-        //         To = model.Email,
-        //         Subject = "Reset Password",
-        //     };
-        //     await _emailService.SendAsync(emailRequest);
-        // }
-        //
-        // /// <summary>
-        // /// Reset user password operation.
-        // /// </summary>
-        // /// <param name="model"></param>
-        // /// <returns></returns>
-        // /// <exception cref="ApiException"></exception>
-        // public async Task<string> ResetPassword(ResetPasswordRequest model)
-        // {
-        //     var account = await _userManager.FindByEmailAsync(model.Email);
-        //     if (account == null) throw new ApiException($"No Accounts Registered with {model.Email}.");
-        //     var result = await _userManager.ResetPasswordAsync(account, model.Token, model.Password);
-        //     if (result.Succeeded)
-        //     {
-        //         return "Password Resetted.";
-        //     }
-        //     else
-        //     {
-        //         throw new ApiException($"Error occured while reseting the password.");
-        //     }
-        // }
     }
 }

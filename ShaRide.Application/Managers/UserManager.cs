@@ -91,6 +91,18 @@ namespace ShaRide.Application.Managers
         }
 
         /// <summary>
+        /// Gets user by given phone number.
+        /// </summary>
+        /// <param name="phoneNumber"></param>
+        /// <returns></returns>
+        public async Task<User> GetUserByPhoneNumber(string phoneNumber)
+        {
+            return (await _dbContext.UserPhones
+                .Include(x => x.User)
+                .FirstOrDefaultAsync(y => y.Number == phoneNumber)).User;
+        }
+
+        /// <summary>
         /// Creates user and save to the database.
         /// </summary>
         /// <param name="user"></param>
@@ -105,6 +117,32 @@ namespace ShaRide.Application.Managers
                 user.UserUniqueKey = await GetNewUserUniqueKey();
                 await _dbContext.Users.AddAsync(user);
                 await _dbContext.SaveChangesAsync();
+                return IdentityResult.Success;
+            }
+            catch (Exception e)
+            {
+                return IdentityResult.Failed();
+            }
+        }
+
+        /// <summary>
+        /// Sets new password to user.
+        /// </summary>
+        /// <param name="user"></param>
+        /// <param name="newPassword"></param>
+        /// <returns></returns>
+        public async Task<IdentityResult> ResetPassword(User user, string newPassword)
+        {
+            try
+            {
+                var passwordHash = PasswordHasher.HashPassword(newPassword);
+                
+                _dbContext.Users.Attach(user);
+                
+                user.PasswordHash = passwordHash;
+                
+                await _dbContext.SaveChangesAsync();
+                
                 return IdentityResult.Success;
             }
             catch (Exception e)

@@ -51,8 +51,6 @@ namespace ShaRide.Application
             services.Configure<TheTexting>(configuration.GetSection("TheTexting"));
             services.AddScoped<IDateTimeService, DateTimeService>();
             services.AddScoped<IEmailService, EmailService>();
-            services.AddScoped<IVerificationCodeService, VerificationCodeService>();
-            services.AddScoped<IVerificationCodeService, VerificationCodeService>();
             services.AddScoped<ILocationService, LocationService>();
             services.AddScoped<IRestrictionService, RestrictionService>();
             services.AddScoped<IBanTypeService, BanTypeService>();

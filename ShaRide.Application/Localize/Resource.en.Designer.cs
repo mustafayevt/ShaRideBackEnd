@@ -97,6 +97,15 @@ namespace ShaRide.Application.Localize {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to User not found with phone &apos;{0}&apos; .
+        /// </summary>
+        public static string Exception_PhoneNotFound {
+            get {
+                return ResourceManager.GetString("Exception.PhoneNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Phone &apos;{0}&apos; is already taken..
         /// </summary>
         public static string Exception_PhoneTaken {
@@ -147,6 +156,15 @@ namespace ShaRide.Application.Localize {
         public static string Validation_Required {
             get {
                 return ResourceManager.GetString("Validation.Required", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Your ShaRide code : {0}.
+        /// </summary>
+        public static string VerificationSms_Confirmation {
+            get {
+                return ResourceManager.GetString("VerificationSms.Confirmation", resourceCulture);
             }
         }
     }

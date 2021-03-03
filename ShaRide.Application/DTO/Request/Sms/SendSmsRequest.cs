@@ -11,5 +11,16 @@ namespace ShaRide.Application.DTO.Request.Sms
         
         [Required(ErrorMessage = LocalizationKeys.REQUIRED)]
         public string MessageBody { get; set; }
+
+        public SendSmsRequest()
+        {
+            
+        }
+
+        public SendSmsRequest(string phoneNumber, string messageBody)
+        {
+            PhoneNumber = phoneNumber;
+            MessageBody = messageBody;
+        }
     }
 }

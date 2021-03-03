@@ -97,6 +97,15 @@ namespace ShaRide.Application.Localize {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; nömrəsi ilə qeydiyyatlı heç bir istifadəçi tapılmadı..
+        /// </summary>
+        public static string Exception_PhoneNotFound {
+            get {
+                return ResourceManager.GetString("Exception.PhoneNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to &apos;{0}&apos; nömrə artıq istifadə olunur..
         /// </summary>
         public static string Exception_PhoneTaken {
@@ -147,6 +156,15 @@ namespace ShaRide.Application.Localize {
         public static string Validation_Required {
             get {
                 return ResourceManager.GetString("Validation.Required", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Sizin ShaRide kodunuz : {0}.
+        /// </summary>
+        public static string VerificationSms_Confirmation {
+            get {
+                return ResourceManager.GetString("VerificationSms.Confirmation", resourceCulture);
             }
         }
     }

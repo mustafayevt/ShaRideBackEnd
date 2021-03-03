@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using ShaRide.Application.Attributes;
 using ShaRide.Application.DTO.Request.Account;
@@ -46,11 +47,36 @@ namespace ShaRide.WebApi.Controllers
         /// </summary>
         /// <param name="phoneNumber"></param>
         /// <returns></returns>
-        [HttpPost("get-verification-code")]
+        [HttpGet("send-phone-verification-sms")]
         [Produces(typeof(string))]
-        public async Task<IActionResult> GetVerificationCodeAsync(string phoneNumber)
+        public async Task<IActionResult> SendPhoneVerificationSmsAsync([Required]string phoneNumber)
         {
-            return Ok(await _accountService.GetVerificationCode(phoneNumber));
+            return Ok(await _accountService.SendPhoneVerificationSms(phoneNumber));
+        }
+
+        /// <summary>
+        /// Gets verification code by given phone number.
+        /// </summary>
+        /// <param name="phoneNumber"></param>
+        /// <returns></returns>
+        [HttpGet("send-password-reset-sms")]
+        [Produces(typeof(string))]
+        public async Task<IActionResult> SendPasswordResetSmsAsync([Required]string phoneNumber)
+        {
+            return Ok(await _accountService.SendPasswordResetSms(phoneNumber));
+        }
+
+        /// <summary>
+        /// Resets user password by given user phone.
+        /// </summary>
+        /// <param name="phoneNumber"></param>
+        /// <param name="newPassword">new password of user</param>
+        /// <returns></returns>
+        [HttpGet("reset-user-password")]
+        [Produces(typeof(int))]
+        public async Task<IActionResult> ResetUserPasswordAsync([Required]string phoneNumber, [Required]string newPassword)
+        {
+            return Ok(await _accountService.ResetUserPassword(phoneNumber,newPassword));
         }
 
         [HttpGet("get-user-thumbnail-photo")]

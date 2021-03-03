@@ -48,4 +48,10 @@
     <data name="Validation.Range" xml:space="preserve">
         <value>'{0}' xanası yalnız {1} - {2} arasında ola bilər.</value>
     </data>
+    <data name="VerificationSms.Confirmation" xml:space="preserve">
+        <value>Sizin ShaRide kodunuz : {0}</value>
+    </data>
+    <data name="Exception.PhoneNotFound" xml:space="preserve">
+        <value>'{0}' nömrəsi ilə qeydiyyatlı heç bir istifadəçi tapılmadı.</value>
+    </data>
 </root>

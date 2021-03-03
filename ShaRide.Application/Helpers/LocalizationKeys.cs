@@ -41,6 +41,12 @@
         /// Has phone parameter.
         /// </summary>
         public const string PHONE_ALREADY_CONFIRMED = "Exception.PhoneConfirmed";
+        
+        /// <summary>
+        /// Use case : exception.
+        /// Has phone parameter.
+        /// </summary>
+        public const string PHONE_NOT_FOUND = "Exception.PhoneNotFound";
 
         /// <summary>
         /// Use case : exception.
@@ -85,5 +91,10 @@
         /// Use case : validation error.
         /// </summary>
         public const string RANGE_VALIDATION = "Validation.Range";
+
+        /// <summary>
+        /// Use case : sending confirmation code.
+        /// </summary>
+        public const string CONFIRMATION_SMS = "VerificationSms.Confirmation";
     }
 }

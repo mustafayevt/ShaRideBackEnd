@@ -48,4 +48,10 @@
     <data name="Validation.Range" xml:space="preserve">
         <value>'{0}' field can only be between {1} - {2}.</value>
     </data>
+    <data name="VerificationSms.Confirmation" xml:space="preserve">
+        <value>Your ShaRide code : {0}</value>
+    </data>
+    <data name="Exception.PhoneNotFound" xml:space="preserve">
+        <value>User not found with phone '{0}' </value>
+    </data>
 </root>
