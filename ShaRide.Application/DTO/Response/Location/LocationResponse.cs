@@ -1,4 +1,5 @@
-﻿using ShaRide.Domain.Enums;
+﻿using System.Collections.Generic;
+using ShaRide.Domain.Enums;
 
 namespace ShaRide.Application.DTO.Response.Location
 {
@@ -6,7 +7,6 @@ namespace ShaRide.Application.DTO.Response.Location
     {
         public int Id { get; set; }
         public string Name { get; set; }
-        public LocationPointResponse LocationPoint { get; set; }
-        public LocationPointType LocationPointType { get; set; }
+        public ICollection<LocationPointResponse> LocationPoints { get; set; }
     }
 }

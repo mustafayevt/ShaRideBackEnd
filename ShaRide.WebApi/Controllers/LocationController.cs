@@ -32,7 +32,8 @@ namespace ShaRide.WebApi.Controllers
         [Produces(typeof(ICollection<LocationResponse>))]
         public async Task<IActionResult> GetLocations()
         {
-            return Ok(await _locationService.GetLocationsAsync());
+            var result = await _locationService.GetLocationsAsync();
+            return Ok(result);
         }
 
         /// <summary>

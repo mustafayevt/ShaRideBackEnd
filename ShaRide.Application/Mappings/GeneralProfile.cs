@@ -10,6 +10,7 @@ using ShaRide.Application.DTO.Request.Invoice;
 using ShaRide.Application.DTO.Request.Location;
 using ShaRide.Application.DTO.Request.Restriction;
 using ShaRide.Application.DTO.Request.Ride;
+using ShaRide.Application.DTO.Response.Account;
 using ShaRide.Application.DTO.Response.BanType;
 using ShaRide.Application.DTO.Response.Car;
 using ShaRide.Application.DTO.Response.CarBrand;
@@ -18,6 +19,7 @@ using ShaRide.Application.DTO.Response.Invoice;
 using ShaRide.Application.DTO.Response.Location;
 using ShaRide.Application.DTO.Response.Restriction;
 using ShaRide.Application.DTO.Response.Ride;
+using ShaRide.Application.DTO.Response.UserPhone;
 using ShaRide.Domain.Entities;
 
 namespace ShaRide.Application.Mappings
@@ -26,12 +28,20 @@ namespace ShaRide.Application.Mappings
     {
         public GeneralProfile()
         {
+            #region User
+
+            CreateMap<User, UserResponse>();
+
+            #endregion
+            
             #region UserPhone
 
             CreateMap<UserPhone, PhoneRequest>()
                 .ForMember(x => x.Number, opt => opt.MapFrom(y => y.Number))
                 .ForMember(x => x.IsMain, opt => opt.MapFrom(y => y.IsMain))
                 .ReverseMap();
+
+            CreateMap<UserPhone, UserPhoneResponse>();
 
             #endregion
 
@@ -51,11 +61,15 @@ namespace ShaRide.Application.Mappings
             //Location Points
             CreateMap<LocationPoint, InsertLocationPointRequest>().ReverseMap();
             CreateMap<LocationPoint, UpdateLocationPointRequest>().ReverseMap();
-            CreateMap<LocationPoint, LocationPointResponse>().ReverseMap();
+            CreateMap<LocationPoint, LocationPointResponse>()
+                .ForMember(x=>x.LocationName, opt=>opt.MapFrom(y=>y.Location.Name))
+                .ReverseMap();
 
             CreateMap<Location, InsertLocationRequest>().ReverseMap();
             CreateMap<Location, UpdateLocationRequest>().ReverseMap();
             CreateMap<Location, LocationResponse>().ReverseMap();
+
+            CreateMap<RideLocationPointComposition, RideLocationPointCompositionResponse>();
 
             #endregion
 
@@ -115,9 +129,10 @@ namespace ShaRide.Application.Mappings
                 .ReverseMap();
 
             CreateMap<Ride, RideResponse>()
-                .ForMember(x=>x.Id,opt=>opt.MapFrom(y=>y.Id))
-                .ReverseMap();
-            
+                .ForMember(x => x.RideCarSeatComposition, opt => opt.MapFrom(y => y.RideCarSeatComposition))
+                .ForMember(x => x.Restrictions, opt => opt.MapFrom(y => y.RestrictionRideComposition.Select(x => x.Restriction)))
+                .ForMember(x => x.LocationPoints, opt => opt.MapFrom(y => y.RideLocationPointComposition));
+
             #endregion
 
             #region Car
@@ -137,7 +152,6 @@ namespace ShaRide.Application.Mappings
                 .ForMember(x => x.Id, opt => opt.MapFrom(y => y.SeatId))
                 .ForMember(x => x.xCordinant, opt => opt.MapFrom(y => y.Seat.xCordinant))
                 .ForMember(x => x.yCordinant, opt => opt.MapFrom(y => y.Seat.yCordinant))
-                .ForMember(x => x.SeatType, opt => opt.MapFrom(y => y.SeatType))
                 .ReverseMap();
             
             CreateMap<Car, InsertCarRequest>()
@@ -154,6 +168,8 @@ namespace ShaRide.Application.Mappings
                 .ForMember(x => x.CarSeats, opt => opt.MapFrom(y => y.CarSeatComposition))
                 .ForMember(x => x.Model, opt => opt.MapFrom(y => y.CarModel))
                 .ReverseMap();
+
+            CreateMap<RideCarSeatComposition, RideCarSeatCompositionResponse>();
 
             #endregion
 

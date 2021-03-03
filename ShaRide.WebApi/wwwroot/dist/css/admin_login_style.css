@@ -19,9 +19,9 @@ body{
     bottom: -40px;
     width: auto;
     height: auto;
-    background-image: url(../images/login_background.jpg);
+    background-image: url(../images/login_background-new.jpg);
     background-size: cover;
-    -webkit-filter: blur(5px);
+    -webkit-filter: blur(0px);
     z-index: 0;
 }
 body {

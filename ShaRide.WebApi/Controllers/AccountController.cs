@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
+using AutoWrapper.Filters;
 using Microsoft.AspNetCore.Mvc;
 using ShaRide.Application.Attributes;
 using ShaRide.Application.DTO.Request.Account;
@@ -81,7 +82,8 @@ namespace ShaRide.WebApi.Controllers
 
         [HttpGet("get-user-thumbnail-photo")]
         [Produces(typeof(byte[]))]
-        public async Task<IActionResult> GetUserThumbnailPhoto(int userId)
+        [AutoWrapIgnore]
+        public async Task<IActionResult> GetUserThumbnailPhoto([Required]int userId)
         {
             var image = await _accountService.GetUserThumbnailPhoto(userId);
             var data = image.Image;
