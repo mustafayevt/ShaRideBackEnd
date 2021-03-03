@@ -12,12 +12,14 @@ namespace ShaRide.Application.Attributes
     {
         public override bool IsValid(object value)
         {
+            var valueAsString = value.ToString() ?? string.Empty;
+            
             List<bool> validations = new List<bool>
             {
-                Regex.IsMatch(value.ToString(), RegexConstraints.HasCharacters),
-                Regex.IsMatch(value.ToString(), RegexConstraints.HasNumbers),
-                Regex.IsMatch(value.ToString(), RegexConstraints.HasLowerCases),
-                Regex.IsMatch(value.ToString(), RegexConstraints.HasUpperCases)
+                Regex.IsMatch(valueAsString, RegexConstraints.HasCharacters),
+                Regex.IsMatch(valueAsString, RegexConstraints.HasNumbers),
+                Regex.IsMatch(valueAsString, RegexConstraints.HasLowerCases),
+                Regex.IsMatch(valueAsString, RegexConstraints.HasUpperCases)
             };
 
 
