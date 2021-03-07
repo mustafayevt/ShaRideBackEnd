@@ -10,15 +10,16 @@ using System.Threading.Tasks;
 using AutoMapper;
 using AutoWrapper.Wrappers;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using ShaRide.Application.Contexts;
 using ShaRide.Application.DTO.Request.Account;
+using ShaRide.Application.DTO.Request.Feedback;
 using ShaRide.Application.DTO.Request.Sms;
 using ShaRide.Application.DTO.Response.Account;
+using ShaRide.Application.DTO.Response.Feedback;
 using ShaRide.Application.Helpers;
 using ShaRide.Application.Localize;
 using ShaRide.Application.Managers;
@@ -151,7 +152,41 @@ namespace ShaRide.Application.Services.Concrete
         {
             User user = await _userManager.GetUserByPhoneNumber(phone);
 
+            if (user is null)
+                throw new ApiException(_localizer.GetString(LocalizationKeys.PHONE_NOT_FOUND, phone));
+
             return await _userManager.ResetPassword(user, newPassword) == IdentityResult.Success ? 0 : -1;
+        }
+
+        /// <summary>
+        /// Saves feedback from user.
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        public async Task<FeedbackResponse> Feedback(InsertFeedbackRequest request)
+        {
+            var feedback = _mapper.Map<Feedback>(request);
+
+            await _dbContext.Feedbacks.AddAsync(feedback);
+
+            await _dbContext.SaveChangesAsync();
+
+            await _dbContext.Attach(feedback).Reference(x => x.CreatedByUser).Query().Include(x => x.Phones)
+                .LoadAsync();
+
+            return _mapper.Map<FeedbackResponse>(feedback);
+        }
+
+        /// <summary>
+        /// Returns all active feedbacks.
+        /// </summary>
+        /// <returns></returns>
+        public async Task<ICollection<FeedbackResponse>> GetAllFeedbacks()
+        {
+            var feedbacks = await _dbContext.Feedbacks.Include(x => x.CreatedByUser).ThenInclude(x => x.Phones)
+                .Where(x => x.IsRowActive).ToListAsync();
+
+            return _mapper.Map<ICollection<FeedbackResponse>>(feedbacks);
         }
 
         /// <summary>
@@ -214,8 +249,9 @@ namespace ShaRide.Application.Services.Concrete
         /// <exception cref="ApiException"></exception>
         public async Task<UserImage> GetUserThumbnailPhoto(int userId)
         {
-            var userImage = await _dbContext.Users.Where(x => x.IsRowActive).Include(x=>x.UserImages).FirstOrDefaultAsync(x => x.Id == userId);
-            if(!_dbContext.Users.Where(x=>x.IsRowActive).Any(x=>x.Id == userId))
+            var userImage = await _dbContext.Users.Where(x => x.IsRowActive).Include(x => x.UserImages)
+                .FirstOrDefaultAsync(x => x.Id == userId);
+            if (!_dbContext.Users.Where(x => x.IsRowActive).Any(x => x.Id == userId))
                 throw new ApiException(_localizer[LocalizationKeys.NOT_FOUND]);
 
             return userImage.UserImages.FirstOrDefault(x => x.IsRowActive);

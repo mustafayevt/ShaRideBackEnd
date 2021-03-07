@@ -6,6 +6,7 @@ using ShaRide.Application.DTO.Request.Car;
 using ShaRide.Application.DTO.Request.CarBrand;
 using ShaRide.Application.DTO.Request.CarModel;
 using ShaRide.Application.DTO.Request.Common;
+using ShaRide.Application.DTO.Request.Feedback;
 using ShaRide.Application.DTO.Request.Invoice;
 using ShaRide.Application.DTO.Request.Location;
 using ShaRide.Application.DTO.Request.Restriction;
@@ -15,6 +16,7 @@ using ShaRide.Application.DTO.Response.BanType;
 using ShaRide.Application.DTO.Response.Car;
 using ShaRide.Application.DTO.Response.CarBrand;
 using ShaRide.Application.DTO.Response.CarModel;
+using ShaRide.Application.DTO.Response.Feedback;
 using ShaRide.Application.DTO.Response.Invoice;
 using ShaRide.Application.DTO.Response.Location;
 using ShaRide.Application.DTO.Response.Restriction;
@@ -186,6 +188,17 @@ namespace ShaRide.Application.Mappings
                 .ForMember(x => x.User, opt => opt.Ignore())
                 .ForMember(x => x.UserId, opt => opt.Ignore());
             CreateMap<RegisterInvoiceRequest, InvoiceResponse>()
+                .ReverseMap();
+
+            #endregion
+
+            #region Feedback
+
+            CreateMap<InsertFeedbackRequest, Feedback>()
+                .ReverseMap();
+
+            CreateMap<FeedbackResponse, Feedback>()
+                .ForMember(x=>x.CreatedByUser,opt=>opt.MapFrom(y=>y.UserResponse))
                 .ReverseMap();
 
             #endregion

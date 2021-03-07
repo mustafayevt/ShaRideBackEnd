@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using ShaRide.Application.Contexts;
@@ -9,9 +10,10 @@ using ShaRide.Application.Contexts;
 namespace ShaRide.Application.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210307193640_feedback")]
+    partial class feedback
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -209,7 +211,7 @@ namespace ShaRide.Application.Migrations
                     b.Property<bool>("IsRowActive")
                         .HasColumnType("boolean");
 
-                    b.Property<int?>("LastModifiedByUserId")
+                    b.Property<int>("LastModifiedByUserId")
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("LastModifiedTimestamp")
@@ -623,7 +625,9 @@ namespace ShaRide.Application.Migrations
 
                     b.HasOne("ShaRide.Domain.Entities.User", "LastModifiedByUser")
                         .WithMany()
-                        .HasForeignKey("LastModifiedByUserId");
+                        .HasForeignKey("LastModifiedByUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("ShaRide.Domain.Entities.Invoice", b =>

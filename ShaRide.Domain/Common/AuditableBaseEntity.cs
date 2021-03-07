@@ -11,7 +11,7 @@ namespace ShaRide.Domain.Common
         public virtual User CreatedByUser { get; set; }
         public DateTime CreatedTimestamp { get; set; }
         [ForeignKey("ApplicationUser")]
-        public int LastModifiedByUserId { get; set; }
+        public int? LastModifiedByUserId { get; set; }
         public virtual User LastModifiedByUser { get; set; }
         public DateTime? LastModifiedTimestamp { get; set; }
     }

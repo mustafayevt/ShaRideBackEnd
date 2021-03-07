@@ -127,6 +127,7 @@ namespace ShaRide.Application.Contexts
         public DbSet<Car> Cars { get; set; }
         public DbSet<Counter> Counters { get; set; }
         public DbSet<Invoice> Invoices { get; set; }
+        public DbSet<Feedback> Feedbacks { get; set; }
 
         #endregion
     }

@@ -42,21 +42,21 @@ namespace ShaRide.Application.Services.Concrete
         public ICollection<RideResponse> GetAllActiveRides()
         {
             var results = _dbContext.Rides
-                .Include(x=>x.Driver)
-                .ThenInclude(x=>x.Phones)
-                .Include(x=>x.RideCarSeatComposition)
-                .ThenInclude(x=>x.CarSeatComposition)
-                .ThenInclude(x=>x.Car)
-                .Include(x=>x.RideCarSeatComposition)
-                .ThenInclude(x=>x.CarSeatComposition)
-                .ThenInclude(x=>x.Seat)
-                .Include(x=>x.RideCarSeatComposition)
-                .ThenInclude(x=>x.Passenger)
-                .Include(x=>x.RideLocationPointComposition)
-                .ThenInclude(x=>x.LocationPoint)
-                .ThenInclude(x=>x.Location)
-                .Include(x=>x.RestrictionRideComposition)
-                .ThenInclude(x=>x.Restriction)
+                .Include(x => x.Driver)
+                .ThenInclude(x => x.Phones)
+                .Include(x => x.RideCarSeatComposition)
+                .ThenInclude(x => x.CarSeatComposition)
+                .ThenInclude(x => x.Car)
+                .Include(x => x.RideCarSeatComposition)
+                .ThenInclude(x => x.CarSeatComposition)
+                .ThenInclude(x => x.Seat)
+                .Include(x => x.RideCarSeatComposition)
+                .ThenInclude(x => x.Passenger)
+                .Include(x => x.RideLocationPointComposition)
+                .ThenInclude(x => x.LocationPoint)
+                .ThenInclude(x => x.Location)
+                .Include(x => x.RestrictionRideComposition)
+                .ThenInclude(x => x.Restriction)
                 .Where(x => x.RideState != RideState.Finished);
 
             return _mapper.Map<ICollection<RideResponse>>(results);
@@ -65,27 +65,39 @@ namespace ShaRide.Application.Services.Concrete
         public ICollection<RideResponse> GetActiveRides(GetActiveRidesRequest request)
         {
             var results = _dbContext.Rides
-                .Include(x=>x.Driver)
-                .ThenInclude(x=>x.Phones)
+                .Include(x => x.Driver)
+                .ThenInclude(x => x.Phones)
+                .Include(x => x.RideCarSeatComposition)
+                .ThenInclude(x => x.CarSeatComposition)
+                .ThenInclude(x => x.Seat)
+                .Include(x => x.RideCarSeatComposition)
+                .ThenInclude(x => x.Passenger)
                 .Include(x=>x.RideCarSeatComposition)
                 .ThenInclude(x=>x.CarSeatComposition)
                 .ThenInclude(x=>x.Car)
+                .ThenInclude(x=>x.CarModel)
+                .ThenInclude(x=>x.BanType)
                 .Include(x=>x.RideCarSeatComposition)
                 .ThenInclude(x=>x.CarSeatComposition)
-                .ThenInclude(x=>x.Seat)
+                .ThenInclude(x=>x.Car)
+                .ThenInclude(x=>x.CarModel)
+                .ThenInclude(x=>x.CarBrand)
                 .Include(x=>x.RideCarSeatComposition)
-                .ThenInclude(x=>x.Passenger)
-                .Include(x=>x.RideLocationPointComposition)
-                .ThenInclude(x=>x.LocationPoint)
-                .ThenInclude(x=>x.Location)
-                .Include(x=>x.RestrictionRideComposition)
-                .ThenInclude(x=>x.Restriction)
+                .ThenInclude(x=>x.CarSeatComposition)
+                .ThenInclude(x=>x.Car)
+                .ThenInclude(x=>x.CarImages)
+                .Include(x => x.RideLocationPointComposition)
+                .ThenInclude(x => x.LocationPoint)
+                .ThenInclude(x => x.Location)
+                .Include(x => x.RestrictionRideComposition)
+                .ThenInclude(x => x.Restriction)
                 .Where(x => x.RideLocationPointComposition
                                 .Any(y => y.LocationPoint.LocationId == request.FromLocationId &&
                                           y.LocationPointType == LocationPointType.StartPoint ||
                                           y.LocationPoint.LocationId == request.ToLocationId &&
                                           y.LocationPointType == LocationPointType.FinishPoint) &&
-                            x.RideState != RideState.Finished);
+                            x.RideState != RideState.Finished &&
+                            x.StartDate.Date == request.Date.Date);
 
             return _mapper.Map<ICollection<RideResponse>>(results);
         }
@@ -108,6 +120,24 @@ namespace ShaRide.Application.Services.Concrete
 
             return _mapper.Map<RideResponse>(ride);
         }
+
+        public async Task<int> UpdateRideState(UpdateRideStateRequest request)
+        {
+            var ride = await _dbContext.Rides.AsTracking().FirstOrDefaultAsync(x => x.IsRowActive && x.Id == request.RideId);
+
+            if (ride is null)
+                throw new ApiException(_localizer.GetString(LocalizationKeys.RIDE_NOT_FOUND, request.RideId));
+
+            if (ride.DriverId != _authenticatedUserService.UserId)
+                throw new ApiException(_localizer.GetString(LocalizationKeys.USER_HAS_NOT_ACCESS_OPERATION));
+
+            ride.RideState = request.RideState;
+
+            await _dbContext.SaveChangesAsync();
+
+            return 0;
+        }
+
         protected int DriverId(InsertRideRequest rideRequest)
         {
             int driverId;

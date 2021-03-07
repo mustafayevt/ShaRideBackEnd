@@ -124,6 +124,15 @@ namespace ShaRide.Application.Localize {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Ride with &apos;{0}&apos; id was not found..
+        /// </summary>
+        public static string Exception_RideNotFound {
+            get {
+                return ResourceManager.GetString("Exception.RideNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Password is to weak.
         /// </summary>
         public static string Validation_Password {
@@ -156,6 +165,15 @@ namespace ShaRide.Application.Localize {
         public static string Validation_Required {
             get {
                 return ResourceManager.GetString("Validation.Required", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This user does not have access to do this access..
+        /// </summary>
+        public static string Validation_UserHasNotAccessToOperation {
+            get {
+                return ResourceManager.GetString("Validation.UserHasNotAccessToOperation", resourceCulture);
             }
         }
         

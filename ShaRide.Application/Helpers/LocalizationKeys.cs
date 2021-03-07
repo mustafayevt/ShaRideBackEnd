@@ -41,7 +41,7 @@
         /// Has phone parameter.
         /// </summary>
         public const string PHONE_ALREADY_CONFIRMED = "Exception.PhoneConfirmed";
-        
+
         /// <summary>
         /// Use case : exception.
         /// Has phone parameter.
@@ -96,5 +96,16 @@
         /// Use case : sending confirmation code.
         /// </summary>
         public const string CONFIRMATION_SMS = "VerificationSms.Confirmation";
+
+        /// <summary>
+        /// Use case : exception.
+        /// Has id parameter
+        /// </summary>
+        public const string RIDE_NOT_FOUND = "Exception.RideNotFound";
+
+        /// <summary>
+        /// Use case : exception.
+        /// </summary>
+        public const string USER_HAS_NOT_ACCESS_OPERATION = "Validation.UserHasNotAccessToOperation";
     }
 }

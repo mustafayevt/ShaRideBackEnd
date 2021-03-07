@@ -10,5 +10,6 @@ namespace ShaRide.Application.DTO.Response.Car
         public short yCordinant { get; set; }
         public SeatRotate SeatRotate { get; set; }
         public SeatType SeatType { get; set; }
+        // public CarResponse Car { get; set; }
     }
 }

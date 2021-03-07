@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
+using AutoWrapper.Filters;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ShaRide.Application.Attributes;
@@ -49,6 +51,19 @@ namespace ShaRide.WebApi.Controllers
         }
 
         /// <summary>
+        /// Returns cars of user.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet("GetCarsByUserId/{id}")]
+        [AllowAnonymous]
+        [ProducesResponseType(typeof(ICollection<CarResponse>),200)]
+        public async Task<IActionResult> GetCarsByUserIdAsync(int id)
+        {
+            return Ok(await _carService.GetCarsByUserIdAsync(id));
+        }
+
+        /// <summary>
         /// Inserts one car.
         /// </summary>
         /// <param name="request"></param>
@@ -82,6 +97,17 @@ namespace ShaRide.WebApi.Controllers
         {
             await _carService.DeleteCarAsync(id);
             return Ok();
+        }
+        
+        [HttpGet("get-car-image")]
+        [Produces(typeof(byte[]))]
+        [AutoWrapIgnore]
+        public async Task<IActionResult> GetCarImageByCarImageId([Required]int carImageId)
+        {
+            var image = await _carService.GetCarImageByCarImageId(carImageId);
+            var data = image.Image;
+            var filename = image.Id + image.Extension;
+            return File(data, "application/force-download", filename);
         }
     }
 }

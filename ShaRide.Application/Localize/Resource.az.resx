@@ -54,4 +54,10 @@
     <data name="Exception.PhoneNotFound" xml:space="preserve">
         <value>'{0}' nömrəsi ilə qeydiyyatlı heç bir istifadəçi tapılmadı.</value>
     </data>
+    <data name="Exception.RideNotFound" xml:space="preserve">
+        <value>'{0}' identifikasiyalı səyahət tapılmadı.</value>
+    </data>
+    <data name="Validation.UserHasNotAccessToOperation" xml:space="preserve">
+        <value>Bu istifadəçinin bu əməliyyatı etmək üçün səlahiyyəti yoxdur.</value>
+    </data>
 </root>

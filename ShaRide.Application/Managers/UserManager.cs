@@ -94,12 +94,12 @@ namespace ShaRide.Application.Managers
         /// Gets user by given phone number.
         /// </summary>
         /// <param name="phoneNumber"></param>
-        /// <returns></returns>
+        /// <returns>null not founds</returns>
         public async Task<User> GetUserByPhoneNumber(string phoneNumber)
         {
             return (await _dbContext.UserPhones
                 .Include(x => x.User)
-                .FirstOrDefaultAsync(y => y.Number == phoneNumber)).User;
+                .FirstOrDefaultAsync(y => y.Number == phoneNumber))?.User;
         }
 
         /// <summary>

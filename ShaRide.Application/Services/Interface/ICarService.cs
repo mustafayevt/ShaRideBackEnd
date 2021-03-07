@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using ShaRide.Application.DTO.Request.Car;
 using ShaRide.Application.DTO.Response;
 using ShaRide.Application.DTO.Response.Car;
+using ShaRide.Domain.Entities;
 
 namespace ShaRide.Application.Services.Interface
 {
@@ -13,6 +14,7 @@ namespace ShaRide.Application.Services.Interface
         Task<ICollection<CarResponse>> GetCarsByUserIdAsync(int request);
         Task<CarResponse> InsertCarAsync(InsertCarRequest request);
         Task<ICollection<CarResponse>> InsertCarsAsync(ICollection<InsertCarRequest> request);
+        Task<CarImage> GetCarImageByCarImageId(int request);
         Task DeleteCarAsync(int request);
     }
 }

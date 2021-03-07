@@ -1,8 +1,11 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using ShaRide.Application.DTO.Request;
 using ShaRide.Application.DTO.Request.Account;
+using ShaRide.Application.DTO.Request.Feedback;
 using ShaRide.Application.DTO.Response;
 using ShaRide.Application.DTO.Response.Account;
+using ShaRide.Application.DTO.Response.Feedback;
 using ShaRide.Domain.Entities;
 
 namespace ShaRide.Application.Services.Interface
@@ -16,5 +19,7 @@ namespace ShaRide.Application.Services.Interface
         Task<string> SendPasswordResetSms(string phoneNumber);
 
         Task<int> ResetUserPassword(string phone, string newPassword);
+        Task<FeedbackResponse> Feedback(InsertFeedbackRequest request);
+        Task<ICollection<FeedbackResponse>> GetAllFeedbacks();
     }
 }

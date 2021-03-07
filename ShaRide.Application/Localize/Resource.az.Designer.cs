@@ -124,6 +124,15 @@ namespace ShaRide.Application.Localize {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; identifikasiyalı səyahət tapılmadı..
+        /// </summary>
+        public static string Exception_RideNotFound {
+            get {
+                return ResourceManager.GetString("Exception.RideNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Şifrə çox bəsitdir.
         /// </summary>
         public static string Validation_Password {
@@ -156,6 +165,15 @@ namespace ShaRide.Application.Localize {
         public static string Validation_Required {
             get {
                 return ResourceManager.GetString("Validation.Required", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Bu istifadəçinin bu əməliyyatı etmək üçün səlahiyyəti yoxdur..
+        /// </summary>
+        public static string Validation_UserHasNotAccessToOperation {
+            get {
+                return ResourceManager.GetString("Validation.UserHasNotAccessToOperation", resourceCulture);
             }
         }
         

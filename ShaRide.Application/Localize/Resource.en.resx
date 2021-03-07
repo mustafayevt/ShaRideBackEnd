@@ -54,4 +54,10 @@
     <data name="Exception.PhoneNotFound" xml:space="preserve">
         <value>User not found with phone '{0}' </value>
     </data>
+    <data name="Exception.RideNotFound" xml:space="preserve">
+        <value>Ride with '{0}' id was not found.</value>
+    </data>
+    <data name="Validation.UserHasNotAccessToOperation" xml:space="preserve">
+        <value>This user does not have access to do this access.</value>
+    </data>
 </root>

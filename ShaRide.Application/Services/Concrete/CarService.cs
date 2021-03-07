@@ -3,12 +3,15 @@ using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
 using AutoMapper;
+using AutoWrapper.Wrappers;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.Localization;
 using ShaRide.Application.Contexts;
 using ShaRide.Application.DTO.Request.Car;
 using ShaRide.Application.DTO.Response;
 using ShaRide.Application.DTO.Response.Car;
+using ShaRide.Application.Helpers;
 using ShaRide.Application.Localize;
 using ShaRide.Application.Services.Interface;
 using ShaRide.Domain.Entities;
@@ -44,26 +47,39 @@ namespace ShaRide.Application.Services.Concrete
 
         public async Task<CarResponse> GetCarByIdAsync(int request)
         {
-            var car = await _dbContext.Cars.Where(x => x.IsRowActive).FirstOrDefaultAsync(x => x.Id == request);
+            var car = await _dbContext.Cars.Include(x=>x.CarImages).Where(x => x.IsRowActive).FirstOrDefaultAsync(x => x.Id == request);
 
             return _mapper.Map<CarResponse>(car);
         }
 
         public async Task<ICollection<CarResponse>> GetCarsByUserIdAsync(int request)
         {
-            var rides =  _dbContext.Rides
-                .Include(x=>x.RideCarSeatComposition)
-                .ThenInclude(x=>x.CarSeatComposition)
-                .ThenInclude(x=>x.Car)
-                .Where(x => x.IsRowActive)
-                .Where(x => x.DriverId == request);
-
-            var car = rides.SelectMany(x => x.RideCarSeatComposition)
+            var cars = (await _dbContext.Rides
+                    .Include(x => x.RideCarSeatComposition)
+                    .ThenInclude(x => x.CarSeatComposition)
+                    .ThenInclude(x => x.Seat)
+                    .Include(x => x.RideCarSeatComposition)
+                    .ThenInclude(x => x.CarSeatComposition)
+                    .ThenInclude(x => x.Car)
+                    .ThenInclude(x => x.CarModel)
+                    .ThenInclude(x => x.BanType)
+                    .Include(x => x.RideCarSeatComposition)
+                    .ThenInclude(x => x.CarSeatComposition)
+                    .ThenInclude(x => x.Car)
+                    .ThenInclude(x => x.CarModel)
+                    .ThenInclude(x => x.CarBrand)
+                    .Include(x => x.RideCarSeatComposition)
+                    .ThenInclude(x => x.CarSeatComposition)
+                    .ThenInclude(x => x.Car)
+                    .ThenInclude(x => x.CarImages)
+                    .Where(x => x.IsRowActive && x.DriverId == request)
+                    .ToListAsync())
+                .SelectMany(x => x.RideCarSeatComposition)
                 .Select(x => x.CarSeatComposition)
                 .Select(x => x.Car)
-                .Distinct();
+                .Distinct(x => x.Id);
 
-            return _mapper.Map<ICollection<CarResponse>>(car);
+            return _mapper.Map<ICollection<CarResponse>>(cars);
         }
 
         public async Task<CarResponse> InsertCarAsync(InsertCarRequest request)
@@ -84,6 +100,16 @@ namespace ShaRide.Application.Services.Concrete
         public Task<ICollection<CarResponse>> InsertCarsAsync(ICollection<InsertCarRequest> request)
         {
             throw new System.NotImplementedException();
+        }
+
+        public async Task<CarImage> GetCarImageByCarImageId(int request)
+        {
+            var carImage = await _dbContext.CarImages.FirstOrDefaultAsync(x => x.IsRowActive && x.Id == request);
+
+            if (carImage is null)
+                throw new ApiException(_localizer[LocalizationKeys.NOT_FOUND]);
+
+            return carImage;
         }
 
         public Task DeleteCarAsync(int request)

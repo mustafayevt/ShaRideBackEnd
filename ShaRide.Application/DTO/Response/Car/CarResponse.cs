@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Newtonsoft.Json;
 using ShaRide.Application.DTO.Request.Car;
 using ShaRide.Application.DTO.Response.BanType;
 using ShaRide.Application.DTO.Response.CarModel;
@@ -14,6 +15,7 @@ namespace ShaRide.Application.DTO.Response.Car
 
         public ICollection<int> CarImageIds { get; set; }
 
+        // [JsonIgnore]
         public ICollection<CarSeatCompositionResponse> CarSeats { get; set; }
     }
 }

@@ -1,9 +1,11 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using AutoWrapper.Filters;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ShaRide.Application.Attributes;
 using ShaRide.Application.DTO.Request.Account;
+using ShaRide.Application.DTO.Request.Feedback;
 using ShaRide.Application.DTO.Response.Account;
 using ShaRide.Application.Services.Interface;
 
@@ -89,6 +91,28 @@ namespace ShaRide.WebApi.Controllers
             var data = image.Image;
             var filename = image.Id + image.Extension;
             return File(data, "application/force-download", filename);
+        }
+
+        /// <summary>
+        /// Saves feedbacks.
+        /// </summary>
+        /// <param name="content"></param>
+        /// <returns></returns>
+        [HttpPost("feedback")]
+        [Authorize]
+        public async Task<IActionResult> Feedback(InsertFeedbackRequest request)
+        {
+            return Ok(await _accountService.Feedback(request));
+        }
+
+        /// <summary>
+        /// Returns all active feedbacks
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("GetAllFeedbacks")]
+        public async Task<IActionResult> GetAllFeedbacks()
+        {
+            return Ok(await _accountService.GetAllFeedbacks());
         }
 
         private string GenerateIpAddress()
