@@ -15,6 +15,6 @@ namespace ShaRide.Domain.Entities
 
         public SeatRotate SeatRotate { get; set; }
 
-        public SeatType SeatType { get; set; }
+        public SeatStatus SeatType { get; set; }
     }
 }

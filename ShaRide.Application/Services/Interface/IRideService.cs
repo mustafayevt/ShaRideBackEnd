@@ -11,7 +11,8 @@ namespace ShaRide.Application.Services.Interface
     {
         ICollection<RideResponse> GetAllActiveRides();
         ICollection<RideResponse> GetActiveRides(GetActiveRidesRequest request);
-        Task<RideResponse> InsertRide(InsertRideRequest request);
+        Task<int> InsertRide(InsertRideRequest request);
         Task<int> UpdateRideState(UpdateRideStateRequest request);
+        Task<int> AddPassengerToRide(AddPassengerToRideRequest request);
     }
 }

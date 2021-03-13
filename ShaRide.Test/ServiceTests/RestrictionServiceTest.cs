@@ -48,7 +48,7 @@ namespace ShaRide.Test.ServiceTests
                 {
                     Id = 1,
                     Title = title,
-                    AssertPath = assetPath
+                    AssetPath = assetPath
                 }
             };
             _dbContextMock.Setup(x => x.Restrictions.ToList()).Returns(restrictions);

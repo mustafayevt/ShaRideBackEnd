@@ -161,7 +161,8 @@ namespace ShaRide.Application.Migrations
 
                     b.HasIndex("CarId");
 
-                    b.HasIndex("SeatId");
+                    b.HasIndex("SeatId", "CarId")
+                        .IsUnique();
 
                     b.ToTable("CarSeatComposition","Ride");
                 });
@@ -295,6 +296,37 @@ namespace ShaRide.Application.Migrations
                     b.ToTable("LocationPoints");
                 });
 
+            modelBuilder.Entity("ShaRide.Domain.Entities.PassengerToRideRequest", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<bool>("IsRowActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("RequestStatus")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("RideCarSeatCompositionId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RideCarSeatCompositionId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("PassengerToRideRequests");
+                });
+
             modelBuilder.Entity("ShaRide.Domain.Entities.Restriction", b =>
                 {
                     b.Property<int>("Id")
@@ -375,7 +407,7 @@ namespace ShaRide.Application.Migrations
                         .HasColumnType("integer")
                         .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
-                    b.Property<int?>("CarSeatCompositionId")
+                    b.Property<int>("CarSeatCompositionId")
                         .HasColumnType("integer");
 
                     b.Property<bool>("IsRowActive")
@@ -416,7 +448,7 @@ namespace ShaRide.Application.Migrations
 
                     b.HasIndex("LocationPointId");
 
-                    b.ToTable("RideLocationPointComposition");
+                    b.ToTable("RideLocationPointComposition","Ride");
                 });
 
             modelBuilder.Entity("ShaRide.Domain.Entities.Role", b =>
@@ -477,11 +509,6 @@ namespace ShaRide.Application.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<short>("Rating")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("smallint")
-                        .HasDefaultValue((short)5);
-
                     b.Property<string>("Surname")
                         .IsRequired()
                         .HasColumnType("text");
@@ -492,6 +519,29 @@ namespace ShaRide.Application.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("User");
+                });
+
+            modelBuilder.Entity("ShaRide.Domain.Entities.UserFcmToken", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+
+                    b.Property<bool>("IsRowActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Token")
+                        .HasColumnType("text");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserFcmTokens");
                 });
 
             modelBuilder.Entity("ShaRide.Domain.Entities.UserImage", b =>
@@ -548,6 +598,39 @@ namespace ShaRide.Application.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("UserPhones");
+                });
+
+            modelBuilder.Entity("ShaRide.Domain.Entities.UserRating", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+
+                    b.Property<int>("DestinationUserId")
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("IsRowActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("RideId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("SourceUserId")
+                        .HasColumnType("integer");
+
+                    b.Property<short>("Value")
+                        .HasColumnType("smallint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DestinationUserId");
+
+                    b.HasIndex("RideId");
+
+                    b.HasIndex("SourceUserId");
+
+                    b.ToTable("UserRatings");
                 });
 
             modelBuilder.Entity("ShaRide.Domain.Entities.UserRoleComposition", b =>
@@ -644,6 +727,21 @@ namespace ShaRide.Application.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("ShaRide.Domain.Entities.PassengerToRideRequest", b =>
+                {
+                    b.HasOne("ShaRide.Domain.Entities.RideCarSeatComposition", "RideCarSeatComposition")
+                        .WithMany()
+                        .HasForeignKey("RideCarSeatCompositionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ShaRide.Domain.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("ShaRide.Domain.Entities.RestrictionRideComposition", b =>
                 {
                     b.HasOne("ShaRide.Domain.Entities.Restriction", "Restriction")
@@ -672,7 +770,9 @@ namespace ShaRide.Application.Migrations
                 {
                     b.HasOne("ShaRide.Domain.Entities.CarSeatComposition", "CarSeatComposition")
                         .WithMany()
-                        .HasForeignKey("CarSeatCompositionId");
+                        .HasForeignKey("CarSeatCompositionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("ShaRide.Domain.Entities.User", "Passenger")
                         .WithMany()
@@ -698,6 +798,15 @@ namespace ShaRide.Application.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("ShaRide.Domain.Entities.UserFcmToken", b =>
+                {
+                    b.HasOne("ShaRide.Domain.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("ShaRide.Domain.Entities.UserImage", b =>
                 {
                     b.HasOne("ShaRide.Domain.Entities.User", "User")
@@ -712,6 +821,27 @@ namespace ShaRide.Application.Migrations
                     b.HasOne("ShaRide.Domain.Entities.User", "User")
                         .WithMany("Phones")
                         .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("ShaRide.Domain.Entities.UserRating", b =>
+                {
+                    b.HasOne("ShaRide.Domain.Entities.User", "DestinationUser")
+                        .WithMany()
+                        .HasForeignKey("DestinationUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ShaRide.Domain.Entities.Ride", "Ride")
+                        .WithMany()
+                        .HasForeignKey("RideId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ShaRide.Domain.Entities.User", "SourceUser")
+                        .WithMany()
+                        .HasForeignKey("SourceUserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

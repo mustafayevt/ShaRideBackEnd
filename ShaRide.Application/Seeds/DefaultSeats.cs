@@ -20,13 +20,14 @@ namespace ShaRide.Application.Seeds
                     {
                         var seat = new Seat
                         {
+                            Id = int.Parse(string.Concat(i,j)),
                             xCordinant = i,
                             yCordinant = j
                         };
                         await dbContext.Seats.AddAsync(seat);
-                        await dbContext.SaveChangesAsync();
                     }
                 }
+                await dbContext.SaveChangesAsync();
             }
         }
     }

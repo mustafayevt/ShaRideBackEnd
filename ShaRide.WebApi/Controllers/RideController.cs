@@ -10,7 +10,7 @@ namespace ShaRide.WebApi.Controllers
     [Route("api/[controller]")]
     [ApiController]
     [Authorize]
-    // [ApiKey] //TODO: uncomment these two lines before prod.
+    [ApiKey]
     public class RideController : ControllerBase
     {
         private readonly IRideService _rideService;
@@ -27,6 +27,7 @@ namespace ShaRide.WebApi.Controllers
         }
 
         [HttpPost("GetActiveRides")]
+        [AllowAnonymous]
         public IActionResult GetActiveRides(GetActiveRidesRequest request)
         {
             return Ok(_rideService.GetActiveRides(request));
@@ -36,6 +37,12 @@ namespace ShaRide.WebApi.Controllers
         public async Task<IActionResult> UpdateRideState(UpdateRideStateRequest request)
         {
             return Ok(await _rideService.UpdateRideState(request));
+        }
+
+        [HttpPost("AddPassengerToRide")]
+        public async Task<IActionResult> AddPassengerToRide(AddPassengerToRideRequest request)
+        {
+            return Ok(await _rideService.AddPassengerToRide(request));
         }
     }
 }

@@ -14,6 +14,7 @@ using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using ShaRide.Application.Contexts;
 using ShaRide.Application.DTO.Request;
+using ShaRide.Application.DTO.Request.UserFcmToken;
 using ShaRide.Application.Helpers;
 using ShaRide.Application.Managers;
 using ShaRide.Application.Services.Concrete;
@@ -49,6 +50,8 @@ namespace ShaRide.Application
             services.AddTransient<ICounterService, CounterService>();
             services.Configure<MailSettings>(configuration.GetSection("MailSettings"));
             services.Configure<TheTexting>(configuration.GetSection("TheTexting"));
+            services.Configure<FcmSettings>(configuration.GetSection("FcmSettings"));
+            services.Configure<FcmNotificationContract>(configuration.GetSection("FcmNotificationContract"));
             services.AddScoped<IDateTimeService, DateTimeService>();
             services.AddScoped<IEmailService, EmailService>();
             services.AddScoped<ILocationService, LocationService>();
@@ -59,6 +62,8 @@ namespace ShaRide.Application
             services.AddScoped<IRideService, RideService>();
             services.AddScoped<ICarService, CarService>();
             services.AddScoped<IInvoiceService, InvoiceService>();
+            services.AddScoped<IUserRatingService, UserRatingService>();
+            services.AddScoped<IUserFcmTokenService, UserFcmTokenService>();
             #endregion
             
             services.Configure<JWTSettings>(configuration.GetSection("JWTSettings"));

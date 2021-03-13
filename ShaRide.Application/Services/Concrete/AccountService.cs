@@ -249,12 +249,16 @@ namespace ShaRide.Application.Services.Concrete
         /// <exception cref="ApiException"></exception>
         public async Task<UserImage> GetUserThumbnailPhoto(int userId)
         {
-            var userImage = await _dbContext.Users.Where(x => x.IsRowActive).Include(x => x.UserImages)
-                .FirstOrDefaultAsync(x => x.Id == userId);
+            User user;
+            if (!_userManager.TryGetUserById(userId, out user))
+                throw new ApiException(_localizer[LocalizationKeys.NOT_FOUND]);
+
+            await _dbContext.Attach(user).Collection(x => x.UserImages).LoadAsync();
+            
             if (!_dbContext.Users.Where(x => x.IsRowActive).Any(x => x.Id == userId))
                 throw new ApiException(_localizer[LocalizationKeys.NOT_FOUND]);
 
-            return userImage.UserImages.FirstOrDefault(x => x.IsRowActive);
+            return user.UserImages.FirstOrDefault(x => x.IsRowActive);
         }
 
         /// <summary>
@@ -277,9 +281,11 @@ namespace ShaRide.Application.Services.Concrete
 
             var claims = new[]
                 {
-                    new Claim(JwtRegisteredClaimNames.Sub, user.Phones.FirstOrDefault(x => x.IsMain).Number),
+                    new Claim(JwtRegisteredClaimNames.Sub, user.Phones.FirstOrDefault(x => x.IsMain)?.Number),
                     new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                    new Claim(JwtRegisteredClaimNames.NameId, string.Concat(user.Name, " - ", user.Surname)),
+                    new Claim(JwtRegisteredClaimNames.NameId, user.Name),
+                    new Claim(JwtRegisteredClaimNames.FamilyName, user.Surname),
+                    new Claim(JwtRegisteredClaimNames.UniqueName, user.UserUniqueKey),
                     new Claim("uid", user.Id.ToString()),
                     new Claim("ip", ipAddress)
                 }

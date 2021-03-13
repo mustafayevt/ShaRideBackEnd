@@ -11,6 +11,8 @@ using ShaRide.Application.DTO.Request.Invoice;
 using ShaRide.Application.DTO.Request.Location;
 using ShaRide.Application.DTO.Request.Restriction;
 using ShaRide.Application.DTO.Request.Ride;
+using ShaRide.Application.DTO.Request.UserFcmToken;
+using ShaRide.Application.DTO.Request.UserRating;
 using ShaRide.Application.DTO.Response.Account;
 using ShaRide.Application.DTO.Response.BanType;
 using ShaRide.Application.DTO.Response.Car;
@@ -21,7 +23,9 @@ using ShaRide.Application.DTO.Response.Invoice;
 using ShaRide.Application.DTO.Response.Location;
 using ShaRide.Application.DTO.Response.Restriction;
 using ShaRide.Application.DTO.Response.Ride;
+using ShaRide.Application.DTO.Response.UserFcmToken;
 using ShaRide.Application.DTO.Response.UserPhone;
+using ShaRide.Application.DTO.Response.UserRating;
 using ShaRide.Domain.Entities;
 
 namespace ShaRide.Application.Mappings
@@ -80,6 +84,9 @@ namespace ShaRide.Application.Mappings
             CreateMap<Restriction, InsertRestrictionRequest>().ReverseMap();
             CreateMap<Restriction, UpdateRestrictionRequest>().ReverseMap();
             CreateMap<Restriction, RestrictionResponse>().ReverseMap();
+            CreateMap<RideRestrictionRequest, RestrictionResponse>()
+                .ForMember(x => x.Id, opt => opt.MapFrom(y => y.RestrictionId))
+                .ReverseMap();
 
             #endregion
 
@@ -119,6 +126,11 @@ namespace ShaRide.Application.Mappings
                 .ForMember(x => x.RestrictionId, opt => opt.MapFrom(y => y.RestrictionId))
                 .ReverseMap();
 
+            CreateMap<RideCarSeatComposition, RideSeatRequest>()
+                .ForMember(x => x.CarSeatCompositionId, opt => opt.MapFrom(y => y.CarSeatCompositionId))
+                .ForMember(x => x.SeatStatus, opt => opt.MapFrom(y => y.SeatStatus))
+                .ReverseMap();
+
             CreateMap<Ride, InsertRideRequest>()
                 .ForMember(x => x.DriverId, opt => opt.MapFrom(y => y.DriverId))
                 .ForMember(x => x.StartDate, opt => opt.MapFrom(y => y.StartDate))
@@ -127,13 +139,19 @@ namespace ShaRide.Application.Mappings
                 .ForMember(x => x.RideState, opt => opt.MapFrom(y => y.RideState))
                 .ForMember(x => x.RideLocationPoints, opt => opt.MapFrom(y => y.RideLocationPointComposition))
                 .ForMember(x => x.RideRestrictions, opt => opt.MapFrom(y => y.RestrictionRideComposition))
-                .ForMember(x => x.RideSeatRequests, opt => opt.Ignore())
+                .ForMember(x => x.RideSeatRequests, opt => opt.MapFrom(y=>y.RideCarSeatComposition))
                 .ReverseMap();
 
             CreateMap<Ride, RideResponse>()
-                .ForMember(x => x.RideCarSeatComposition, opt => opt.MapFrom(y => y.RideCarSeatComposition))
-                .ForMember(x => x.Restrictions, opt => opt.MapFrom(y => y.RestrictionRideComposition.Select(x => x.Restriction)))
-                .ForMember(x => x.LocationPoints, opt => opt.MapFrom(y => y.RideLocationPointComposition));
+                .ForMember(x => x.Restrictions, opt => opt.MapFrom(y => y.RestrictionRideComposition.Select(y=>new RestrictionResponse
+                {
+                    Id = y.Restriction.Id,
+                    Title = y.Restriction.Title,
+                    AssetPath = y.Restriction.AssetPath,
+                    IsPossible = y.IsPossible
+                })))
+                .ForMember(x => x.LocationPoints, opt => opt.MapFrom(y => y.RideLocationPointComposition))
+                .ReverseMap();
 
             #endregion
 
@@ -147,11 +165,10 @@ namespace ShaRide.Application.Mappings
                 .ForMember(x => x.Extension, opt => opt.MapFrom(y => y.Extension));
 
             CreateMap<CarSeatComposition, InsertCarSeatCompositionRequest>()
-                .ForMember(x => x.Id, opt => opt.MapFrom(y => y.SeatId))
+                .ForMember(x => x.SeatId, opt => opt.MapFrom(y => y.SeatId))
                 .ReverseMap();
 
             CreateMap<CarSeatComposition, CarSeatCompositionResponse>()
-                .ForMember(x => x.Id, opt => opt.MapFrom(y => y.SeatId))
                 .ForMember(x => x.xCordinant, opt => opt.MapFrom(y => y.Seat.xCordinant))
                 .ForMember(x => x.yCordinant, opt => opt.MapFrom(y => y.Seat.yCordinant))
                 .ReverseMap();
@@ -164,6 +181,13 @@ namespace ShaRide.Application.Mappings
                 .ReverseMap();
             
             CreateMap<Car, CarResponse>()
+                .ForMember(x => x.RegisterNumber, opt => opt.MapFrom(y => y.RegisterNumber))
+                .ForMember(x => x.CarImageIds, opt => opt.MapFrom(x=>x.CarImages.Select(carImage=>carImage.Id)))
+                .ForMember(x => x.CarSeats, opt => opt.MapFrom(y => y.CarSeatComposition))
+                .ForMember(x => x.Model, opt => opt.MapFrom(y => y.CarModel))
+                .ReverseMap();
+            
+            CreateMap<Car, RideCarResponse>()
                 .ForMember(x => x.Id, opt => opt.MapFrom(y => y.CarModelId))
                 .ForMember(x => x.RegisterNumber, opt => opt.MapFrom(y => y.RegisterNumber))
                 .ForMember(x => x.CarImageIds, opt => opt.MapFrom(x=>x.CarImages.Select(carImage=>carImage.Id)))
@@ -171,7 +195,8 @@ namespace ShaRide.Application.Mappings
                 .ForMember(x => x.Model, opt => opt.MapFrom(y => y.CarModel))
                 .ReverseMap();
 
-            CreateMap<RideCarSeatComposition, RideCarSeatCompositionResponse>();
+            CreateMap<RideCarSeatComposition, RideCarSeatCompositionResponse>()
+                .ForMember(x=>x.Car,opt=>opt.MapFrom(y=>y.CarSeatComposition.Car));
 
             #endregion
 
@@ -200,6 +225,21 @@ namespace ShaRide.Application.Mappings
             CreateMap<FeedbackResponse, Feedback>()
                 .ForMember(x=>x.CreatedByUser,opt=>opt.MapFrom(y=>y.UserResponse))
                 .ReverseMap();
+
+            #endregion
+
+            #region UserRating
+
+            CreateMap<UserRatingResponse, InsertUserRatingRequest>().ReverseMap();
+            CreateMap<RatingRequest, RatingResponse>().ReverseMap();
+
+            #endregion
+
+            #region UserFcmToken
+
+            CreateMap<UserFcmToken, UserFcmTokenInsertRequest>().ReverseMap();
+            CreateMap<UserFcmToken, UserFcmTokenUpdateRequest>().ReverseMap();
+            CreateMap<UserFcmToken, UserFcmTokenResponse>().ReverseMap();
 
             #endregion
         }

@@ -7,6 +7,8 @@
     <ItemGroup>
       <Compile Remove="Migrations\20201122113232_imgcol1.cs" />
       <Compile Remove="Migrations\20201122113232_imgcol1.Designer.cs" />
+      <Compile Remove="Migrations\20210309193357_userrating2.cs" />
+      <Compile Remove="Migrations\20210309193357_userrating2.Designer.cs" />
       <Compile Update="Localize\Resource.az.Designer.cs">
         <DesignTime>True</DesignTime>
         <AutoGen>True</AutoGen>

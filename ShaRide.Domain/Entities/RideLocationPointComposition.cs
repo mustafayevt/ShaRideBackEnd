@@ -1,7 +1,9 @@
-﻿using ShaRide.Domain.Enums;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using ShaRide.Domain.Enums;
 
 namespace ShaRide.Domain.Entities
 {
+    [Table(nameof(RideLocationPointComposition),Schema = "Ride")]
     public class RideLocationPointComposition
     {
         public int RideId { get; set; }

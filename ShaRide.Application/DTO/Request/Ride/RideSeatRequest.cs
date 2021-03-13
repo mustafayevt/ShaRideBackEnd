@@ -7,7 +7,7 @@ namespace ShaRide.Application.DTO.Request.Ride
     public class RideSeatRequest
     {
         [Required(ErrorMessage = LocalizationKeys.REQUIRED)]
-        public int Id { get; set; }
+        public int CarSeatCompositionId { get; set; }
 
         [Required(ErrorMessage = LocalizationKeys.REQUIRED)]
         public SeatStatus SeatStatus { get; set; }

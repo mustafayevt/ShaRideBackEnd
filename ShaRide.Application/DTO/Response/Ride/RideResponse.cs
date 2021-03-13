@@ -22,7 +22,8 @@ namespace ShaRide.Application.DTO.Response.Ride
         
         public RideState RideState { get; set; }
 
-        public ICollection<RideCarSeatCompositionResponse> RideCarSeatComposition { get; set; }
+        public RideCarResponse Car { get; set; }
+
         public ICollection<RideLocationPointCompositionResponse> LocationPoints { get; set; }
         
         public ICollection<RestrictionResponse> Restrictions { get; set; }

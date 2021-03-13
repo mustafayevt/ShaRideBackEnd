@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using ShaRide.Application.Services.Interface;
 using ShaRide.Domain.Common;
 using ShaRide.Domain.Entities;
+using ShaRide.Domain.Enums;
 
 namespace ShaRide.Application.Contexts
 {
@@ -80,7 +81,6 @@ namespace ShaRide.Application.Contexts
             builder.Entity<User>(entity =>
             {
                 entity.ToTable(name: "User");
-                entity.Property(x => x.Rating).HasDefaultValue(5);
             });
 
             builder.Entity<UserImage>(entity =>
@@ -98,6 +98,8 @@ namespace ShaRide.Application.Contexts
             builder.Entity<RestrictionRideComposition>().HasKey(x => new {x.RestrictionId, x.RideId});
             
             builder.Entity<RideLocationPointComposition>().HasKey(x => new {x.RideId,x.LocationPointId});
+
+            builder.Entity<CarSeatComposition>().HasIndex(x => new {x.SeatId, x.CarId}).IsUnique();
 
             builder.Entity<Restriction>().HasIndex(x => x.Title);
 
@@ -118,6 +120,7 @@ namespace ShaRide.Application.Contexts
         public DbSet<Restriction> Restrictions { get; set; }
         public DbSet<RestrictionRideComposition> RestrictionRideComposition { get; set; }
         public DbSet<RideLocationPointComposition> RideLocationPointComposition { get; set; }
+        public DbSet<RideCarSeatComposition> RideCarSeatCompositions { get; set; }
         public DbSet<Ride> Rides { get; set; }
         public DbSet<CarBrand> CarBrands { get; set; }
         public DbSet<CarModel> CarModels { get; set; }
@@ -128,6 +131,9 @@ namespace ShaRide.Application.Contexts
         public DbSet<Counter> Counters { get; set; }
         public DbSet<Invoice> Invoices { get; set; }
         public DbSet<Feedback> Feedbacks { get; set; }
+        public DbSet<UserRating> UserRatings { get; set; }
+        public DbSet<UserFcmToken> UserFcmTokens { get; set; }
+        public DbSet<PassengerToRideRequest> PassengerToRideRequests { get; set; }
 
         #endregion
     }

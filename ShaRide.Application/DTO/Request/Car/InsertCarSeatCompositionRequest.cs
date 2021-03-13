@@ -7,12 +7,12 @@ namespace ShaRide.Application.DTO.Request.Car
     public class InsertCarSeatCompositionRequest
     {
         [Required(ErrorMessage = LocalizationKeys.REQUIRED)]
-        public int Id { get; set; }
+        public int SeatId { get; set; }
 
         [Required(ErrorMessage = LocalizationKeys.REQUIRED)]
         public SeatRotate SeatRotate { get; set; }
 
         [Required(ErrorMessage = LocalizationKeys.REQUIRED)]
-        public SeatType SeatType { get; set; }
+        public SeatStatus SeatType { get; set; }
     }
 }

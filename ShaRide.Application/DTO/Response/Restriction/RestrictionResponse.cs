@@ -4,6 +4,7 @@
     {
         public int Id { get; set; }
         public string Title { get; set; }
-        public string AssertPath { get; set; }
+        public string AssetPath { get; set; }
+        public bool IsPossible { get; set; }
     }
 }
