@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ShaRide.Application.Attributes;
@@ -43,6 +44,18 @@ namespace ShaRide.WebApi.Controllers
         public async Task<IActionResult> AddPassengerToRide(AddPassengerToRideRequest request)
         {
             return Ok(await _rideService.AddPassengerToRide(request));
+        }
+
+        [HttpGet("GetPassengerToRideRequests")]
+        public async Task<IActionResult> GetPassengerToRideRequests()
+        {
+            return Ok(await _rideService.GetPassengerToRideRequests());
+        }
+
+        [HttpPost("RespondUserRideRequest")]
+        public async Task<IActionResult> RespondUserRideRequest(List<DriverRespondRequest> requests)
+        {
+            return Ok(await _rideService.RespondUserRideRequest(requests));
         }
     }
 }

@@ -9,6 +9,8 @@ namespace ShaRide.Domain.Entities
     {
         public CarSeatComposition CarSeatComposition { get; set; }
         public int CarSeatCompositionId { get; set; }
+        public Ride Ride { get; set; }
+        public int RideId { get; set; }
 
         public SeatStatus SeatStatus { get; set; }
 

@@ -23,6 +23,11 @@ namespace ShaRide.Application.DTO.Request.UserFcmToken
                 this.status = status;
             }
 
+            public Data()
+            {
+                
+            }
+
             public string click_action { get; set; }
             public string id { get; set; }
             public string status { get; set; }

@@ -47,5 +47,28 @@ namespace ShaRide.Application.ManualMapping
             }
             return rideResponses;
         }
+
+        public static IEnumerable<PassengerToRideResponse> ToPassengerToRideResponse(this ICollection<PassengerToRideRequest> source, IMapper mapper)
+        {
+            foreach (var passengerToRideRequest in source)
+            {
+                yield return new PassengerToRideResponse
+                {
+                    Ride = mapper.Map<RideResponse>(passengerToRideRequest.RideCarSeatComposition.Ride),
+                    RequestId = passengerToRideRequest.Id,
+                    PassengerRequest = new CarSeatCompositionResponse
+                    {
+                        Passenger = mapper.Map<UserResponse>(passengerToRideRequest.User),
+                        xCordinant = passengerToRideRequest.RideCarSeatComposition.CarSeatComposition.Seat.xCordinant,
+                        yCordinant = passengerToRideRequest.RideCarSeatComposition.CarSeatComposition.Seat.yCordinant,
+                        CarId = passengerToRideRequest.RideCarSeatComposition.CarSeatComposition.CarId,
+                        SeatId = passengerToRideRequest.RideCarSeatComposition.CarSeatComposition.SeatId,
+                        SeatRotate = passengerToRideRequest.RideCarSeatComposition.CarSeatComposition.SeatRotate,
+                        SeatType = passengerToRideRequest.RideCarSeatComposition.CarSeatComposition.SeatType,
+                        Id = passengerToRideRequest.RideCarSeatComposition.CarSeatComposition.Id,
+                    }
+                };
+            }
+        }
     }
 }

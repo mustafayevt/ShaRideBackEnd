@@ -1,15 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
 using AutoMapper;
 using AutoWrapper.Wrappers;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
 using ShaRide.Application.Contexts;
 using ShaRide.Application.DTO.Request.Ride;
 using ShaRide.Application.DTO.Request.UserFcmToken;
+using ShaRide.Application.DTO.Response.Restriction;
 using ShaRide.Application.DTO.Response.Ride;
 using ShaRide.Application.Helpers;
 using ShaRide.Application.Localize;
@@ -123,7 +126,8 @@ namespace ShaRide.Application.Services.Concrete
                             x.RideState != RideState.Finished &&
                             x.StartDate.Date == request.Date.Date &&
                             (!request.BanTypeId.HasValue || x.RideCarSeatComposition.Any(y =>
-                                y.CarSeatComposition.Car.CarModel.BanTypeId == request.BanTypeId)));
+                                y.CarSeatComposition.Car.CarModel.BanTypeId == request.BanTypeId && 
+                                y.SeatStatus == SeatStatus.Suitable)));
 
             var rides = results.RidesToRideResponses(_mapper);
 
@@ -197,6 +201,18 @@ namespace ShaRide.Application.Services.Concrete
                 throw new ApiException(_localizer.GetString(LocalizationKeys.NOT_FOUND,
                     _authenticatedUserService.UserId.Value));
 
+            #region Remove user all old requests
+
+            var userOldRequests = _dbContext.PassengerToRideRequests.AsTracking().Include(x => x.RideCarSeatComposition).Where(x =>
+                x.IsRowActive &&
+                request.RideId == x.RideCarSeatComposition.RideId && x.UserId == _authenticatedUserService.UserId);
+
+            await userOldRequests.ForEachAsync(x => x.IsRowActive = false);
+
+            #endregion
+
+            #region Add new requests
+
             var passengerToRideRequests = request.RideCarSeatCompositionIds.Select(x =>
             {
                 return new PassengerToRideRequest
@@ -207,12 +223,15 @@ namespace ShaRide.Application.Services.Concrete
             });
 
             await _dbContext.PassengerToRideRequests.AddRangeAsync(passengerToRideRequests);
+
+                #endregion
             
             await _dbContext.SaveChangesAsync();
 
+            //Sending notification to driver through FCM.
             await Task.Run(async () =>
             {
-                var userFcmTokens = _dbContext.UserFcmTokens.Where(x => x.IsRowActive);
+                var userFcmTokens = _dbContext.UserFcmTokens.Where(x => x.IsRowActive && x.UserId == request.DriverId);
 
                 var rideLocationComposition = _dbContext.RideLocationPointComposition.Include(x => x.Ride)
                     .Include(x => x.LocationPoint).ThenInclude(x => x.Location).Where(x => x.RideId == request.RideId);
@@ -227,7 +246,7 @@ namespace ShaRide.Application.Services.Concrete
                     $"{user.Name} {user.Surname} {startLocationName} - {finishLocationName} səyahətində {request.RideCarSeatCompositionIds.Count} oturacaq sifariş etmək istəyir.";
 
                 var fcmContract = _fcmNotificationContract.Value;
-                fcmContract.data = new FcmNotificationContract.Data("testClickAction", "1", "pending");
+                // fcmContract.data = new FcmNotificationContract.Data("testClickAction", "1", "pending");
                 fcmContract.notification = new FcmNotificationContract.Notification{body = notificationBody};
                 fcmContract.registration_ids = userFcmTokens.Select(x => x.Token).ToList();
 
@@ -235,6 +254,83 @@ namespace ShaRide.Application.Services.Concrete
             });
             
             return 0;
+        }
+
+        public async Task<int> RespondUserRideRequest(List<DriverRespondRequest> requests)
+        {
+            List<PassengerToRideRequest> updatedRequests = _dbContext.PassengerToRideRequests.AsTracking().Include(x=>x.RideCarSeatComposition)
+                .ThenInclude(x=>x.Ride).Where(x=> x.IsRowActive && requests.Select(driverRespondRequest=>driverRespondRequest.RequestId).Contains(x.Id)).ToList();
+
+            //Rule check for if there is any suitable seat for specific ride. 
+            foreach (var passengerToRideRequest in updatedRequests)
+            {
+                if (_dbContext.RideCarSeatCompositions.Count(composition =>
+                    composition.IsRowActive &&
+                    composition.SeatStatus == SeatStatus.Suitable) < updatedRequests.Count(x =>
+                    x.RideCarSeatComposition.RideId == passengerToRideRequest.RideCarSeatComposition.RideId))
+                {
+                    throw new ApiException("There is no suitable seats in this ride.");
+                }
+            }
+            
+            //this is core part. Changes status in PassengerToRideRequest table.
+            foreach (var driverRespondRequest in requests)
+            {
+                var requestEntity =
+                    updatedRequests.FirstOrDefault(x => x.Id == driverRespondRequest.RequestId);
+                
+                if (requestEntity is null)
+                    throw new ApiException(new InvalidOperationException(),400);
+            
+                requestEntity.RequestStatus = driverRespondRequest.RespondStatus;
+            }
+
+            if(requests.FirstOrDefault()?.RespondStatus == PassengerToRideRequestStatus.Confrimed)
+                await AcceptRideRequest(updatedRequests);
+            
+            else if (requests.FirstOrDefault()?.RespondStatus == PassengerToRideRequestStatus.Rejected)
+                await RejectRideRequest(updatedRequests);
+
+            await _dbContext.SaveChangesAsync();
+            
+            return 0;
+        }
+
+
+        public async Task<IEnumerable<PassengerToRideResponse>> GetPassengerToRideRequests()
+        {
+            var requests = _dbContext
+                .PassengerToRideRequests
+                .AsTracking()
+                .Include(x=>x.User)
+                .Include(x=>x.RideCarSeatComposition)
+                .ThenInclude(x=>x.CarSeatComposition)
+                .ThenInclude(x=>x.Seat)
+                .Include(x=>x.RideCarSeatComposition)
+                .ThenInclude(x=>x.Ride)
+                .ThenInclude(x=>x.RideLocationPointComposition)
+                .ThenInclude(x=>x.LocationPoint)
+                .ThenInclude(x=>x.Location)
+                .Where(x => x.IsRowActive &&
+                            x.RequestStatus == PassengerToRideRequestStatus.WaitingForResponse &&
+                            x.RideCarSeatComposition.Ride.DriverId == _authenticatedUserService.UserId);
+
+            await requests.ForEachAsync(x =>
+            {
+                _dbContext.Entry(x).Reference(x => x.RideCarSeatComposition)
+                    .Query()
+                    .Include(x => x.Ride)
+                    .ThenInclude(x => x.RideCarSeatComposition)
+                    .ThenInclude(x => x.CarSeatComposition)
+                    .ThenInclude(x => x.Car)
+                    .Include(x => x.Ride)
+                    .ThenInclude(x => x.RideCarSeatComposition)
+                    .ThenInclude(x => x.CarSeatComposition).
+                    ThenInclude(x => x.Seat);
+
+            });
+
+            return (requests).ToList().ToPassengerToRideResponse(_mapper);
         }
 
         protected int DriverId(InsertRideRequest rideRequest)
@@ -257,6 +353,145 @@ namespace ShaRide.Application.Services.Concrete
             }
 
             return driverId;
+        }
+        
+        /// <summary>
+        /// Accepts users ride request after pass rule checking.
+        /// </summary>
+        /// <param name="updatedRequests"></param>
+        /// <returns></returns>
+        private async Task AcceptRideRequest(List<PassengerToRideRequest> updatedRequests)
+        {
+            updatedRequests.ForEach(x =>
+            {
+                x.RideCarSeatComposition.SeatStatus = SeatStatus.Sold;
+                x.RideCarSeatComposition.PassengerId = x.UserId;
+            });
+
+            //Remove rejected requests.
+            await RejectOtherRideRequests(updatedRequests);
+            
+            //Sending notification to driver through FCM.
+            await Task.Run(async () =>
+            {
+                var notificationsToUser = updatedRequests.Select(x => x.UserId);
+
+                var userFcmTokens =
+                    _dbContext.UserFcmTokens.Where(x => x.IsRowActive && notificationsToUser.First() == x.UserId);
+
+                var rideLocationComposition = _dbContext.RideLocationPointComposition.Include(x => x.Ride)
+                    .Include(x => x.LocationPoint).ThenInclude(x => x.Location).Where(x =>
+                        x.RideId == updatedRequests.FirstOrDefault().RideCarSeatComposition.RideId);
+
+                var startLocationName = rideLocationComposition
+                    .First(x => x.LocationPointType == LocationPointType.StartPoint).LocationPoint.Location.Name;
+
+                var finishLocationName = rideLocationComposition
+                    .First(x => x.LocationPointType == LocationPointType.FinishPoint).LocationPoint.Location.Name;
+
+                var notificationBody =
+                    $"Sürücü {startLocationName} - {finishLocationName} səyahəti üçün verdiyiniz sifarişi qəbul etdi.";
+
+                var fcmContract = _fcmNotificationContract.Value;
+                // fcmContract.data = new FcmNotificationContract.Data("testClickAction", "1", "pending");
+                fcmContract.notification = new FcmNotificationContract.Notification {body = notificationBody};
+                fcmContract.registration_ids = userFcmTokens.Select(x => x.Token).ToList();
+
+                await _userFcmTokenService.SendNotificationToUser(fcmContract);
+            });
+        }
+        
+        /// <summary>
+        /// Rejects other users request in same seat in ride.
+        /// </summary>
+        /// <param name="updatedRequests"></param>
+        /// <returns></returns>
+        private async Task RejectOtherRideRequests(List<PassengerToRideRequest> updatedRequests)
+        {
+            //This implementation is considered for single request. for multiple requests need to change this method as well.
+            if (updatedRequests.FirstOrDefault()?.RequestStatus != PassengerToRideRequestStatus.Confrimed)
+                return;
+            
+            var rejectedRequests = _dbContext.PassengerToRideRequests.AsTracking().Include(x => x.RideCarSeatComposition)
+                .ToList().AsEnumerable().Where(x =>
+                    x.IsRowActive && updatedRequests.Count(y =>
+                        y.RideCarSeatComposition.RideId == x.RideCarSeatComposition.RideId &&
+                        y.RideCarSeatComposition.CarSeatCompositionId ==
+                        x.RideCarSeatComposition.CarSeatCompositionId) > 0 &&
+                    x.RequestStatus == PassengerToRideRequestStatus.WaitingForResponse).ToList();
+
+            rejectedRequests.ForEach(x => x.IsRowActive = false);
+
+            //Sending notification to driver through FCM.
+            await Task.Run(async () =>
+            {
+                var notificationsToUser = rejectedRequests.Select(x => x.UserId);
+
+                var userFcmTokens =
+                    _dbContext.UserFcmTokens.Where(x => x.IsRowActive && notificationsToUser.Contains(x.UserId));
+
+                var rideLocationComposition = _dbContext.RideLocationPointComposition.Include(x => x.Ride)
+                    .Include(x => x.LocationPoint).ThenInclude(x => x.Location).Where(x =>
+                        x.RideId == updatedRequests.FirstOrDefault().RideCarSeatComposition.RideId);
+
+                var startLocationName = rideLocationComposition
+                    .First(x => x.LocationPointType == LocationPointType.StartPoint).LocationPoint.Location.Name;
+
+                var finishLocationName = rideLocationComposition
+                    .First(x => x.LocationPointType == LocationPointType.FinishPoint).LocationPoint.Location.Name;
+
+                var notificationBody =
+                    $"{startLocationName} - {finishLocationName} səyahəti üçün verdiyiniz sifariş sistem tərəfindən ləğv olundu.";
+
+                var fcmContract = _fcmNotificationContract.Value;
+                // fcmContract.data = new FcmNotificationContract.Data("testClickAction", "1", "pending");
+                fcmContract.notification = new FcmNotificationContract.Notification {body = notificationBody};
+                fcmContract.registration_ids = userFcmTokens.Select(x => x.Token).ToList();
+
+                await _userFcmTokenService.SendNotificationToUser(fcmContract);
+            });
+        }
+
+        /// <summary>
+        /// Rejects users ride request after pass rule checking
+        /// </summary>
+        /// <param name="updatedRequests"></param>
+        /// <returns></returns>
+        private async Task RejectRideRequest(List<PassengerToRideRequest> updatedRequests)
+        {
+            updatedRequests.ForEach(x =>
+            {
+                x.RequestStatus = PassengerToRideRequestStatus.Rejected;
+            });
+            
+            //Sending notification to driver through FCM.
+            await Task.Run(async () =>
+            {
+                var notificationsToUser = updatedRequests.Select(x => x.UserId);
+
+                var userFcmTokens =
+                    _dbContext.UserFcmTokens.Where(x => x.IsRowActive && notificationsToUser.First() == x.UserId);
+
+                var rideLocationComposition = _dbContext.RideLocationPointComposition.Include(x => x.Ride)
+                    .Include(x => x.LocationPoint).ThenInclude(x => x.Location).Where(x =>
+                        x.RideId == updatedRequests.FirstOrDefault().RideCarSeatComposition.RideId);
+
+                var startLocationName = rideLocationComposition
+                    .First(x => x.LocationPointType == LocationPointType.StartPoint).LocationPoint.Location.Name;
+
+                var finishLocationName = rideLocationComposition
+                    .First(x => x.LocationPointType == LocationPointType.FinishPoint).LocationPoint.Location.Name;
+
+                var notificationBody =
+                    $"Sürücü {startLocationName} - {finishLocationName} səyahəti üçün verdiyiniz sifarişdən imtina etdi.";
+
+                var fcmContract = _fcmNotificationContract.Value;
+                // fcmContract.data = new FcmNotificationContract.Data("testClickAction", "1", "pending");
+                fcmContract.notification = new FcmNotificationContract.Notification {body = notificationBody};
+                fcmContract.registration_ids = userFcmTokens.Select(x => x.Token).ToList();
+
+                await _userFcmTokenService.SendNotificationToUser(fcmContract);
+            });
         }
     }
 }

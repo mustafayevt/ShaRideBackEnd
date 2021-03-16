@@ -14,5 +14,7 @@ namespace ShaRide.Application.Services.Interface
         Task<int> InsertRide(InsertRideRequest request);
         Task<int> UpdateRideState(UpdateRideStateRequest request);
         Task<int> AddPassengerToRide(AddPassengerToRideRequest request);
+        Task<int> RespondUserRideRequest(List<DriverRespondRequest> requests);
+        Task<IEnumerable<PassengerToRideResponse>> GetPassengerToRideRequests();
     }
 }
