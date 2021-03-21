@@ -60,4 +60,10 @@
     <data name="Validation.UserHasNotAccessToOperation" xml:space="preserve">
         <value>Bu istifadəçinin bu əməliyyatı etmək üçün səlahiyyəti yoxdur.</value>
     </data>
+    <data name="Validation.UserDoesNotHaveEnoughBalance" xml:space="preserve">
+        <value>Bu əməliyyat üçün istifadəçinin balansı çatmır</value>
+    </data>
+    <data name="Validation.RideCannotCancelled" xml:space="preserve">
+        <value>Başlama vaxtına 1 saat qalmış, səyahət imtina edilə bilməz.</value>
+    </data>
 </root>

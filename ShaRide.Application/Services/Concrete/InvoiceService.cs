@@ -37,6 +37,8 @@ namespace ShaRide.Application.Services.Concrete
 
             newInvoice.UserId = user.Id;
 
+            user.Balance += newInvoice.Amount;
+
             await _applicationDbContext.Invoices.AddAsync(newInvoice);
 
             await _applicationDbContext.SaveChangesAsync();

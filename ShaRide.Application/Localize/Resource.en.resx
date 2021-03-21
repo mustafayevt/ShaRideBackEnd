@@ -60,4 +60,10 @@
     <data name="Validation.UserHasNotAccessToOperation" xml:space="preserve">
         <value>This user does not have access to do this access.</value>
     </data>
+    <data name="Validation.UserDoesNotHaveEnoughBalance" xml:space="preserve">
+        <value>User does not have enough balance for this operation</value>
+    </data>
+    <data name="Validation.RideCannotCancelled" xml:space="preserve">
+        <value>One hour before the start time, the Ride cannot be canceled</value>
+    </data>
 </root>

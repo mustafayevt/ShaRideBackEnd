@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
@@ -150,7 +151,12 @@ namespace ShaRide.Application.Services.Concrete
         {
             var ride = _mapper.Map<Ride>(request);
 
-            ride.DriverId = DriverId(request);
+            var driver = await GetUser(request);
+
+            if (driver.Balance < 10m)
+                throw new ApiException(_localizer.GetString(LocalizationKeys.USER_DOES_NOT_HAVE_ENOUGH_BALANCE));
+            
+            ride.DriverId = driver.Id;
 
             if (!request.CarId.HasValue || request.CarId.Equals(0))
             {
@@ -333,26 +339,222 @@ namespace ShaRide.Application.Services.Concrete
             return (requests).ToList().ToPassengerToRideResponse(_mapper);
         }
 
-        protected int DriverId(InsertRideRequest rideRequest)
+        public async Task<int> CancelRide(CancelRideRequest request)
         {
-            int driverId;
+            var ride = await _dbContext.Rides.AsTracking().FirstOrDefaultAsync(x => x.IsRowActive && x.Id.Equals(request.RideId));
+
+            if (ride.Equals(null))
+                throw new ApiException(_localizer[LocalizationKeys.RIDE_NOT_FOUND, request.RideId]);
+            
+            //ride date validation check.
+            TimeSpan difference = ride.StartDate.Subtract(request.CancelDate);
+            if (difference.Hours < 1)
+                throw new ApiException(_localizer.GetString(LocalizationKeys.RIDE_CANNOT_CANCELLED));
+
+            ride.RideState = RideState.Canceled;
+
+            await _dbContext.SaveChangesAsync();
+            
+            await Task.Run(async () =>
+            {
+                var notificationsToUser = _dbContext
+                    .RideCarSeatCompositions
+                    .Include(x=>x.Passenger)
+                    .Where(x=>x.IsRowActive && x.RideId == ride.Id && x.PassengerId.HasValue)
+                    .Select(x=>x.Passenger);
+
+                var userFcmTokens =
+                    _dbContext.UserFcmTokens.Where(x => x.IsRowActive && notificationsToUser.Select(y=>y.Id).Contains(x.UserId));
+
+                var rideLocationComposition = _dbContext.RideLocationPointComposition.Include(x => x.Ride)
+                    .Include(x => x.LocationPoint).ThenInclude(x => x.Location).Where(x =>
+                        x.RideId == ride.Id);
+
+                var startLocationName = rideLocationComposition
+                    .First(x => x.LocationPointType == LocationPointType.StartPoint).LocationPoint.Location.Name;
+
+                var finishLocationName = rideLocationComposition
+                    .First(x => x.LocationPointType == LocationPointType.FinishPoint).LocationPoint.Location.Name;
+
+                var notificationBody =
+                    $"{ride.StartDate.ToString("F", new CultureInfo("az-AZ"))} tarixli {startLocationName} - {finishLocationName} səyahəti sürücü tərəfindən ləğv edildi.";
+
+                var fcmContract = _fcmNotificationContract.Value;
+                fcmContract.notification = new FcmNotificationContract.Notification {body = notificationBody};
+                fcmContract.registration_ids = userFcmTokens.Select(x => x.Token).ToList();
+
+                await _userFcmTokenService.SendNotificationToUser(fcmContract);
+            });
+
+            return 0;
+        }
+
+        public Task<ICollection<RideResponse>> GetCurrentUsersRidesAsDriver()
+        {
+            var dbResult = _dbContext
+                .Rides
+                .Include(x => x.Driver)
+                .ThenInclude(x => x.Phones)
+                .Include(x => x.RideCarSeatComposition)
+                .ThenInclude(x => x.CarSeatComposition)
+                .ThenInclude(x => x.Seat)
+                .Include(x => x.RideCarSeatComposition)
+                .ThenInclude(x => x.Passenger)
+                .Include(x => x.RideCarSeatComposition)
+                .ThenInclude(x => x.CarSeatComposition)
+                .ThenInclude(x => x.Car)
+                .ThenInclude(x => x.CarModel)
+                .ThenInclude(x => x.BanType)
+                .Include(x => x.RideCarSeatComposition)
+                .ThenInclude(x => x.CarSeatComposition)
+                .ThenInclude(x => x.Car)
+                .ThenInclude(x => x.CarModel)
+                .ThenInclude(x => x.CarBrand)
+                .Include(x => x.RideCarSeatComposition)
+                .ThenInclude(x => x.CarSeatComposition)
+                .ThenInclude(x => x.Car)
+                .ThenInclude(x => x.CarImages)
+                .Include(x => x.RideLocationPointComposition)
+                .ThenInclude(x => x.LocationPoint)
+                .ThenInclude(x => x.Location)
+                .Include(x => x.RestrictionRideComposition)
+                .ThenInclude(x => x.Restriction)
+                .Where(x => x.IsRowActive && x.DriverId == _authenticatedUserService.UserId)
+                .OrderByDescending(x=>x.StartDate)
+                .Take(50);
+
+            var rides = dbResult.RidesToRideResponses(_mapper);
+            
+            return Task.FromResult(rides);
+        }
+
+        public Task<ICollection<RideResponse>> GetCurrentUsersRidesAsPassenger()
+        {
+            var dbResult = _dbContext
+                .Rides
+                .Include(x => x.Driver)
+                .ThenInclude(x => x.Phones)
+                .Include(x => x.RideCarSeatComposition)
+                .ThenInclude(x => x.CarSeatComposition)
+                .ThenInclude(x => x.Seat)
+                .Include(x => x.RideCarSeatComposition)
+                .ThenInclude(x => x.Passenger)
+                .Include(x => x.RideCarSeatComposition)
+                .ThenInclude(x => x.CarSeatComposition)
+                .ThenInclude(x => x.Car)
+                .ThenInclude(x => x.CarModel)
+                .ThenInclude(x => x.BanType)
+                .Include(x => x.RideCarSeatComposition)
+                .ThenInclude(x => x.CarSeatComposition)
+                .ThenInclude(x => x.Car)
+                .ThenInclude(x => x.CarModel)
+                .ThenInclude(x => x.CarBrand)
+                .Include(x => x.RideCarSeatComposition)
+                .ThenInclude(x => x.CarSeatComposition)
+                .ThenInclude(x => x.Car)
+                .ThenInclude(x => x.CarImages)
+                .Include(x => x.RideLocationPointComposition)
+                .ThenInclude(x => x.LocationPoint)
+                .ThenInclude(x => x.Location)
+                .Include(x => x.RestrictionRideComposition)
+                .ThenInclude(x => x.Restriction)
+                .Where(x => x.IsRowActive && x.RideCarSeatComposition.Any(y=>y.PassengerId.Equals(_authenticatedUserService.UserId)))
+                .OrderByDescending(x=>x.StartDate)
+                .Take(50);
+
+            var rides = dbResult.RidesToRideResponses(_mapper);
+            
+            return Task.FromResult(rides);
+        }
+
+        public async Task<int> CancelPassengerRideRequest(int rideId)
+        {
+            var ride = await _dbContext
+                .Rides
+                .AsTracking()
+                .Include(x=>x.Driver)
+                .Include(x=>x.RideCarSeatComposition)
+                .ThenInclude(x=>x.CarSeatComposition)
+                .FirstOrDefaultAsync(x=>x.IsRowActive && x.Id == rideId);
+
+            if (ride.Equals(null))
+                throw new ApiException(_localizer.GetString(LocalizationKeys.RIDE_NOT_FOUND, rideId));
+
+            var soldSeats =
+                ride.RideCarSeatComposition.Where(x => x.PassengerId.Equals(_authenticatedUserService.UserId));
+            
+            foreach (var rideCarSeatComposition in soldSeats)
+            {
+                rideCarSeatComposition.PassengerId = null;
+                rideCarSeatComposition.SeatStatus = SeatStatus.Suitable;
+            }
+
+            var passengerRideRequests = _dbContext.PassengerToRideRequests.Where(x =>
+                x.IsRowActive && ride.RideCarSeatComposition.Contains(x.RideCarSeatComposition));
+            
+            foreach (var passengerToRideRequest in passengerRideRequests)
+            {
+                passengerToRideRequest.IsRowActive = false;
+            }
+
+            await _dbContext.SaveChangesAsync();
+
+            //Sending notification to driver through FCM.
+            await Task.Run(async () =>
+            {
+                var notificationToUser = ride.Driver;
+
+                var currentUser = await _userManager.GetCurrentUser();
+                
+                var userFcmTokens =
+                    _dbContext.UserFcmTokens.Where(x => x.IsRowActive && notificationToUser.Id == x.UserId);
+
+                var rideLocationComposition = _dbContext.RideLocationPointComposition.Include(x => x.Ride)
+                    .Include(x => x.LocationPoint).ThenInclude(x => x.Location).Where(x =>
+                        x.RideId == ride.Id);
+
+                var startLocationName = rideLocationComposition
+                    .First(x => x.LocationPointType == LocationPointType.StartPoint).LocationPoint.Location.Name;
+
+                var finishLocationName = rideLocationComposition
+                    .First(x => x.LocationPointType == LocationPointType.FinishPoint).LocationPoint.Location.Name;
+
+                var notificationBody =
+                    $"Sərnişin {currentUser.Name} {currentUser.Surname}, {startLocationName} - {finishLocationName} səyahəti üçün verdiyi sifarişdən imtina etdi.";
+
+                var fcmContract = _fcmNotificationContract.Value;
+                fcmContract.notification = new FcmNotificationContract.Notification {body = notificationBody};
+                fcmContract.registration_ids = userFcmTokens.Select(x => x.Token).ToList();
+
+                await _userFcmTokenService.SendNotificationToUser(fcmContract);
+            });
+            
+            return 0;
+        }
+
+        /// <summary>
+        /// Returns user by ride request for driver registration.
+        /// </summary>
+        /// <param name="rideRequest"></param>
+        /// <returns></returns>
+        /// <exception cref="ApiException"></exception>
+        protected async Task<User> GetUser(InsertRideRequest rideRequest)
+        {
+            User user;
 
             if (rideRequest.DriverId.HasValue && rideRequest.DriverId != _authenticatedUserService.UserId)
             {
-                User user;
                 if (!_userManager.TryGetUserById(rideRequest.DriverId.Value, out user))
                 {
                     throw new ApiException(_localizer[LocalizationKeys.NOT_FOUND, $"Driver - {rideRequest.DriverId}"]);
                 }
-
-                driverId = rideRequest.DriverId.Value;
             }
             else
             {
-                driverId = _authenticatedUserService.UserId.Value;
+                user =  await _userManager.GetCurrentUser();
             }
 
-            return driverId;
+            return user;
         }
         
         /// <summary>

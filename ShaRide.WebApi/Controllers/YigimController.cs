@@ -27,7 +27,7 @@ namespace ShaRide.WebApi.Controllers
             _invoiceService = invoiceService;
         }
 
-        [HttpGet("GetDebt")]
+        [HttpGet("GetUserBalance")]
         public async Task<ActionResult> GetUserInfoById([Required]string userId)
         {
             var user = await _userManager.FindByUniqueKey(userId);
@@ -36,9 +36,7 @@ namespace ShaRide.WebApi.Controllers
                 throw new ApiException(
                     $"User with id : {userId} is not found out system. Please contact with administration");
 
-            var debtOfUser = 0m;
-
-            var response = new UserInfoResponse(user.Name, user.Surname, debtOfUser);
+            var response = new UserInfoResponse(user.Name, user.Surname, user.Balance);
 
             return Ok(response);
         }

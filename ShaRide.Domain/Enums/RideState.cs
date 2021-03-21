@@ -8,6 +8,8 @@
         
         OnRoad,
         
-        Finished
+        Finished,
+        
+        Canceled
     }
 }

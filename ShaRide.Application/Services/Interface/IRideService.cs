@@ -1,9 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using ShaRide.Application.DTO.Request.Ride;
-using ShaRide.Application.DTO.Response;
 using ShaRide.Application.DTO.Response.Ride;
-using ShaRide.Domain.Enums;
 
 namespace ShaRide.Application.Services.Interface
 {
@@ -16,5 +14,9 @@ namespace ShaRide.Application.Services.Interface
         Task<int> AddPassengerToRide(AddPassengerToRideRequest request);
         Task<int> RespondUserRideRequest(List<DriverRespondRequest> requests);
         Task<IEnumerable<PassengerToRideResponse>> GetPassengerToRideRequests();
+        Task<int> CancelRide(CancelRideRequest request);
+        Task<ICollection<RideResponse>> GetCurrentUsersRidesAsDriver();
+        Task<ICollection<RideResponse>> GetCurrentUsersRidesAsPassenger();
+        Task<int> CancelPassengerRideRequest(int rideId);
     }
 }

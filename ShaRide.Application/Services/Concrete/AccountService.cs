@@ -148,14 +148,25 @@ namespace ShaRide.Application.Services.Concrete
         /// <param name="phone"></param>
         /// <param name="newPassword"></param>
         /// <returns></returns>
-        public async Task<int> ResetUserPassword(string phone, string newPassword)
+        public async Task<AuthenticationResponse> ResetUserPassword(string phone, string newPassword)
         {
             User user = await _userManager.GetUserByPhoneNumber(phone);
 
             if (user is null)
                 throw new ApiException(_localizer.GetString(LocalizationKeys.PHONE_NOT_FOUND, phone));
 
-            return await _userManager.ResetPassword(user, newPassword) == IdentityResult.Success ? 0 : -1;
+            var passwordResetResult = await _userManager.ResetPassword(user, newPassword);
+
+            if (!passwordResetResult.Succeeded)
+                throw new ApiException(_localizer.GetString(LocalizationKeys.INVALID_CREDENTIALS, phone));
+
+            var authResponse = await AuthenticateAsync(new AuthenticationRequest
+            {
+                Phone = phone,
+                Password = newPassword
+            }, null);
+
+            return authResponse;
         }
 
         /// <summary>
@@ -187,6 +198,24 @@ namespace ShaRide.Application.Services.Concrete
                 .Where(x => x.IsRowActive).ToListAsync();
 
             return _mapper.Map<ICollection<FeedbackResponse>>(feedbacks);
+        }
+
+        public async Task<decimal> GetCurrentUserBalance()
+        {
+            var user = await _userManager.GetCurrentUser();
+
+            if (user.Equals(null))
+                throw new ApiException(_localizer.GetString(LocalizationKeys.INVALID_CREDENTIALS));
+
+            return user.Balance;
+        }
+
+        public Task<decimal> GetUserBalance(int userId)
+        {
+            if (!_userManager.TryGetUserById(userId, out var user))
+                throw new ApiException(_localizer.GetString(LocalizationKeys.NOT_FOUND, userId));
+
+            return Task.FromResult(user.Balance);
         }
 
         /// <summary>

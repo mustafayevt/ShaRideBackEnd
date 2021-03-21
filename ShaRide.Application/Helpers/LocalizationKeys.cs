@@ -107,5 +107,13 @@
         /// Use case : exception.
         /// </summary>
         public const string USER_HAS_NOT_ACCESS_OPERATION = "Validation.UserHasNotAccessToOperation";
+
+        /// <summary>
+        /// Use case : validation.
+        /// General not enough balance validation.
+        /// </summary>
+        public const string USER_DOES_NOT_HAVE_ENOUGH_BALANCE = "Validation.UserDoesNotHaveEnoughBalance";
+
+        public const string RIDE_CANNOT_CANCELLED = "Validation.RideCannotCancelled";
     }
 }

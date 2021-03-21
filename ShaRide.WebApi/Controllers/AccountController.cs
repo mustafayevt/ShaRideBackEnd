@@ -96,7 +96,6 @@ namespace ShaRide.WebApi.Controllers
         /// <summary>
         /// Saves feedbacks.
         /// </summary>
-        /// <param name="content"></param>
         /// <returns></returns>
         [HttpPost("feedback")]
         [Authorize]
@@ -115,6 +114,26 @@ namespace ShaRide.WebApi.Controllers
             return Ok(await _accountService.GetAllFeedbacks());
         }
 
+        /// <summary>
+        /// Returns current users balance.
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("GetCurrentUserBalance")]
+        public async Task<IActionResult> GetCurrentUserBalance()
+        {
+            return Ok(await _accountService.GetCurrentUserBalance());
+        }
+
+        /// <summary>
+        /// Returns current users balance.
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("GetUserBalance/{userId}")]
+        public async Task<IActionResult> GetUserBalance([Required] int userId)
+        {
+            return Ok(await _accountService.GetUserBalance(userId));
+        }
+        
         private string GenerateIpAddress()
         {
             if (Request.Headers.ContainsKey("X-Forwarded-For"))

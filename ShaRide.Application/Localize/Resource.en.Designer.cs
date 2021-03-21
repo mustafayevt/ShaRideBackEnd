@@ -169,6 +169,24 @@ namespace ShaRide.Application.Localize {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to One hour before the start time, the Ride cannot be canceled.
+        /// </summary>
+        public static string Validation_RideCannotCancelled {
+            get {
+                return ResourceManager.GetString("Validation.RideCannotCancelled", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to User does not have enough balance for this operation.
+        /// </summary>
+        public static string Validation_UserDoesNotHaveEnoughBalance {
+            get {
+                return ResourceManager.GetString("Validation.UserDoesNotHaveEnoughBalance", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to This user does not have access to do this access..
         /// </summary>
         public static string Validation_UserHasNotAccessToOperation {

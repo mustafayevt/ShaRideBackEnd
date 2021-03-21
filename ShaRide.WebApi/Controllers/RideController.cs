@@ -57,5 +57,17 @@ namespace ShaRide.WebApi.Controllers
         {
             return Ok(await _rideService.RespondUserRideRequest(requests));
         }
+
+        [HttpGet("GetCurrentUsersRidesAsDriver")]
+        public async Task<IActionResult> GetCurrentUsersRidesAsDriver()
+        {
+            return Ok(await _rideService.GetCurrentUsersRidesAsDriver());
+        }
+
+        [HttpGet("GetCurrentUsersRidesAsPassenger")]
+        public async Task<IActionResult> GetCurrentUsersRidesAsPassenger()
+        {
+            return Ok(await _rideService.GetCurrentUsersRidesAsPassenger());
+        }
     }
 }

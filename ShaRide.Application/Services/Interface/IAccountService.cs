@@ -18,8 +18,10 @@ namespace ShaRide.Application.Services.Interface
         Task<UserImage> GetUserThumbnailPhoto(int userId);
         Task<string> SendPasswordResetSms(string phoneNumber);
 
-        Task<int> ResetUserPassword(string phone, string newPassword);
+        Task<AuthenticationResponse> ResetUserPassword(string phone, string newPassword);
         Task<FeedbackResponse> Feedback(InsertFeedbackRequest request);
         Task<ICollection<FeedbackResponse>> GetAllFeedbacks();
+        Task<decimal> GetCurrentUserBalance();
+        Task<decimal> GetUserBalance(int userId);
     }
 }
