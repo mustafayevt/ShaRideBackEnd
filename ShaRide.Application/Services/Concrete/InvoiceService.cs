@@ -24,7 +24,7 @@ namespace ShaRide.Application.Services.Concrete
 
         public async Task<InvoiceResponse> RegisterInvoice(RegisterInvoiceRequest request)
         {
-            var user = await _applicationDbContext.Users
+            var user = await _applicationDbContext.Users.AsTracking()
                 .FirstOrDefaultAsync(x => x.IsRowActive && x.UserUniqueKey == request.UserId);
             if (user is null)
                 throw new ApiException($"User with id : '{request.UserId}' not found in our system");

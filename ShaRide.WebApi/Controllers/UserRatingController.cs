@@ -32,5 +32,26 @@ namespace ShaRide.WebApi.Controllers
         {
             return Ok(await _userRatingService.InsertRating(request));
         }
+
+        /// <summary>
+        /// Returns user rating based on user id that sent in parameter.
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        [HttpGet("GetUserRating/{userId}")]
+        public async Task<IActionResult> GetUserRating(int userId)
+        {
+            return Ok(await _userRatingService.GetUserRating(userId));
+        }
+
+        /// <summary>
+        /// Returns current user rating based on JWT authentication.
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("GetCurrentUserRating")]
+        public async Task<IActionResult> GetCurrentUserRating()
+        {
+            return Ok(await _userRatingService.GetCurrentUserRating());
+        }
     }
 }

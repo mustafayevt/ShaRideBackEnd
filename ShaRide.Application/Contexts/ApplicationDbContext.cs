@@ -93,6 +93,11 @@ namespace ShaRide.Application.Contexts
                 entity.Property(x => x.Image).HasColumnType("bytea");
             });
 
+            builder.Entity<UserPhone>(entity =>
+            {
+                entity.HasIndex(x => x.Number).IsUnique();
+            });
+
             builder.Entity<UserRoleComposition>().HasKey(x => new {x.UserId, x.RoleId});
             
             builder.Entity<RestrictionRideComposition>().HasKey(x => new {x.RestrictionId, x.RideId});

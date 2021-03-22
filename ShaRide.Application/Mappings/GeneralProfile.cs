@@ -171,6 +171,7 @@ namespace ShaRide.Application.Mappings
             CreateMap<CarSeatComposition, CarSeatCompositionResponse>()
                 .ForMember(x => x.xCordinant, opt => opt.MapFrom(y => y.Seat.xCordinant))
                 .ForMember(x => x.yCordinant, opt => opt.MapFrom(y => y.Seat.yCordinant))
+                .ForMember(x => x.SeatType, opt => opt.MapFrom(y => y.SeatType))
                 .ReverseMap();
             
             CreateMap<Car, InsertCarRequest>()

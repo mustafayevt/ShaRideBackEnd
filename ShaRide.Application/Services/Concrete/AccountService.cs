@@ -40,6 +40,8 @@ namespace ShaRide.Application.Services.Concrete
         private readonly IMapper _mapper;
         private readonly IStringLocalizer _localizer;
         private readonly ApplicationDbContext _dbContext;
+        private readonly IUserRatingService _userRatingService;
+        private readonly IAuthenticatedUserService _authenticatedUserService;
 
         public AccountService(UserManager userManager,
             IOptions<JWTSettings> jwtSettings,
@@ -47,7 +49,7 @@ namespace ShaRide.Application.Services.Concrete
             IEmailService emailService,
             IMapper mapper,
             IStringLocalizer<Resource> localizer,
-            ApplicationDbContext dbContext, ISmsService smsService)
+            ApplicationDbContext dbContext, ISmsService smsService, IUserRatingService userRatingService, IAuthenticatedUserService authenticatedUserService)
         {
             _userManager = userManager;
             _jwtSettings = jwtSettings.Value;
@@ -57,6 +59,8 @@ namespace ShaRide.Application.Services.Concrete
             _localizer = localizer;
             _dbContext = dbContext;
             _smsService = smsService;
+            _userRatingService = userRatingService;
+            _authenticatedUserService = authenticatedUserService;
         }
 
         /// <summary>
@@ -204,7 +208,7 @@ namespace ShaRide.Application.Services.Concrete
         {
             var user = await _userManager.GetCurrentUser();
 
-            if (user.Equals(null))
+            if (user == null)
                 throw new ApiException(_localizer.GetString(LocalizationKeys.INVALID_CREDENTIALS));
 
             return user.Balance;

@@ -61,16 +61,24 @@ namespace ShaRide.Application.Services.Concrete
             return _mapper.Map<UserRatingResponse>(request);
         }
 
-        public short GetUserRating(int userId)
+        public Task<short> GetUserRating(int userId)
         {
             if (!_userManager.TryGetUserById(userId, out _))
-                throw new ApiException(_localizer[LocalizationKeys.NOT_FOUND]);
+                throw new ApiException(_localizer[LocalizationKeys.NOT_FOUND, userId]);
 
             var ratings = _dbContext.UserRatings.Where(x => x.IsRowActive && x.DestinationUserId.Equals(userId));
             var sumOfRating = ratings.Any() ? ratings.Average(x => x.Value) : 5;
             var fraction = sumOfRating - (int) sumOfRating;
 
-            return (short) (fraction >= 0.5 ? sumOfRating + 1 : sumOfRating);
+            return Task.FromResult((short) (fraction >= 0.5 ? sumOfRating + 1 : sumOfRating));
+        }
+
+        public async Task<short> GetCurrentUserRating()
+        {
+            if (!_authenticatedUserService.IsUserAuthenticate)
+                throw new ApiException(_localizer.GetString(LocalizationKeys.USER_HAS_NOT_ACCESS_OPERATION));
+            
+            return await GetUserRating(_authenticatedUserService.UserId.Value);
         }
     }
 }

@@ -29,9 +29,9 @@ namespace ShaRide.WebApi.Controllers
 
         [HttpPost("GetActiveRides")]
         [AllowAnonymous]
-        public IActionResult GetActiveRides(GetActiveRidesRequest request)
+        public async Task<IActionResult> GetActiveRides(GetActiveRidesRequest request)
         {
-            return Ok(_rideService.GetActiveRides(request));
+            return Ok(await _rideService.GetActiveRides(request));
         }
 
         [HttpPost("UpdateRideState")]
@@ -68,6 +68,30 @@ namespace ShaRide.WebApi.Controllers
         public async Task<IActionResult> GetCurrentUsersRidesAsPassenger()
         {
             return Ok(await _rideService.GetCurrentUsersRidesAsPassenger());
+        }
+
+        [HttpGet("GetCurrentUsersRideRequests")]
+        public async Task<IActionResult> GetCurrentUsersRideRequests()
+        {
+            return Ok(await _rideService.GetCurrentUsersRideRequests());
+        }
+
+        [HttpPost("CancelRide")]
+        public async Task<IActionResult> CancelRide(CancelRideRequest request)
+        {
+            return Ok(await _rideService.CancelRide(request));
+        }
+
+        [HttpPost("CancelPassengerRideRequest/{rideId}")]
+        public async Task<IActionResult> CancelPassengerRideRequest(int rideId)
+        {
+            return Ok(await _rideService.CancelPassengerRideRequest(rideId));
+        }
+
+        [HttpGet("SuggestRidesToUser")]
+        public async Task<IActionResult> SuggestRidesToUser()
+        {
+            return Ok(await _rideService.SuggestRidesToUser());
         }
     }
 }

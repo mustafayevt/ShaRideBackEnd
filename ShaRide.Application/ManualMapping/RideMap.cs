@@ -5,6 +5,7 @@ using ShaRide.Application.DTO.Response.Account;
 using ShaRide.Application.DTO.Response.Car;
 using ShaRide.Application.DTO.Response.Ride;
 using ShaRide.Domain.Entities;
+using ShaRide.Domain.Enums;
 
 namespace ShaRide.Application.ManualMapping
 {
@@ -52,9 +53,9 @@ namespace ShaRide.Application.ManualMapping
         {
             foreach (var passengerToRideRequest in source)
             {
-                yield return new PassengerToRideResponse
+                var response = new PassengerToRideResponse
                 {
-                    Ride = mapper.Map<RideResponse>(passengerToRideRequest.RideCarSeatComposition.Ride),
+                    Ride = RidesToRideResponses(new []{passengerToRideRequest.RideCarSeatComposition.Ride},mapper).First(),
                     RequestId = passengerToRideRequest.Id,
                     PassengerRequest = new CarSeatCompositionResponse
                     {
@@ -68,6 +69,11 @@ namespace ShaRide.Application.ManualMapping
                         Id = passengerToRideRequest.RideCarSeatComposition.CarSeatComposition.Id,
                     }
                 };
+
+                response.Ride.Car.CarSeats = mapper.Map<ICollection<CarSeatCompositionResponse>>(passengerToRideRequest
+                    .RideCarSeatComposition.CarSeatComposition.Car.CarSeatComposition);
+
+                yield return response;
             }
         }
     }

@@ -8,6 +8,7 @@ namespace ShaRide.Application.Services.Interface
     {
         Task<UserFcmTokenResponse> InsertToken(UserFcmTokenInsertRequest request);
         Task<UserFcmTokenResponse> UpdateToken(UserFcmTokenUpdateRequest request);
+        Task<int> DeleteToken(UserFcmTokenDeleteRequest request);
         Task<int> SendNotificationToUser(FcmNotificationContract contract);
     }
 }

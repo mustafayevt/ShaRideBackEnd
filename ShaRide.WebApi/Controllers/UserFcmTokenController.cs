@@ -49,5 +49,15 @@ namespace ShaRide.WebApi.Controllers
             return Ok(await _userFcmTokenService.UpdateToken(request));
         }
 
+        /// <summary>
+        /// Deletes existing FCM token of user.
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpDelete]
+        public async Task<IActionResult> DeleteToken(UserFcmTokenDeleteRequest request)
+        {
+            return Ok(await _userFcmTokenService.DeleteToken(request));
+        }
     }
 }

@@ -230,7 +230,7 @@ namespace ShaRide.Application.Managers
         /// <returns></returns>
         public bool TryGetUserById(int userId, out User user )
         {
-            user = _dbContext.Users.FirstOrDefault(x => x.Id.Equals(userId));
+            user = _dbContext.Users.Find(userId);
             return user != null;
         }
 

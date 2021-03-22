@@ -76,6 +76,23 @@ namespace ShaRide.Application.Services.Concrete
             return _mapper.Map<UserFcmTokenResponse>(userFcmToken);
         }
 
+        public async Task<int> DeleteToken(UserFcmTokenDeleteRequest request)
+        {
+            var userFcmToken = await _dbContext.UserFcmTokens.SingleOrDefaultAsync(x=>x.IsRowActive && x.UserId.Equals(request.UserId) && x.Token.Equals(request.Token));
+            
+            if (userFcmToken is null)
+                throw new ApiException(_localizer.GetString(LocalizationKeys.NOT_FOUND, request.Token));
+            
+            if (!_userManager.TryGetUserById(request.UserId, out _))
+                throw new ApiException(_localizer.GetString(LocalizationKeys.NOT_FOUND, request.UserId));
+
+            _dbContext.Entry(userFcmToken).State = EntityState.Deleted;
+
+            await _dbContext.SaveChangesAsync();
+
+            return 0;
+        }
+
         public async Task<int> SendNotificationToUser(FcmNotificationContract contract)
         {
             using (var httpClient = _httpClientFactory.CreateClient())
