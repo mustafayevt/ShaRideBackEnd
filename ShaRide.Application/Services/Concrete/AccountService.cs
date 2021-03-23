@@ -6,6 +6,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using AutoMapper;
 using AutoWrapper.Wrappers;
@@ -220,6 +221,31 @@ namespace ShaRide.Application.Services.Concrete
                 throw new ApiException(_localizer.GetString(LocalizationKeys.NOT_FOUND, userId));
 
             return Task.FromResult(user.Balance);
+        }
+
+        public async Task<int> InsertPotentialClientPhone(InsertPotentialClientPhoneRequest request)
+        {
+            await Task.Delay(1500);
+            
+            var phone = request.Phone.Replace("+","").Replace("-","").Replace(" ","");
+            
+            if (string.IsNullOrEmpty(phone))
+                return 1;
+            
+            var isExistingPhone = _dbContext.PotentialClientNumbers.Any(x => x.Phone.Equals(phone));
+
+            if (isExistingPhone)
+                return 1;
+
+            await _dbContext.PotentialClientNumbers.AddAsync(new PotentialClientNumber
+            {
+                Phone = phone
+            });
+
+            await _dbContext.SaveChangesAsync();
+
+            
+            return 0;
         }
 
         /// <summary>

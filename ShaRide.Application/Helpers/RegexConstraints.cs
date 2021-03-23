@@ -9,5 +9,6 @@
         public static string Length = @".{6,100}";
         public static string NameSurname = @"^[A-Za-z]+$";
         public static string Phone = @"^(\+[0-9]{12})$";
+        public static string PhoneWithoutPlus = @"^(\[0-9]{12})$";
     }
 }

@@ -108,6 +108,8 @@ namespace ShaRide.Application.Contexts
 
             builder.Entity<Restriction>().HasIndex(x => x.Title);
 
+            builder.Entity<PotentialClientNumber>().HasIndex(x => x.Phone);
+
             #endregion
         }
 
@@ -139,6 +141,8 @@ namespace ShaRide.Application.Contexts
         public DbSet<UserRating> UserRatings { get; set; }
         public DbSet<UserFcmToken> UserFcmTokens { get; set; }
         public DbSet<PassengerToRideRequest> PassengerToRideRequests { get; set; }
+        public DbSet<PotentialClientNumber> PotentialClientNumbers { get; set; }
+        public DbSet<SiteVisitor> SiteVisitors { get; set; }
 
         #endregion
     }

@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using AutoWrapper.Wrappers;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
 using ShaRide.Application.Contexts;
@@ -755,9 +756,11 @@ namespace ShaRide.Application.Services.Concrete
 
             if (!notificationsToUser.Any())
                 return;
-                
+
             var userFcmTokens =
-                _dbContext.UserFcmTokens.Where(x => x.IsRowActive && notificationsToUser.Contains(x.UserId) || x.UserId.Equals(driverId));
+                _dbContext.UserFcmTokens.Where(x =>
+                        x.IsRowActive && notificationsToUser.Contains(x.UserId) || x.UserId.Equals(driverId))
+                    .Distinct(y => y.Token);
 
             var fcmContract = _fcmNotificationContract.Value;
             // fcmContract.data = new FcmNotificationContract.Data("testClickAction", "1", "pending");

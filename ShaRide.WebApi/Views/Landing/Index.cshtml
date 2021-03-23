@@ -4,225 +4,187 @@
     ViewBag.Title = "ShaRide";
     Layout = "_Layout";
 }
-<div class="body-wrap boxed-container">
-    <header class="site-header text-light">
-        <div class="container">
-            <div class="site-header-inner">
-                <div class="brand header-brand">
-                    <h1 class="m-0">
-                        <a href="#">
-                            <img class="header-logo-image" src="~/dist/images/logo.svg" alt="Logo">
-                        </a>
-                    </h1>
-                </div>
-            </div>
+    <nav>
+        <div class="images">
+            <img src="~/dist/images/logo.png" alt="logo">
+            <img class="menuIcon" src="~/dist/images/menu.png" alt="menu">
         </div>
-    </header>
+        <div class="menu">
+            <a href="#advantages">Üstünlüklər</a>
+            <a href="#benefitList">Fayda</a>
+            <a href="#detailList">Ətraflı</a>
+            <button type="button">Qoşul</button>
+            <span class="company">ALİEN solutions</span>
+        </div>
+    </nav>
+    <section class="banner">
+        <div class="bannerText">
+            <h1>
+                Yoldaşını tap, yola çıxaq!
+            </h1>
+            <p>
+                Elə indi gedəcəyin yeri seç, sürücünü tap, yola düş. Taksi və avtobuslarda vaxt itirmə! ShaRide ilə pul və vaxtına qənaət edərək istədiyin vaxt, istədiyin yerə səyahət et.
+            </p>
+        </div>
 
-    <main>
-        <section class="hero text-center text-light">
-            <div class="hero-bg"></div>
-            <div class="hero-particles-container">
-                <canvas id="hero-particles"></canvas>
-            </div>
-            <div class="container-sm">
-                <div class="hero-inner">
-                    <div class="hero-copy">
-                        <h1 class="hero-title mt-0">ShaRide Landing Page.</h1>
-                        <p class="hero-paragraph">Our landing page template works on all devices, so you only have to set it up once, and get beautiful results forever.</p>
-                        <div class="hero-cta">
-                            <a class="button button-primary button-wide-mobile" href="#">Get early access</a>
-                        </div>
-                    </div>
-                    <div class="mockup-container">
-                        <div class="mockup-bg">
-                            <img src="~/dist/images/iphone-hero-bg.svg" alt="iPhone illustration">
-                        </div>
-                        <img class="device-mockup" src="~/dist/images/iphone-hero.png" alt="iPhone Hero">
-                    </div>
-                </div>
-            </div>
-        </section>
+        <div class="coverImg">
+            <img src="~/dist/images/cover.png" alt="coverImg">
+        </div>
 
-        <section class="features-extended section">
-            <div class="features-extended-inner section-inner">
-                <div class="features-extended-wrap">
-                    <div class="container">
-                        <div class="feature-extended">
-                            <div class="feature-extended-image">
-                                <div class="mockup-bg">
-                                    <img src="~/dist/images/iphone-feature-bg-01.svg" alt="iPhone Feature 01 illustration">
-                                </div>
-                                <img class="device-mockup is-revealing" src="~/dist/images/iphone-feature-01.png" alt="iPhone Feature 01">
-                            </div>
-                            <div class="feature-extended-body is-revealing">
-                                <h3 class="mt-0 mb-16">Amazing features, coming soon.</h3>
-                                <p class="m-0">Quam quisque id diam vel quam elementum pulvinar. Ut etiam sit amet nisl purus in mollis nunc. Odio morbi quis commodo odio aenean sed adipiscing diam donec.</p>
-                            </div>
-                        </div>
-                        <div class="feature-extended">
-                            <div class="feature-extended-image">
-                                <div class="mockup-bg">
-                                    <img src="~/dist/images/iphone-feature-bg-02.svg" alt="iPhone Feature 02 illustration">
-                                </div>
-                                <img class="device-mockup is-revealing" src="~/dist/images/iphone-feature-02.png" alt="iPhone Feature 02">
-                            </div>
-                            <div class="feature-extended-body is-revealing">
-                                <h3 class="mt-0 mb-16">Amazing features, coming soon.</h3>
-                                <p class="m-0">Quam quisque id diam vel quam elementum pulvinar. Ut etiam sit amet nisl purus in mollis nunc. Odio morbi quis commodo odio aenean sed adipiscing diam donec.</p>
-                            </div>
-                        </div>
-                        <div class="feature-extended">
-                            <div class="feature-extended-image">
-                                <div class="mockup-bg">
-                                    <img src="~/dist/images/iphone-feature-bg-03.svg" alt="iPhone Feature 03 illustration">
-                                </div>
-                                <img class="device-mockup is-revealing" src="~/dist/images/iphone-feature-03.png" alt="iPhone Feature 03">
-                            </div>
-                            <div class="feature-extended-body is-revealing">
-                                <h3 class="mt-0 mb-16">Amazing features, coming soon.</h3>
-                                <p class="m-0">Quam quisque id diam vel quam elementum pulvinar. Ut etiam sit amet nisl purus in mollis nunc. Odio morbi quis commodo odio aenean sed adipiscing diam donec.</p>
-                            </div>
-                        </div>
-                        <div class="feature-extended">
-                            <div class="feature-extended-image">
-                                <div class="mockup-bg">
-                                    <img src="~/dist/images/iphone-feature-bg-04.svg" alt="iPhone Feature 04 illustration">
-                                </div>
-                                <img class="device-mockup is-revealing" src="~/dist/images/iphone-feature-04.png" alt="iPhone Feature 04">
-                            </div>
-                            <div class="feature-extended-body is-revealing">
-                                <h3 class="mt-0 mb-16">Amazing features, coming soon.</h3>
-                                <p class="m-0">Quam quisque id diam vel quam elementum pulvinar. Ut etiam sit amet nisl purus in mollis nunc. Odio morbi quis commodo odio aenean sed adipiscing diam donec.</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-    </main>
+    </section>
 
-    <footer class="site-footer">
-        <div class="footer-particles-container">
-            <canvas id="footer-particles"></canvas>
+    <section id="bonus">
+        <div class="join">
+            <h3>İlk qoşul — bonus qazan!</h3>
+            <h5>İlk 500 nəfərə bonus komissiyasız 20 sifariş qəbulu</h5>
+            <span>Nömrəni qeyd edərək tətbiqin istifadəyə verilməsi və digər kampaniyalar haqda dərhal xəbərdar
+                ol.</span>
         </div>
-        <div class="site-footer-top">
-            <section class="cta section text-light">
-                <div class="container-sm">
-                    <div class="cta-inner section-inner">
-                        <div class="cta-header text-center">
-                            <h2 class="section-title mt-0">Stay in the know</h2>
-                            <p class="section-paragraph">Lorem ipsum is common placeholder text used to demonstrate the graphic elements of a document or visual presentation.</p>
-                            <div class="cta-cta">
-                                <a class="button button-primary button-wide-mobile" href="#">Get early access</a>
-                            </div>
-                        </div>
+        <form >
+            <input id="phone" placeholder="+994 __ - ___ - __ - __" type="tel">
+            <span class="alertText">Nömrə düzgün yığılmayıb</span>
+            <button class="send" type="button" id="registerClientPhone">Göndər</button>
+            <button type="button" class="sending">Nömrə göndərilir
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <button type="button" class="sent">Nömrə göndərildi</button>
+        </form>
+    </section>
+
+    <section id="advantages">
+        <div class="images">
+            <img class="activeImg" src="~/dist/images/1.png" alt="advantageImg">
+            <img src="~/dist/images/2.png" alt="advantageImg">
+            <img src="~/dist/images/3.png" alt="advantageImg">
+        </div>
+        <div class="text">
+            <div class="description activeText">
+                <img class="activeImg" src="~/dist/images/1.png" alt="advantageImg">
+                <h2>Sürətli</h2>
+                <p>Vaxtın azdır? Sadecə tətbiqi açaraq gedəcəyin istiqamətdə yol yoldaşını tap və yola çıx! Avtobus gözləmək və taksi axtarmaq ilə vaxt itirmə. </p>
+            </div>
+            <div class="description">
+                <img src="~/dist/images/2.png" alt="advantageImg">
+                <h2>Təhlükəsiz</h2>
+                <p>Yol yoldaşlarının hesablarına və reytinqlərinə baxaraq doğru insanlarla yola çıxdığından əmin ol!</p>
+            </div>
+            <div class="description">
+                <img src="~/dist/images/3.png" alt="advantageImg">
+
+                <h2>Rahat</h2>
+                <p>Səfəri əvvəlcədən planlaya və özünə ən uyğun marşrutu seçərək yola çıxa bilərsən. ShaRide balansını artıraraq nağd ödəniş olmadan səfərlər et.</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="benefitList">
+        <h1>ShaRide ilə qazan</h1>
+        <div class="benefits">
+            <div class="benefit">
+                <h5>Sadə sifariş etmək imkanı</h5>
+                <p>Sərnişinlər üçün maneələri aradan qaldır! ShaRide istifadəsi asan dizaynı ilə sürətli qeydiyyatdan keçib səyahətə başlamaq üçün bütün lazımi məlumatları təmin edir.</p>
+            </div>
+            <div class="benefit">
+                <h5>İstədiyin dizaynı əlavə et</h5>
+                <p>Maşınını istədiyin kimi dizayn edə bilərsən. Yeni oturacaqlar əlavə et, oturacaqları çevir, interyerin dizaynını istədiyin kimi dəyiş. </p>
+            </div>
+            <div class="benefit">
+                <h5>Bir neçə maşın əlavə et</h5>
+                <p>Bir neçə maşının var? Hesabına bir neçə maşın əlavə edə bilərsən, istənilən model və müxtəlif dizaynlar ilə. </p>
+            </div>
+            <div class="benefit">
+                <h5>Aylıq hesabatlar</h5>
+                <p>Səfərlərin barədə hər zaman məlumatlı ol! Hər səfər üçün nə qədər qazandığını izlə və aylıq hesabatlarına nəzarət et.</p>
+            </div>
+        </div>
+    </section>
+    <section id="detailList">
+        <h1>Sərfəli səyahət üçün hər şey!</h1>
+        <div class="detail">
+            <div class="who">
+                <h4 class="activeHeader">Sərnişinlər üçün</h4>
+                <h4>Sürücülər üçün</h4>
+                <h4>İkisi birində tətbiq</h4>
+            </div>
+            <div class="detailContainer">
+                <div class="description activeDescription">
+                    <div class="header">
+                        <h4>Sərnişinlər üçün</h4>
                     </div>
+                    <div class="text">
+                        <span>Yol yoldaşının məlumatlarına və reytinqinə bax</span>
+                        <span>Bir həftə əvvəldən səfər sifarişi</span>
+                        <span>Səfərin qiymətini, başlanğıc və bitmə məntəqələrini öncədən gör</span>
+                        <span>Sürücü və avtomobilin məlumatlarına baxmaq imkanı</span>
+                        <span>Nağd və ya balansdan ödəmək imkanı</span>
+                        <span>Axtarış nəticələrini qiymətə, sürücü reytinqinə, vaxta və yer sayına görə filterlə</span>
+                        <span>Qadağaları və ödəniş üsullarını əvvəlcədən gör</span>
+                        <span>Səfərlərin aylıq hesabatları</span>
+                        <span>Istədiyin oturacağı seçin</span>
+                    </div>
+                    <img src="~/dist/images/up.png" class="up" alt="closeDetailText">
+                    <img src="~/dist/images/down.png" class="down active" alt="openDetailText">
                 </div>
-            </section>
-        </div>
-        <div class="site-footer-bottom">
-            <div class="container">
-                <div class="site-footer-inner">
-                    <div class="brand footer-brand">
-                        <a href="#">
-                            <img src="~/dist/images/logo.svg" alt="Venus logo">
-                        </a>
+                <div class="description">
+                    <div class="header">
+                        <h4>Sürücülər üçün</h4>
                     </div>
-                    <ul class="footer-links list-reset">
-                        <li>
-                            <a href="#">Contact</a>
-                        </li>
-                        <li>
-                            <a href="#">About us</a>
-                        </li>
-                        <li>
-                            <a href="#">FAQ's</a>
-                        </li>
-                        <li>
-                            <a href="#">Support</a>
-                        </li>
-                    </ul>
-                    <ul class="footer-social-links list-reset">
-                        <li>
-                            <a href="https://www.facebook.com/ShaRide.carpooling" target="_blank">
-                                <span class="screen-reader-text">Facebook</span>
-                                <svg width="16" height="16" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M6.023 16L6 9H3V6h3V4c0-2.7 1.672-4 4.08-4 1.153 0 2.144.086 2.433.124v2.821h-1.67c-1.31 0-1.563.623-1.563 1.536V6H13l-1 3H9.28v7H6.023z" fill="#FFF"/>
-                                </svg>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="https://www.instagram.com/sharide/" target="_blank">
-                                <span class="screen-reader-text">Instagram</span>
-                                <svg version="1.1" width="16" height="16" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-                                	 viewBox="0 0 504.4 504.4" style="enable-background:new 0 0 504.4 504.4;" xml:space="preserve">
-                                <g>
-                                	<g>
-                                        <path d="M296.8,219.8c-10-14-26.4-23.2-44.8-23.2c-18.4,0-34.8,9.2-44.8,23.2c-6.4,9.2-10.4,20.4-10.4,32.4
-                                			c0,30.4,24.8,55.2,55.2,55.2c30.4,0,55.2-24.8,55.2-55.2C307.2,240.2,303.2,229,296.8,219.8z" 
-                                              fill="#FFFFFF"/>
-                                	</g>
-                                </g>
-                                <g>
-                                	<g>
-                                        <path d="M331.6,220.2c4,8,6.4,20.8,6.4,32c0,47.2-38.4,86-86,86c-47.6,0-86-38.4-86-86c0-11.6,2.4-24,6.4-32H124v128.4
-                                			c0,16.8,14.8,31.6,31.6,31.6h192.8c16.8,0,31.6-14.8,31.6-31.6V220.2H331.6z"
-                                              fill="#FFFFFF"/>
-                                	</g>
-                                </g>
-                                <g>
-                                	<g>
-                                		<polygon points="365.6,131.4 319.2,131.4 319.2,184.6 372,184.6 372,138.2 372,131 		"/>
-                                	</g>
-                                </g>
-                                <g>
-                                	<g>
-                                        <path d="M377.6,0.2H126.4C56.8,0.2,0,57,0,126.6v251.6c0,69.2,56.8,126,126.4,126H378c69.6,0,126.4-56.8,126.4-126.4V126.6
-                                			C504,57,447.2,0.2,377.6,0.2z M408,219.8L408,219.8l0,128.8c0,33.6-26,59.6-59.6,59.6H155.6c-33.6,0-59.6-26-59.6-59.6V219.8v-64
-                                			c0-33.6,26-59.6,59.6-59.6h192.8c33.6,0,59.6,26,59.6,59.6V219.8z"
-                                              fill="#FFFFFF"/>
-                                	</g>
-                                </g>
-                                <g>
-                                </g>
-                                <g>
-                                </g>
-                                <g>
-                                </g>
-                                <g>
-                                </g>
-                                <g>
-                                </g>
-                                <g>
-                                </g>
-                                <g>
-                                </g>
-                                <g>
-                                </g>
-                                <g>
-                                </g>
-                                <g>
-                                </g>
-                                <g>
-                                </g>
-                                <g>
-                                </g>
-                                <g>
-                                </g>
-                                <g>
-                                </g>
-                                <g>
-                                </g>
-                                </svg>
-                            </a>
-                        </li>
-                    </ul>
-                    <div class="footer-copyright">&copy; 2018 Venus, all rights reserved</div>
+                    <div class="text">
+                        <span>Səfərləri əvvəlcədən planlaşdır</span>
+                        <span>Bir neçə maşın əlavə etmək imkanı</span>
+                        <span>Başlanğıc və bitmə məntəqələrini təyin et</span>
+                        <span>İnteryeri özün dizayn et</span>
+                        <span>İstədiyin ödəmə üsulunu əlavə et</span>
+                        <span>Sadə və asan istifadəçi interfeysi</span>
+                        <span>Eyni istiqamətə gedən sərnişinləri götür</span>
+                        <span>Səfərlərin aylıq hesabatları</span>
+                    </div>
+                    <img src="~/dist/images/up.png" class="up" alt="closeDetailText">
+                    <img src="~/dist/images/down.png" class="down active" alt="openDetailText">
+                </div>
+                <div class="description">
+                    <div class="header">
+                        <h4>İkisi birində tətbiq</h4>
+                    </div>
+                    <div class="text">
+                        <span>Ayrı-ayrı tətbiqlər yükləməyə ehtiyac yoxdur!</span>
+                        <span>A-dan B-ə getməlisən? Gedəcəyin yerə ən yaxın səfəri tap və ya istədiyin vaxta səfər
+                        sifariş et.</span>
+                        <span>Maşınınla səfərə çıxırsan? Tətbiqetməni aç və səfərinin detallarını yerləşdir.</span>
+                        <span>Əvvəlcədən qərar verilmiş məkanda sürücü ilə görüş.</span>
+                        <span>Sərnişinlərdən gələn sifarişləri təsdiqlə/imtina et</span>
+                        <span>Yaxşı yol!</span>
+                    </div>
+                    <img src="~/dist/images/up.png" class="up" alt="closeDetailText">
+                    <img src="~/dist/images/down.png" class="down active" alt="openDetailText">
                 </div>
             </div>
         </div>
+    </section>
+
+    <footer>
+        <div class="left">
+            <span class="name">ShaRide</span>
+            <span class="slogan">Biz ölkə daxili sərfəli və təbiət-dostu səyahəti asanlaşdırırıq!</span>
+            <span class="solution">ALİEN solutions</span>
+        </div>
+        <div class="right">
+            <div class="menu">
+                <a href="#advantages">Üstünlüklər</a>
+                <a href="#benefitList">Fayda</a>
+                <a href="#detailList">Ətraflı</a>
+            </div>
+            <div class="social">
+                <span>Follow us</span>
+                <a href="https://www.facebook.com/ShaRide.carpooling" target="_blank">Facebook</a>
+                <a href="https://www.instagram.com/sharide/" target="_blank">Instagram</a>
+            </div>
+        </div>
+
     </footer>
-</div>
 
-<script src="~/dist/js/main.min.js"></script>
+
+
+<script src="~/dist/scripts/index.js"></script>

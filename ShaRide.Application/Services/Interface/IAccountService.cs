@@ -23,5 +23,6 @@ namespace ShaRide.Application.Services.Interface
         Task<ICollection<FeedbackResponse>> GetAllFeedbacks();
         Task<decimal> GetCurrentUserBalance();
         Task<decimal> GetUserBalance(int userId);
+        Task<int> InsertPotentialClientPhone(InsertPotentialClientPhoneRequest request);
     }
 }

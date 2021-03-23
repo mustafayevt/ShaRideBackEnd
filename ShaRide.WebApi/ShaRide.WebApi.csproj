@@ -67,6 +67,7 @@
   <ItemGroup>
     <Folder Include="Handlers" />
     <Folder Include="wwwroot" />
+    <Folder Include="wwwroot\dist" />
   </ItemGroup>
 
   <ItemGroup>
@@ -101,6 +102,8 @@
     <_ContentIncludedByDefault Remove="wwwroot\scss\layout\_mockups.scss" />
     <_ContentIncludedByDefault Remove="wwwroot\scss\style.scss" />
     <_ContentIncludedByDefault Remove="wwwroot\scss\_normalize.scss" />
+    <_ContentIncludedByDefault Remove="wwwroot\dist\css\admin_login_style.css" />
+    <_ContentIncludedByDefault Remove="wwwroot\dist\css\style.css" />
   </ItemGroup>
 
 
