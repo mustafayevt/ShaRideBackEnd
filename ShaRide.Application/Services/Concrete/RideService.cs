@@ -32,7 +32,7 @@ namespace ShaRide.Application.Services.Concrete
         private readonly IAuthenticatedUserService _authenticatedUserService;
         private readonly IUserRatingService _userRatingService;
         private readonly UserManager _userManager;
-        private IOptions<FcmNotificationContract> _fcmNotificationContract;
+        private readonly IOptions<FcmNotificationContract> _fcmNotificationContract;
         private IUserFcmTokenService _userFcmTokenService;
 
         public RideService(ApplicationDbContext dbContext, IStringLocalizer<Resource> localizer, IMapper mapper,
@@ -123,10 +123,12 @@ namespace ShaRide.Application.Services.Concrete
                                 y.LocationPoint.LocationId == request.ToLocationId &&
                                 y.LocationPointType == LocationPointType.FinishPoint) &&
                             x.RideState != RideState.Finished &&
+                            x.RideState != RideState.Canceled &&
                             x.StartDate.Date == request.Date.Date &&
                             (!request.BanTypeId.HasValue || x.RideCarSeatComposition.Any(y =>
-                                y.CarSeatComposition.Car.CarModel.BanTypeId == request.BanTypeId && 
-                                y.SeatStatus == SeatStatus.Suitable)));
+                                y.CarSeatComposition.Car.CarModel.BanTypeId == request.BanTypeId)) 
+                            && x.RideCarSeatComposition.Any(y=>y.SeatStatus == SeatStatus.Suitable)
+                            && x.DriverId != _authenticatedUserService.UserId);
 
             var rides = results.RidesToRideResponses(_mapper);
 
@@ -474,7 +476,9 @@ namespace ShaRide.Application.Services.Concrete
                 .ThenInclude(x => x.Location)
                 .Include(x => x.RestrictionRideComposition)
                 .ThenInclude(x => x.Restriction)
-                .Where(x => x.IsRowActive && x.DriverId == _authenticatedUserService.UserId)
+                .Where(x => x.IsRowActive &&
+                            x.DriverId == _authenticatedUserService.UserId &&
+                            x.RideState != RideState.Canceled)
                 .OrderByDescending(x=>x.StartDate)
                 .Take(50);
 
@@ -483,7 +487,7 @@ namespace ShaRide.Application.Services.Concrete
             return Task.FromResult(rides);
         }
 
-        public Task<ICollection<RideResponse>> GetCurrentUsersRidesAsPassenger()
+        public Task<ICollection<RideResponse>> GetCurrentUserRidesAsPassenger()
         {
             var dbResult = _dbContext
                 .Rides
@@ -513,7 +517,9 @@ namespace ShaRide.Application.Services.Concrete
                 .ThenInclude(x => x.Location)
                 .Include(x => x.RestrictionRideComposition)
                 .ThenInclude(x => x.Restriction)
-                .Where(x => x.IsRowActive && x.RideCarSeatComposition.Any(y=>y.PassengerId.Equals(_authenticatedUserService.UserId)))
+                .Where(x => x.IsRowActive &&
+                            x.RideCarSeatComposition.Any(y=>y.PassengerId.Equals(_authenticatedUserService.UserId)) &&
+                            x.RideState != RideState.Canceled)
                 .OrderByDescending(x=>x.StartDate)
                 .Take(50);
 
@@ -531,7 +537,9 @@ namespace ShaRide.Application.Services.Concrete
                 .ThenInclude(x=>x.RideLocationPointComposition)
                 .ThenInclude(x=>x.LocationPoint)
                 .ThenInclude(x=>x.Location)
-                .Where(x => x.UserId.Equals(_authenticatedUserService.UserId) && x.IsRowActive)
+                .Where(x => x.UserId.Equals(_authenticatedUserService.UserId)
+                            && x.IsRowActive 
+                            && x.RideCarSeatComposition.Ride.RideState != RideState.Canceled)
                 .ToListAsync();
 
             var requests = dbResult.GroupBy(y => new {y.RideCarSeatComposition.Ride.Id, y.RequestStatus}).Select(x =>
@@ -566,18 +574,21 @@ namespace ShaRide.Application.Services.Concrete
             var soldSeats =
                 ride.RideCarSeatComposition.Where(x => x.PassengerId.Equals(_authenticatedUserService.UserId));
             
-            foreach (var rideCarSeatComposition in soldSeats)
-            {
-                rideCarSeatComposition.PassengerId = null;
-                rideCarSeatComposition.SeatStatus = SeatStatus.Suitable;
-            }
-
-            var passengerRideRequests = _dbContext.PassengerToRideRequests.Where(x =>
-                x.IsRowActive && ride.RideCarSeatComposition.Contains(x.RideCarSeatComposition));
+            var rideCarSeatCompositions = ride.RideCarSeatComposition.ToList();
+            
+            var passengerRideRequests = _dbContext.PassengerToRideRequests.AsTracking().Where(x =>
+                x.IsRowActive && rideCarSeatCompositions.Select(y=>y.CarSeatCompositionId).Contains(x.RideCarSeatComposition.CarSeatCompositionId) &&
+                x.RideCarSeatComposition.RideId.Equals(ride.Id));
             
             foreach (var passengerToRideRequest in passengerRideRequests)
             {
                 passengerToRideRequest.IsRowActive = false;
+            }
+            
+            foreach (var rideCarSeatComposition in soldSeats)
+            {
+                rideCarSeatComposition.PassengerId = null;
+                rideCarSeatComposition.SeatStatus = SeatStatus.Suitable;
             }
 
             await _dbContext.SaveChangesAsync();
@@ -693,6 +704,69 @@ namespace ShaRide.Application.Services.Concrete
             throw new NotImplementedException();
         }
 
+        public Task<List<Ride>> GetRidesForNotificationByDateTime(DateTime rideStarTime)
+        {
+            var results = _dbContext.Rides
+                .Include(x => x.Driver)
+                .ThenInclude(x => x.Phones)
+                .Include(x => x.RideCarSeatComposition)
+                .ThenInclude(x => x.CarSeatComposition)
+                .ThenInclude(x => x.Seat)
+                .Include(x => x.RideCarSeatComposition)
+                .ThenInclude(x => x.Passenger)
+                .Include(x => x.RideCarSeatComposition)
+                .ThenInclude(x => x.CarSeatComposition)
+                .ThenInclude(x => x.Car)
+                .ThenInclude(x => x.CarModel)
+                .ThenInclude(x => x.BanType)
+                .Include(x => x.RideCarSeatComposition)
+                .ThenInclude(x => x.CarSeatComposition)
+                .ThenInclude(x => x.Car)
+                .ThenInclude(x => x.CarModel)
+                .ThenInclude(x => x.CarBrand)
+                .Include(x => x.RideCarSeatComposition)
+                .ThenInclude(x => x.CarSeatComposition)
+                .ThenInclude(x => x.Car)
+                .ThenInclude(x => x.CarImages)
+                .Include(x => x.RideLocationPointComposition)
+                .ThenInclude(x => x.LocationPoint)
+                .ThenInclude(x => x.Location)
+                .Include(x => x.RestrictionRideComposition)
+                .ThenInclude(x => x.Restriction)
+                .Where(x => 
+                            x.RideState != RideState.Finished &&
+                            x.RideState != RideState.Canceled &&
+                            x.StartDate >= rideStarTime)
+                .ToList();
+
+            return Task.FromResult(results);
+        }
+
+        /// <summary>
+        /// Sends notification to all users in the passed ride.
+        /// </summary>
+        /// <param name="ride"></param>
+        /// <param name="notificationBody"></param>
+        /// <returns></returns>
+        public async Task SendNotificationsToUsersInRide(Ride ride, string notificationBody)
+        {
+            var notificationsToUser = ride.RideCarSeatComposition.Select(x => x.PassengerId).ToList();
+            var driverId = ride.DriverId;
+
+            if (!notificationsToUser.Any())
+                return;
+                
+            var userFcmTokens =
+                _dbContext.UserFcmTokens.Where(x => x.IsRowActive && notificationsToUser.Contains(x.UserId) || x.UserId.Equals(driverId));
+
+            var fcmContract = _fcmNotificationContract.Value;
+            // fcmContract.data = new FcmNotificationContract.Data("testClickAction", "1", "pending");
+            fcmContract.notification = new FcmNotificationContract.Notification {body = notificationBody};
+            fcmContract.registration_ids = userFcmTokens.Select(x => x.Token).ToList();
+
+            await _userFcmTokenService.SendNotificationToUser(fcmContract);
+        }
+
         /// <summary>
         /// Returns user by ride request for driver registration.
         /// </summary>
@@ -734,10 +808,10 @@ namespace ShaRide.Application.Services.Concrete
             //Remove rejected requests.
             await RejectOtherRideRequests(updatedRequests);
             
-            //Sending notification to driver through FCM.
+            //Sending notification to passenger through FCM.
             await Task.Run(async () =>
             {
-                var notificationsToUser = updatedRequests.Select(x => x.RideCarSeatComposition.Ride.DriverId).ToList();
+                var notificationsToUser = updatedRequests.Select(x => x.RideCarSeatComposition.PassengerId).ToList();
 
                 if (!notificationsToUser.Any())
                     return;

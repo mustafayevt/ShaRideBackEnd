@@ -67,7 +67,7 @@ namespace ShaRide.WebApi.Controllers
         [HttpGet("GetCurrentUsersRidesAsPassenger")]
         public async Task<IActionResult> GetCurrentUsersRidesAsPassenger()
         {
-            return Ok(await _rideService.GetCurrentUsersRidesAsPassenger());
+            return Ok(await _rideService.GetCurrentUserRidesAsPassenger());
         }
 
         [HttpGet("GetCurrentUsersRideRequests")]

@@ -12,6 +12,7 @@ using Microsoft.Extensions.Hosting;
 using ShaRide.Application;
 using ShaRide.Application.Localize;
 using ShaRide.Application.Services.Interface;
+using ShaRide.WebApi.BackgroundServices;
 using ShaRide.WebApi.Extensions;
 using ShaRide.WebApi.Services;
 
@@ -42,6 +43,7 @@ namespace ShaRide.WebApi
                 {
                     options.DataAnnotationLocalizerProvider = (type, factory) => factory.Create(typeof(Resource));
                 });
+            services.AddHostedService<RideNotificationWorker>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
