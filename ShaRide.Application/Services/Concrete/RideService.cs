@@ -33,12 +33,13 @@ namespace ShaRide.Application.Services.Concrete
         private readonly IAuthenticatedUserService _authenticatedUserService;
         private readonly IUserRatingService _userRatingService;
         private readonly UserManager _userManager;
+        private readonly ILocationService _locationService;
         private readonly IOptions<FcmNotificationContract> _fcmNotificationContract;
         private IUserFcmTokenService _userFcmTokenService;
 
         public RideService(ApplicationDbContext dbContext, IStringLocalizer<Resource> localizer, IMapper mapper,
             ICarService carService, IAuthenticatedUserService authenticatedUserService, UserManager userManager,
-            IUserRatingService userRatingService, IOptions<FcmNotificationContract> fcmNotificationContract, IUserFcmTokenService userFcmTokenService)
+            IUserRatingService userRatingService, IOptions<FcmNotificationContract> fcmNotificationContract, IUserFcmTokenService userFcmTokenService, ILocationService locationService)
         {
             _dbContext = dbContext;
             _localizer = localizer;
@@ -49,6 +50,7 @@ namespace ShaRide.Application.Services.Concrete
             _userRatingService = userRatingService;
             _fcmNotificationContract = fcmNotificationContract;
             _userFcmTokenService = userFcmTokenService;
+            _locationService = locationService;
         }
 
         public async Task<ICollection<RideResponse>> GetAllActiveRides()
@@ -174,6 +176,78 @@ namespace ShaRide.Application.Services.Concrete
                     });
                 }
             }
+
+            #region Ride location
+
+            //Avoiding null reference.
+            ride.RideLocationPointComposition ??= new List<RideLocationPointComposition>();
+            
+            foreach (var rideLocationPointComposition in request.RideLocationPoints)
+            {
+                if (rideLocationPointComposition.LocationPointId.HasValue)
+                {
+                    ride.RideLocationPointComposition.Add(new RideLocationPointComposition
+                    {
+                        LocationPointId = rideLocationPointComposition.LocationPointId.Value,
+                        LocationPointType = rideLocationPointComposition.LocationPointType
+                    });
+                }
+                else
+                {
+                    //Custom selection
+                    if (rideLocationPointComposition.LocationPoint.Name.Equals("Xəritədən seçildi"))
+                    {
+                        LocationPoint locationPoint;
+                        locationPoint = await _dbContext.LocationPoints.Include(x => x.Location)
+                            .FirstOrDefaultAsync(x =>
+                                x.IsRowActive && x.Latitude.Equals(rideLocationPointComposition.LocationPoint.Latitude) &&
+                                x.Longitude.Equals(rideLocationPointComposition.LocationPoint.Longitude));
+
+                        if (locationPoint == null)
+                        {
+                            ride.RideLocationPointComposition.Add(new RideLocationPointComposition
+                            {
+                                LocationPoint = _mapper.Map<LocationPoint>(rideLocationPointComposition.LocationPoint),
+                                LocationPointType = rideLocationPointComposition.LocationPointType
+                            });
+                        }
+                        else
+                        {
+                            ride.RideLocationPointComposition.Add(new RideLocationPointComposition
+                            {
+                                LocationPointId = locationPoint.Id,
+                                LocationPointType = rideLocationPointComposition.LocationPointType
+                            });
+                        }
+                    }
+                    else
+                    {
+                        LocationPoint locationPoint;
+                        locationPoint = await _dbContext.LocationPoints.Include(x => x.Location)
+                            .FirstOrDefaultAsync(x =>
+                                x.IsRowActive && x.Name.Equals(rideLocationPointComposition.LocationPoint.Name));
+
+                        if (locationPoint == null)
+                        {
+                            ride.RideLocationPointComposition.Add(new RideLocationPointComposition
+                            {
+                                LocationPoint = _mapper.Map<LocationPoint>(rideLocationPointComposition.LocationPoint),
+                                LocationPointType = rideLocationPointComposition.LocationPointType
+                            });
+                        }
+                        else
+                        {
+                            ride.RideLocationPointComposition.Add(new RideLocationPointComposition
+                            {
+                                LocationPointId = locationPoint.Id,
+                                LocationPointType = rideLocationPointComposition.LocationPointType
+                            });
+                        }
+                    }
+                }
+            }
+
+            #endregion
 
             await _dbContext.Rides.AddAsync(ride);
 
@@ -488,7 +562,7 @@ namespace ShaRide.Application.Services.Concrete
             return Task.FromResult(rides);
         }
 
-        public Task<ICollection<RideResponse>> GetCurrentUserRidesAsPassenger()
+        public async Task<ICollection<RideResponse>> GetCurrentUserRidesAsPassenger()
         {
             var dbResult = _dbContext
                 .Rides
@@ -526,7 +600,16 @@ namespace ShaRide.Application.Services.Concrete
 
             var rides = dbResult.RidesToRideResponses(_mapper);
             
-            return Task.FromResult(rides);
+            foreach (var rideResponse in rides)
+            {
+                rideResponse.Driver.Rating = await _userRatingService.GetUserRating(rideResponse.Driver.Id);
+                foreach (var carSeatCompositionResponse in rideResponse.Car.CarSeats)
+                {
+                    carSeatCompositionResponse.Passenger.Rating = await _userRatingService.GetUserRating(carSeatCompositionResponse.Passenger.Id);
+                }
+            }
+            
+            return rides;
         }
 
         public async Task<ICollection<GetUserRideRequestResponse>> GetCurrentUsersRideRequests()
@@ -759,7 +842,7 @@ namespace ShaRide.Application.Services.Concrete
 
             var userFcmTokens =
                 _dbContext.UserFcmTokens.Where(x =>
-                        x.IsRowActive && notificationsToUser.Contains(x.UserId) || x.UserId.Equals(driverId))
+                        x.IsRowActive && notificationsToUser.Contains(x.UserId) || x.UserId.Equals(driverId)).ToList()
                     .Distinct(y => y.Token);
 
             var fcmContract = _fcmNotificationContract.Value;

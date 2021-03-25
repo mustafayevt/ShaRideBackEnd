@@ -34,7 +34,7 @@ namespace ShaRide.Application.Services.Concrete
             
             locations.ForEach(x =>
             {
-                x.LocationPoints = x.LocationPoints.Where(y => y.IsRowActive).ToList();
+                x.LocationPoints = x.LocationPoints.Where(y => y.IsRowActive && !x.Name.Equals("Xəritədən seçildi")).ToList();
             });
 
             return _mapper.Map<ICollection<LocationResponse>>(locations);
@@ -42,14 +42,14 @@ namespace ShaRide.Application.Services.Concrete
 
         public async Task<ICollection<LocationPointResponse>> GetLocationPointsAsync()
         {
-            var locationPoints = await _dbContext.LocationPoints.Include(x=>x.Location).Where(x=>x.IsRowActive).ToListAsync();
+            var locationPoints = await _dbContext.LocationPoints.Include(x=>x.Location).Where(x=>x.IsRowActive && !x.Name.Equals("XƏritədən seçildi")).ToListAsync();
 
             return _mapper.Map<ICollection<LocationPointResponse>>(locationPoints);
         }
 
         public async Task<ICollection<LocationPointResponse>> GetLocationPointsByLocationIdAsync(int request)
         {
-            var locationPoints = await _dbContext.LocationPoints.Where(x => x.LocationId == request && x.IsRowActive).ToListAsync();
+            var locationPoints = await _dbContext.LocationPoints.Where(x => x.LocationId == request && x.IsRowActive && !x.Name.Equals("XƏritədən seçildi")).ToListAsync();
 
             return _mapper.Map<ICollection<LocationPointResponse>>(locationPoints);
         }
@@ -62,6 +62,28 @@ namespace ShaRide.Application.Services.Concrete
                 throw new ApiException(_localizer[LocalizationKeys.NOT_FOUND,request]);
 
             return _mapper.Map<LocationResponse>(location);
+        }
+
+        public async Task<LocationPointResponse> GetLocationPointByIdAsync(int request)
+        {
+            var locationPoint = await _dbContext.LocationPoints.Include(x => x.Location)
+                .FirstOrDefaultAsync(x => x.IsRowActive && x.Id.Equals(request));
+            
+            if(locationPoint == null)
+                throw new ApiException(_localizer[LocalizationKeys.NOT_FOUND,request]);
+
+            return _mapper.Map<LocationPointResponse>(locationPoint);
+        }
+
+        public async Task<LocationPointResponse> GetLocationPointByName(string request)
+        {
+            var locationPoint = await _dbContext.LocationPoints.Include(x => x.Location)
+                .FirstOrDefaultAsync(x => x.IsRowActive && x.Name.Equals(request));
+            
+            if(locationPoint == null)
+                throw new ApiException(_localizer[LocalizationKeys.NOT_FOUND,request]);
+
+            return _mapper.Map<LocationPointResponse>(locationPoint);
         }
 
         public async Task<LocationResponse> InsertLocationAsync(InsertLocationRequest request)

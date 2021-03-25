@@ -14,6 +14,8 @@ namespace ShaRide.Application.Services.Interface
         Task<ICollection<LocationPointResponse>> GetLocationPointsAsync();
         Task<ICollection<LocationPointResponse>> GetLocationPointsByLocationIdAsync(int request);
         Task<LocationResponse> GetLocationByIdAsync(int request);
+        Task<LocationPointResponse> GetLocationPointByIdAsync(int request);
+        Task<LocationPointResponse> GetLocationPointByName(string request);
         Task<LocationResponse> InsertLocationAsync(InsertLocationRequest request);
         Task<LocationPointResponse> InsertLocationPointAsync(InsertLocationPointRequest request);
         Task<LocationResponse> UpdateLocationAsync(UpdateLocationRequest request);

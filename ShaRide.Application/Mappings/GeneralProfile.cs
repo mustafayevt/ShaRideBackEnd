@@ -137,7 +137,7 @@ namespace ShaRide.Application.Mappings
                 .ForMember(x => x.PricePerSeat, opt => opt.MapFrom(y => y.PricePerSeat))
                 .ForMember(x => x.Note, opt => opt.MapFrom(y => y.Note))
                 .ForMember(x => x.RideState, opt => opt.MapFrom(y => y.RideState))
-                .ForMember(x => x.RideLocationPoints, opt => opt.MapFrom(y => y.RideLocationPointComposition))
+                // .ForMember(x => x.RideLocationPoints, opt => opt.MapFrom(y => y.RideLocationPointComposition))
                 .ForMember(x => x.RideRestrictions, opt => opt.MapFrom(y => y.RestrictionRideComposition))
                 .ForMember(x => x.RideSeatRequests, opt => opt.MapFrom(y=>y.RideCarSeatComposition))
                 .ReverseMap();

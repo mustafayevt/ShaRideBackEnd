@@ -30,7 +30,6 @@ namespace ShaRide.WebApi.BackgroundServices
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
 #if !DEBUG
-            
             while (!stoppingToken.IsCancellationRequested)
             {
                 // 1 hour before ride starts.

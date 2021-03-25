@@ -110,6 +110,8 @@ namespace ShaRide.Application.Contexts
 
             builder.Entity<PotentialClientNumber>().HasIndex(x => x.Phone);
 
+            builder.Entity<LocationPoint>().HasIndex(x => new {x.Latitude, x.Longitude}).IsUnique();
+
             #endregion
         }
 

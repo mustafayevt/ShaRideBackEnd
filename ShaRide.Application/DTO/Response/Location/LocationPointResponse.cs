@@ -8,5 +8,7 @@ namespace ShaRide.Application.DTO.Response.Location
         public int LocationId { get; set; }
         public string LocationName { get; set; }
         public string Name { get; set; }
+        public double Latitude { get; set; }
+        public double Longitude { get; set; }
     }
 }
