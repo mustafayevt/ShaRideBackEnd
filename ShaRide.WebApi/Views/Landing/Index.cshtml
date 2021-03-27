@@ -3,8 +3,9 @@
 @{
     ViewBag.Title = "ShaRide";
     Layout = "_Layout";
-}
-    <nav>
+} 
+
+<nav>
         <div class="images">
             <img src="~/dist/images/logo.png" alt="logo">
             <img class="menuIcon" src="~/dist/images/menu.png" alt="menu">
@@ -40,17 +41,17 @@
             <span>Nömrəni qeyd edərək tətbiqin istifadəyə verilməsi və digər kampaniyalar haqda dərhal xəbərdar
                 ol.</span>
         </div>
-        <form >
+        <div class="form">
             <input id="phone" placeholder="+994 __ - ___ - __ - __" type="tel">
             <span class="alertText">Nömrə düzgün yığılmayıb</span>
-            <button class="send" type="button" id="registerClientPhone">Göndər</button>
+            <button class="send" type="button">Göndər</button>
             <button type="button" class="sending">Nömrə göndərilir
                 <span></span>
                 <span></span>
                 <span></span>
             </button>
             <button type="button" class="sent">Nömrə göndərildi</button>
-        </form>
+        </div>
     </section>
 
     <section id="advantages">
@@ -63,7 +64,7 @@
             <div class="description activeText">
                 <img class="activeImg" src="~/dist/images/1.png" alt="advantageImg">
                 <h2>Sürətli</h2>
-                <p>Vaxtın azdır? Sadecə tətbiqi açaraq gedəcəyin istiqamətdə yol yoldaşını tap və yola çıx! Avtobus gözləmək və taksi axtarmaq ilə vaxt itirmə. </p>
+                <p>Vaxtın azdır? Sadəcə tətbiqi açaraq gedəcəyin istiqamətdə yol yoldaşını tap və yola çıx! Avtobus gözləmək və taksi axtarmaq ilə vaxt itirmə. </p>
             </div>
             <div class="description">
                 <img src="~/dist/images/2.png" alt="advantageImg">
@@ -187,4 +188,13 @@
 
 
 
-<script src="~/dist/scripts/index.js"></script>
+    <script src="~/dist/scripts/index.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/imask"></script>
+    <script>
+        var element = document.getElementById('phone');
+        var maskOptions = {
+            mask: '+994 00 - 000 - 00 - 00'
+        };
+        var mask = IMask(element, maskOptions);
+    </script>

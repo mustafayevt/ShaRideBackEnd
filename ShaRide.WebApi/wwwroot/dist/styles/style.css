@@ -13,6 +13,7 @@ html {
 
 body {
   color: #fff;
+  -webkit-tap-highlight-color: transparent;
 }
 
 span,
@@ -196,16 +197,16 @@ nav .menu .company {
   line-height: 26px;
 }
 
-#bonus form {
+#bonus .form {
   width: 300px;
 }
 
-#bonus form * {
+#bonus .form * {
   display: block;
   margin-left: auto;
 }
 
-#bonus form input {
+#bonus .form input {
   width: 100%;
   padding: 18px 24px;
   -webkit-transition: 0.2s;
@@ -218,31 +219,31 @@ nav .menu .company {
   line-height: 27px;
 }
 
-#bonus form input::-webkit-input-placeholder {
+#bonus .form input::-webkit-input-placeholder {
   color: #fff;
 }
 
-#bonus form input:-ms-input-placeholder {
+#bonus .form input:-ms-input-placeholder {
   color: #fff;
 }
 
-#bonus form input::-ms-input-placeholder {
+#bonus .form input::-ms-input-placeholder {
   color: #fff;
 }
 
-#bonus form input::placeholder {
+#bonus .form input::placeholder {
   color: #fff;
 }
 
-#bonus form input:focus {
+#bonus .form input:focus {
   border: 1px solid #fff;
 }
 
-#bonus form input.incorrect {
+#bonus .form input.incorrect {
   border: 1px solid #ED3A3A;
 }
 
-#bonus form .alertText {
+#bonus .form .alertText {
   display: none;
   width: 300px;
   color: #ED3A3A;
@@ -252,26 +253,26 @@ nav .menu .company {
   margin-top: 8px;
 }
 
-#bonus form button {
+#bonus .form button {
   background: #FFFFFF;
   color: #45BA35;
   margin-top: 31px;
 }
 
-#bonus form button.send {
+#bonus .form button.send {
   padding: 13px 36px;
 }
 
-#bonus form button.send:hover {
+#bonus .form button.send:hover {
   -webkit-box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.5);
           box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.5);
 }
 
-#bonus form button.send:active {
+#bonus .form button.send:active {
   opacity: 0.8;
 }
 
-#bonus form button.sending, #bonus form button.sent {
+#bonus .form button.sending, #bonus .form button.sent {
   display: none;
   border-radius: 0;
   width: 300px;
@@ -283,7 +284,7 @@ nav .menu .company {
   line-height: 27px;
 }
 
-#bonus form button.sending span {
+#bonus .form button.sending span {
   width: 5px;
   height: 5px;
   background-color: #45BA35;
@@ -293,12 +294,12 @@ nav .menu .company {
           animation: sending 0.9s infinite;
 }
 
-#bonus form button.sending span:nth-child(2) {
+#bonus .form button.sending span:nth-child(2) {
   -webkit-animation-delay: 0.3s;
           animation-delay: 0.3s;
 }
 
-#bonus form button.sending span:nth-child(3) {
+#bonus .form button.sending span:nth-child(3) {
   -webkit-animation-delay: 0.6s;
           animation-delay: 0.6s;
 }
@@ -456,8 +457,9 @@ nav .menu .company {
 #detailList .detail {
   display: -ms-grid;
   display: grid;
-  -ms-grid-columns: auto 645px;
-      grid-template-columns: auto 645px;
+  -ms-grid-columns: auto minmax(600px, 645px);
+      grid-template-columns: auto minmax(600px, 645px);
+  grid-column-gap: 50px;
 }
 
 #detailList .detail .who h4 {
@@ -684,7 +686,7 @@ footer .right .social a:hover {
     font-size: 20px;
     line-height: 24px;
   }
-  #bonus form button {
+  #bonus .form button {
     margin-top: 48px;
   }
   #advantages {
@@ -699,8 +701,11 @@ footer .right .social a:hover {
     color: white;
     display: -ms-grid;
     display: grid;
-    -ms-grid-columns: auto auto;
-        grid-template-columns: auto auto;
+    -webkit-box-pack: justify;
+        -ms-flex-pack: justify;
+            justify-content: space-between;
+    -ms-grid-columns: minmax(100px, 400px) auto;
+        grid-template-columns: minmax(100px, 400px) auto;
     -ms-grid-rows: auto auto;
         grid-template-rows: auto auto;
   }
@@ -723,7 +728,7 @@ footer .right .social a:hover {
   }
   #advantages .text .description img {
     display: block;
-    height: 400px;
+    max-width: 100%;
     -o-object-fit: cover;
        object-fit: cover;
     -ms-grid-column: 1;
@@ -750,7 +755,7 @@ footer .right .social a:hover {
   }
   #advantages .text .description h2,
   #advantages .text .description p {
-    width: 400px;
+    width: 100%;
   }
   #advantages .text .description:not(:last-child) {
     margin-bottom: 0;
@@ -762,7 +767,11 @@ footer .right .social a:hover {
     margin-bottom: 44px;
   }
   #benefitList .benefits {
+    -ms-grid-columns: 1fr 1fr;
+        grid-template-columns: 1fr 1fr;
     row-gap: 50px;
+    -webkit-column-gap: 74px;
+            column-gap: 74px;
     -webkit-box-pack: justify;
         -ms-flex-pack: justify;
             justify-content: space-between;
@@ -771,6 +780,7 @@ footer .right .social a:hover {
     padding: 50px 80px 0;
   }
   #detailList h1 {
+    width: 674px;
     margin-bottom: 35px;
   }
   #detailList .detail {
@@ -886,7 +896,9 @@ footer .right .social a:hover {
     width: auto;
   }
   .banner .coverImg {
-    height: 600px;
+    max-width: 100%;
+    margin-top: -120px;
+    margin-bottom: -120px;
   }
   #bonus {
     -webkit-box-orient: vertical;
@@ -899,13 +911,13 @@ footer .right .social a:hover {
     width: auto;
     margin-bottom: 31px;
   }
-  #bonus form {
+  #bonus .form {
     width: 100%;
   }
-  #bonus form input {
+  #bonus .form input {
     width: 300px;
   }
-  #bonus form button {
+  #bonus .form button {
     margin-top: 35px;
   }
   #advantages .text .description {
@@ -918,13 +930,12 @@ footer .right .social a:hover {
   #advantages .text .description img {
     height: 350px;
   }
-  #advantages .text .description h2,
-  #advantages .text .description p {
-    width: 140px;
+  #benefitList {
+    padding: 50px 30px 75px;
   }
   #benefitList .benefits {
-    -ms-grid-columns: 300px;
-        grid-template-columns: 300px;
+    -ms-grid-columns: 1fr;
+        grid-template-columns: 1fr;
     -webkit-box-pack: center;
         -ms-flex-pack: center;
             justify-content: center;
@@ -944,6 +955,7 @@ footer .right .social a:hover {
     right: -30px;
   }
   footer {
+    padding: 45px 30px;
     -webkit-box-orient: vertical;
     -webkit-box-direction: reverse;
         -ms-flex-direction: column-reverse;
@@ -982,14 +994,14 @@ footer .right .social a:hover {
     color: #878787;
   }
 }
+.bannerText h1{
+  font-weight: 900;
+}
 
 @media only screen and (max-width: 576px) {
   .banner .coverImg {
-    height: 450px;
-  }
-  #advantages .text .description h2,
-  #advantages .text .description p {
-    width: 100px;
+    margin-top: -80px;
+    margin-bottom: -80px;
   }
   #detailList .detail .description .text {
     -ms-grid-columns: 1fr;
@@ -1001,6 +1013,9 @@ footer .right .social a:hover {
     right: 50%;
     -webkit-transform: translateX(50%);
             transform: translateX(50%);
+  }
+  #detailList .detail .description img.up {
+    pointer-events: auto;
   }
 }
 /*# sourceMappingURL=style.css.map */

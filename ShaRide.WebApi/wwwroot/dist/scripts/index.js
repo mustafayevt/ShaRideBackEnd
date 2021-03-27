@@ -61,7 +61,7 @@ send.addEventListener("click", function() {
     if (regex.test(phone)) {
         document.querySelector('#bonus input').classList.remove('incorrect');
         document.querySelector('#bonus .alertText').style.display = 'none'
-        
+
         // switching button animation to on.
         sending.style.display = 'block';
         send.style.display = 'none';
@@ -88,19 +88,6 @@ send.addEventListener("click", function() {
     }
 })
 
-
-
-//phone mask regex
-document.getElementById('phone').addEventListener('focus', function(e) {
-    e.target.value = "+994";
-});
-
-document.getElementById('phone').addEventListener('input', function(e) {
-    var x = e.target.value.replace(/\D/g, '').match(/\d{0,3}(\d{0,2})(\d{0,3})(\d{0,2})(\d{0,2})/);
-    e.target.value = '+994 ' + (!x[2] ? x[1] : x[1] + ' - ' + x[2] + (x[3] ? ' - ' + x[3] : '') + (x[4] ? ' - ' + x[4] : ''));
-
-});
-
 var descriptionHeader = document.querySelectorAll('#detailList .description .header');
 var openDescription = document.querySelectorAll('#detailList .description .down');
 var closeDescription = document.querySelectorAll('#detailList .description .up');
@@ -111,4 +98,18 @@ for (let i = 0; i < descriptionHeader.length; i++) {
         closeDescription[i].classList.toggle('active');
         openDescription[i].classList.toggle('active');
     })
+    closeDescription[i].addEventListener('click', function() {
+        detailDescriptionText[i].classList.toggle('open');
+        closeDescription[i].classList.toggle('active');
+        openDescription[i].classList.toggle('active');
+    })
 }
+
+
+//bind send button to enter key 
+document.querySelector('#phone').addEventListener("keyup", function(event) {
+    if (event.keyCode === 13) {
+        event.preventDefault();
+        document.querySelector('#bonus .send').click();
+    }
+});
