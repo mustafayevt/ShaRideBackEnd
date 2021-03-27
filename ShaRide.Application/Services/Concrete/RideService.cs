@@ -605,6 +605,9 @@ namespace ShaRide.Application.Services.Concrete
                 rideResponse.Driver.Rating = await _userRatingService.GetUserRating(rideResponse.Driver.Id);
                 foreach (var carSeatCompositionResponse in rideResponse.Car.CarSeats)
                 {
+                    if(carSeatCompositionResponse.Passenger is null)
+                        continue;
+                    
                     carSeatCompositionResponse.Passenger.Rating = await _userRatingService.GetUserRating(carSeatCompositionResponse.Passenger.Id);
                 }
             }
