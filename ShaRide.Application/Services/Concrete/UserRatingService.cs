@@ -73,6 +73,21 @@ namespace ShaRide.Application.Services.Concrete
             return Task.FromResult((short) (fraction >= 0.5 ? sumOfRating + 1 : sumOfRating));
         }
 
+        public IEnumerable<KeyValuePair<int, short>> GetUserRating(params int[] userIds)
+        {
+            userIds = userIds.Distinct().ToArray();
+            
+            var ratings = _dbContext.UserRatings.Where(x => x.IsRowActive && userIds.Contains(x.DestinationUserId)).ToList();
+            foreach (var userId in userIds)
+            {
+                var sumOfRating = ratings.Any(x => x.DestinationUserId.Equals(userId)) ? ratings.Where(x=>x.DestinationUserId.Equals(userId)).Average(x => x.Value) : 5;
+                var fraction = sumOfRating - (int) sumOfRating;
+                var rating = (short) (fraction >= 0.5 ? sumOfRating + 1 : sumOfRating);
+
+                yield return new KeyValuePair<int, short>(userId, rating);
+            }
+        }
+
         public async Task<short> GetCurrentUserRating()
         {
             if (!_authenticatedUserService.IsUserAuthenticate)

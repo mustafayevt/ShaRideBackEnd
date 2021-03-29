@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using ShaRide.Application.Contexts;
@@ -9,9 +10,10 @@ using ShaRide.Application.Contexts;
 namespace ShaRide.Application.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210329161301_Message")]
+    partial class Message
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -473,9 +475,6 @@ namespace ShaRide.Application.Migrations
 
                     b.Property<int>("RideState")
                         .HasColumnType("integer");
-
-                    b.Property<DateTime?>("RideStateChangeDatetime")
-                        .HasColumnType("timestamp without time zone");
 
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("timestamp without time zone");

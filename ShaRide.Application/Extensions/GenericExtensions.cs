@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace ShaRide.Application.Helpers
+namespace ShaRide.Application.Extensions
 {
     public static class GenericExtensions
     {

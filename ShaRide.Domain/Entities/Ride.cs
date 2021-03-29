@@ -21,6 +21,8 @@ namespace ShaRide.Domain.Entities
 
         public RideState RideState { get; set; }
 
+        public DateTime? RideStateChangeDatetime { get; set; }
+
         public ICollection<RideCarSeatComposition> RideCarSeatComposition { get; set; }
 
         public ICollection<RideLocationPointComposition> RideLocationPointComposition { get; set; }

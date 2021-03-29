@@ -34,7 +34,7 @@ namespace ShaRide.Application.Services.Concrete
             
             locations.ForEach(x =>
             {
-                x.LocationPoints = x.LocationPoints.Where(y => y.IsRowActive && !x.Name.Equals("Xəritədən seçildi")).ToList();
+                x.LocationPoints = x.LocationPoints.Where(y => y.IsRowActive && !y.Name.Equals("Xəritədən seçildi")).ToList();
             });
 
             return _mapper.Map<ICollection<LocationResponse>>(locations);
@@ -42,14 +42,14 @@ namespace ShaRide.Application.Services.Concrete
 
         public async Task<ICollection<LocationPointResponse>> GetLocationPointsAsync()
         {
-            var locationPoints = await _dbContext.LocationPoints.Include(x=>x.Location).Where(x=>x.IsRowActive && !x.Name.Equals("XƏritədən seçildi")).ToListAsync();
+            var locationPoints = await _dbContext.LocationPoints.Include(x=>x.Location).Where(x=>x.IsRowActive && !x.Name.Equals("Xəritədən seçildi")).ToListAsync();
 
             return _mapper.Map<ICollection<LocationPointResponse>>(locationPoints);
         }
 
         public async Task<ICollection<LocationPointResponse>> GetLocationPointsByLocationIdAsync(int request)
         {
-            var locationPoints = await _dbContext.LocationPoints.Where(x => x.LocationId == request && x.IsRowActive && !x.Name.Equals("XƏritədən seçildi")).ToListAsync();
+            var locationPoints = await _dbContext.LocationPoints.Where(x => x.LocationId == request && x.IsRowActive && !x.Name.Equals("Xəritədən seçildi")).ToListAsync();
 
             return _mapper.Map<ICollection<LocationPointResponse>>(locationPoints);
         }

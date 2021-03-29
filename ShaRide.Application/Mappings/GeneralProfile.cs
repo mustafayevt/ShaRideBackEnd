@@ -9,6 +9,7 @@ using ShaRide.Application.DTO.Request.Common;
 using ShaRide.Application.DTO.Request.Feedback;
 using ShaRide.Application.DTO.Request.Invoice;
 using ShaRide.Application.DTO.Request.Location;
+using ShaRide.Application.DTO.Request.Message;
 using ShaRide.Application.DTO.Request.Restriction;
 using ShaRide.Application.DTO.Request.Ride;
 using ShaRide.Application.DTO.Request.UserFcmToken;
@@ -241,6 +242,12 @@ namespace ShaRide.Application.Mappings
             CreateMap<UserFcmToken, UserFcmTokenInsertRequest>().ReverseMap();
             CreateMap<UserFcmToken, UserFcmTokenUpdateRequest>().ReverseMap();
             CreateMap<UserFcmToken, UserFcmTokenResponse>().ReverseMap();
+
+            #endregion
+
+            #region Message
+
+            CreateMap<Message, InsertMessageRequest>().ReverseMap();
 
             #endregion
         }

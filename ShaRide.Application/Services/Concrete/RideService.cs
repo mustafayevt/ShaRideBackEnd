@@ -2,18 +2,17 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
 using AutoMapper;
 using AutoWrapper.Wrappers;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
 using ShaRide.Application.Contexts;
 using ShaRide.Application.DTO.Request.Ride;
 using ShaRide.Application.DTO.Request.UserFcmToken;
 using ShaRide.Application.DTO.Response.Ride;
+using ShaRide.Application.Extensions;
 using ShaRide.Application.Helpers;
 using ShaRide.Application.Localize;
 using ShaRide.Application.Managers;
@@ -35,11 +34,12 @@ namespace ShaRide.Application.Services.Concrete
         private readonly UserManager _userManager;
         private readonly ILocationService _locationService;
         private readonly IOptions<FcmNotificationContract> _fcmNotificationContract;
-        private IUserFcmTokenService _userFcmTokenService;
+        private readonly IUserFcmTokenService _userFcmTokenService;
+        private readonly IDateTimeService _dateTimeService;
 
         public RideService(ApplicationDbContext dbContext, IStringLocalizer<Resource> localizer, IMapper mapper,
             ICarService carService, IAuthenticatedUserService authenticatedUserService, UserManager userManager,
-            IUserRatingService userRatingService, IOptions<FcmNotificationContract> fcmNotificationContract, IUserFcmTokenService userFcmTokenService, ILocationService locationService)
+            IUserRatingService userRatingService, IOptions<FcmNotificationContract> fcmNotificationContract, IUserFcmTokenService userFcmTokenService, ILocationService locationService, IDateTimeService dateTimeService)
         {
             _dbContext = dbContext;
             _localizer = localizer;
@@ -51,6 +51,7 @@ namespace ShaRide.Application.Services.Concrete
             _fcmNotificationContract = fcmNotificationContract;
             _userFcmTokenService = userFcmTokenService;
             _locationService = locationService;
+            _dateTimeService = dateTimeService;
         }
 
         public async Task<ICollection<RideResponse>> GetAllActiveRides()
@@ -268,6 +269,7 @@ namespace ShaRide.Application.Services.Concrete
                 throw new ApiException(_localizer.GetString(LocalizationKeys.USER_HAS_NOT_ACCESS_OPERATION));
 
             ride.RideState = request.RideState;
+            ride.RideStateChangeDatetime = _dateTimeService.AzerbaijanDateTime;
 
             await _dbContext.SaveChangesAsync();
             
@@ -297,6 +299,7 @@ namespace ShaRide.Application.Services.Concrete
                     throw new NotImplementedException();
                 
                 var fcmContract = _fcmNotificationContract.Value;
+                fcmContract.data.click_action = "RIDE_HAS_FINISHED";
                 fcmContract.data.id = "2";
                 fcmContract.notification = new FcmNotificationContract.Notification {body = notificationBody};
                 fcmContract.registration_ids = userFcmTokens.Select(x => x.Token).ToList();
@@ -366,7 +369,7 @@ namespace ShaRide.Application.Services.Concrete
                     $"{user.Name} {user.Surname} {startLocationName} - {finishLocationName} səyahətində {request.RideCarSeatCompositionIds.Count} oturacaq sifariş etmək istəyir.";
 
                 var fcmContract = _fcmNotificationContract.Value;
-                // fcmContract.data = new FcmNotificationContract.Data("testClickAction", "1", "pending");
+                fcmContract.data = new FcmNotificationContract.Data("ADD_PASSENGER_TO_RIDE", "1", "pending");
                 fcmContract.notification = new FcmNotificationContract.Notification{body = notificationBody};
                 fcmContract.registration_ids = userFcmTokens.Select(x => x.Token).ToList();
 
@@ -498,6 +501,8 @@ namespace ShaRide.Application.Services.Concrete
                 var userFcmTokens =
                     _dbContext.UserFcmTokens.Where(x => x.IsRowActive && notificationsToUser.Select(y=>y.Id).Contains(x.UserId));
 
+                if (!userFcmTokens.Any()) return;
+                
                 var rideLocationComposition = _dbContext.RideLocationPointComposition.Include(x => x.Ride)
                     .Include(x => x.LocationPoint).ThenInclude(x => x.Location).Where(x =>
                         x.RideId == ride.Id);
@@ -521,7 +526,7 @@ namespace ShaRide.Application.Services.Concrete
             return 0;
         }
 
-        public Task<ICollection<RideResponse>> GetCurrentUsersRidesAsDriver()
+        public async Task<ICollection<RideResponse>> GetCurrentUsersRidesAsDriver()
         {
             var dbResult = _dbContext
                 .Rides
@@ -559,7 +564,19 @@ namespace ShaRide.Application.Services.Concrete
 
             var rides = dbResult.RidesToRideResponses(_mapper);
             
-            return Task.FromResult(rides);
+            foreach (var rideResponse in rides)
+            {
+                rideResponse.Driver.Rating = await _userRatingService.GetUserRating(rideResponse.Driver.Id);
+                foreach (var carSeatCompositionResponse in rideResponse.Car.CarSeats)
+                {
+                    if(carSeatCompositionResponse.Passenger is null)
+                        continue;
+                    
+                    carSeatCompositionResponse.Passenger.Rating = await _userRatingService.GetUserRating(carSeatCompositionResponse.Passenger.Id);
+                }
+            }
+            
+            return rides;
         }
 
         public async Task<ICollection<RideResponse>> GetCurrentUserRidesAsPassenger()
@@ -922,7 +939,7 @@ namespace ShaRide.Application.Services.Concrete
                     $"Sürücü {startLocationName} - {finishLocationName} səyahəti üçün verdiyiniz sifarişi qəbul etdi.";
 
                 var fcmContract = _fcmNotificationContract.Value;
-                // fcmContract.data = new FcmNotificationContract.Data("testClickAction", "1", "pending");
+                fcmContract.data = new FcmNotificationContract.Data("ADD_PASSENGER_TO_RIDE", "1", "pending");
                 fcmContract.notification = new FcmNotificationContract.Notification {body = notificationBody};
                 fcmContract.registration_ids = userFcmTokens.Select(x => x.Token).ToList();
 
@@ -976,7 +993,7 @@ namespace ShaRide.Application.Services.Concrete
                     $"{startLocationName} - {finishLocationName} səyahəti üçün verdiyiniz sifariş sistem tərəfindən ləğv olundu.";
 
                 var fcmContract = _fcmNotificationContract.Value;
-                // fcmContract.data = new FcmNotificationContract.Data("testClickAction", "1", "pending");
+                fcmContract.data = new FcmNotificationContract.Data("ADD_PASSENGER_TO_RIDE", "1", "pending");
                 fcmContract.notification = new FcmNotificationContract.Notification {body = notificationBody};
                 fcmContract.registration_ids = userFcmTokens.Select(x => x.Token).ToList();
 
@@ -1018,7 +1035,7 @@ namespace ShaRide.Application.Services.Concrete
                     $"Sürücü {startLocationName} - {finishLocationName} səyahəti üçün verdiyiniz sifarişdən imtina etdi.";
 
                 var fcmContract = _fcmNotificationContract.Value;
-                // fcmContract.data = new FcmNotificationContract.Data("testClickAction", "1", "pending");
+                fcmContract.data = new FcmNotificationContract.Data("ADD_PASSENGER_TO_RIDE", "1", "pending");
                 fcmContract.notification = new FcmNotificationContract.Notification {body = notificationBody};
                 fcmContract.registration_ids = userFcmTokens.Select(x => x.Token).ToList();
 

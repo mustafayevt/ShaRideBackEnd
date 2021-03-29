@@ -20,5 +20,20 @@ namespace ShaRide.Domain.Entities
         public ICollection<UserImage> UserImages { get; set; }
 
         public decimal Balance { get; set; }
+
+        public override bool Equals(object? obj)
+        {
+            return base.Equals(obj);
+        }
+
+        protected bool Equals(User other)
+        {
+            return Name == other.Name && Surname == other.Surname && PasswordHash == other.PasswordHash && UserUniqueKey == other.UserUniqueKey && Equals(Phones, other.Phones) && Equals(UserRoleComposition, other.UserRoleComposition) && Equals(UserImages, other.UserImages) && Balance == other.Balance;
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(Name, Surname, PasswordHash, UserUniqueKey, Phones, UserRoleComposition, UserImages, Balance);
+        }
     }
 }

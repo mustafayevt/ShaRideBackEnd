@@ -112,6 +112,14 @@ namespace ShaRide.Application.Contexts
 
             builder.Entity<LocationPoint>().HasIndex(x => new {x.Latitude, x.Longitude}).IsUnique();
 
+            builder.Entity<Message>(entity =>
+            {
+                entity.HasIndex(x => x.Content).IsUnique();
+                entity.HasIndex(x => x.MessageType).IsUnique();
+                entity.HasIndex(x => x.SenderType).IsUnique();
+                entity.HasIndex(x => x.RideId).IsUnique();
+            });
+
             #endregion
         }
 
@@ -145,6 +153,7 @@ namespace ShaRide.Application.Contexts
         public DbSet<PassengerToRideRequest> PassengerToRideRequests { get; set; }
         public DbSet<PotentialClientNumber> PotentialClientNumbers { get; set; }
         public DbSet<SiteVisitor> SiteVisitors { get; set; }
+        public DbSet<Message> Messages { get; set; }
 
         #endregion
     }

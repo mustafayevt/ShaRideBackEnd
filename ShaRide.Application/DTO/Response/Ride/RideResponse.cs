@@ -21,6 +21,8 @@ namespace ShaRide.Application.DTO.Response.Ride
         public string Note { get; set; }
         
         public RideState RideState { get; set; }
+        
+        public DateTime? RideStateChangeDatetime { get; set; }
 
         public RideCarResponse Car { get; set; }
 
