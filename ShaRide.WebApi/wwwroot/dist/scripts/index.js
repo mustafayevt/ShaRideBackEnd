@@ -43,9 +43,21 @@ document.querySelector('.menu button').addEventListener('click', function() {
 });
 
 //menu toogle
-document.getElementsByClassName('menuIcon')[0].addEventListener('click', function() {
+document.getElementsByClassName('menuIcon')[0].addEventListener('click', function (event) {
     var menu = document.querySelector('nav').classList.toggle('open');
+    if (document.querySelector('nav').classList.contains('open')) {
+        window.history.pushState('open', null, null);
+    } else {
+        window.history.back();
+    }
 })
+
+window.addEventListener('popstate', function (event) {
+    if (event.state = 'open') {
+        var menu = document.querySelector('nav').classList.remove('open');
+    }
+})
+
 
 document.querySelector('nav .menu').addEventListener('click', function() {
     var menu = document.querySelector('nav').classList.remove('open');
