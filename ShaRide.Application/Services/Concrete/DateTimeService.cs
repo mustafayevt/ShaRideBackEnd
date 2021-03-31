@@ -2,6 +2,7 @@
 using System.Globalization;
 using ShaRide.Application.Extensions;
 using ShaRide.Application.Services.Interface;
+using TimeZoneConverter;
 
 namespace ShaRide.Application.Services.Concrete
 {
@@ -13,9 +14,9 @@ namespace ShaRide.Application.Services.Concrete
         {
             get
             {
-                var timeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById("Azerbaijan Standard Time");
-
-                var dateTimeNow = TimeZoneInfo.ConvertTime(DateTime.Now, timeZoneInfo);
+                var info = TZConvert.GetTimeZoneInfo("Azerbaijan Standard Time");
+                
+                var dateTimeNow = TimeZoneInfo.ConvertTime(DateTime.Now, info);
                 
                 return dateTimeNow;
             }
