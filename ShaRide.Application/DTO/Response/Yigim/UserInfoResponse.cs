@@ -4,13 +4,13 @@
     {
         public string Name { get; set; }
         public string Surname { get; set; }
-        public decimal Debt { get; set; }
+        public decimal Balance { get; set; }
 
-        public UserInfoResponse(string name, string surname, decimal debt)
+        public UserInfoResponse(string name, string surname, decimal balance)
         {
             Name = name;
             Surname = surname;
-            Debt = debt;
+            Balance = balance;
         }
     }
 }

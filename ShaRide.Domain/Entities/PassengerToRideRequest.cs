@@ -11,7 +11,7 @@ namespace ShaRide.Domain.Entities
         public User User { get; set; }
         public int UserId { get; set; }
         public DateTime Date { get; set; } = DateTime.UtcNow;
-
+        public PaymentType PaymentType { get; set; }
         public PassengerToRideRequestStatus RequestStatus { get; set; } =
             PassengerToRideRequestStatus.WaitingForResponse;
     }

@@ -12,6 +12,7 @@ namespace ShaRide.Application.Services.Interface
         Task<CarModelResponse> InsertCarModelAsync(InsertCarModelRequest request);
         Task<ICollection<CarModelResponse>> InsertCarModelsAsync(ICollection<InsertCarModelRequest> request);
         Task<CarModelResponse> UpdateCarModelAsync(UpdateCarModelRequest request);
+        Task<int> UpdateCarModelBanIdAsync(ICollection<UpdateCarModelBanIdRequest> request);
         Task DeleteCarModelAsync(int request);
     }
 }

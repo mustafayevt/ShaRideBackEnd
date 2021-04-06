@@ -55,6 +55,7 @@ namespace ShaRide.WebApi
                     await DefaultRoles.SeedAsync(userManager);
                     await DefaultAdminUsers.SeedAsync(userManager);
                     await DefaultSeats.SeedAsync(dbContext);
+                    await CarBrandModelSeed.SeedAsync(dbContext);
 
                     Log.Information("Finished Seeding Default Data");
                     Log.Information("Application Starting");

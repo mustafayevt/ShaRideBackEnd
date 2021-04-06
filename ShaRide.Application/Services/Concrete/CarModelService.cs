@@ -152,6 +152,19 @@ namespace ShaRide.Application.Services.Concrete
             return _mapper.Map<CarModelResponse>(updatedCarModel);
         }
 
+        public async Task<int> UpdateCarModelBanIdAsync(ICollection<UpdateCarModelBanIdRequest> request)
+        {
+            var models = _dbContext.CarModels.AsTracking().Where(x => request.Select(y=>y.ModelId).Contains(x.Id));
+            await models.ForEachAsync(x =>
+            {
+                x.BanTypeId = request.FirstOrDefault(y => y.ModelId.Equals(x.Id)).BanId;
+            });
+            
+            await _dbContext.SaveChangesAsync();
+
+            return 0;
+        }
+
         public async Task DeleteCarModelAsync(int request)
         {
             var deleteCarModel = await _dbContext.CarModels.Where(x => x.IsRowActive).AsTracking()

@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
+using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
 using AutoMapper;
 using AutoWrapper.Wrappers;
@@ -259,7 +261,12 @@ namespace ShaRide.Application.Services.Concrete
 
         public async Task<int> UpdateRideState(UpdateRideStateRequest request)
         {
-            var ride = await _dbContext.Rides.AsTracking()
+            var ride = await _dbContext
+                .Rides
+                .Include(x=>x.Driver)
+                .Include(x=>x.RideCarSeatComposition)
+                .ThenInclude(x=>x.Passenger)
+                .AsTracking()
                 .FirstOrDefaultAsync(x => x.IsRowActive && x.Id == request.RideId);
 
             if (ride is null)
@@ -270,6 +277,44 @@ namespace ShaRide.Application.Services.Concrete
 
             ride.RideState = request.RideState;
             ride.RideStateChangeDatetime = _dateTimeService.AzerbaijanDateTime;
+
+            //Payment stuff
+            if (request.RideState.Equals(RideState.Finished))
+            {
+                #region Payment source balance
+
+                var paymentSourceFromBalance = ride.RideCarSeatComposition.Where(x => x.PaymentType == PaymentType.Balance).ToList();
+
+                if (paymentSourceFromBalance.Any())
+                {
+                    foreach (var payments in paymentSourceFromBalance)
+                    {
+                        var amount = ride.PricePerSeat;
+
+                        payments.Passenger.Balance -= amount;
+                        // In here, we're deducting driver's income for our great future.
+                        ride.Driver.Balance += (amount * 85) / 100;
+                    }
+                }
+
+                #endregion
+
+                #region Payment source cash
+
+                var paymentSourceFromCash = ride.RideCarSeatComposition.Where(x => x.PaymentType == PaymentType.Cash).ToList();
+
+                if (paymentSourceFromCash.Any())
+                {
+                    foreach (var rideCarSeatComposition in paymentSourceFromBalance)
+                    {
+                        var amount = ride.PricePerSeat;
+                        // In here, we're deducting driver's income for our great future.
+                        ride.Driver.Balance -= (amount * 15) / 100;
+                    }
+                }
+
+                #endregion
+            }
 
             await _dbContext.SaveChangesAsync();
             
@@ -288,6 +333,9 @@ namespace ShaRide.Application.Services.Concrete
                 var userFcmTokens =
                     _dbContext.UserFcmTokens.Where(x => x.IsRowActive && notificationsToUser.Select(y=>y.Id).Contains(x.UserId));
 
+                if (!userFcmTokens.Any())
+                    return;
+                
                 var notificationBody = string.Empty;
 
                 if (ride.RideState.Equals(RideState.OnRoad))
@@ -318,6 +366,23 @@ namespace ShaRide.Application.Services.Concrete
                 throw new ApiException(_localizer.GetString(LocalizationKeys.NOT_FOUND,
                     _authenticatedUserService.UserId.Value));
 
+            #region User balance rule checking
+
+            var ridePricePerSeat = _dbContext.RideCarSeatCompositions
+                .Include(x=>x.Ride)
+                .FirstOrDefault(x => x.IsRowActive && request.RideCarSeatCompositionIds.Contains(x.Id))
+                ?.Ride.PricePerSeat;
+
+            if (request.PaymentType.Equals(PaymentType.Balance))
+            {
+                var amountOfRequestedSeats = request.RideCarSeatCompositionIds.Count * ridePricePerSeat.Value;
+
+                if (user.Balance < amountOfRequestedSeats)
+                    throw new ApiException(_localizer.GetString(LocalizationKeys.USER_DOES_NOT_HAVE_ENOUGH_BALANCE));
+            }
+
+            #endregion
+            
             #region Remove user all old requests
 
             var userOldRequests = _dbContext.PassengerToRideRequests.AsTracking().Include(x => x.RideCarSeatComposition).Where(x =>
@@ -341,7 +406,8 @@ namespace ShaRide.Application.Services.Concrete
                 return new PassengerToRideRequest
                 {
                     UserId = _authenticatedUserService.UserId.Value,
-                    RideCarSeatCompositionId = x
+                    RideCarSeatCompositionId = x,
+                    PaymentType = request.PaymentType
                 };
             });
 
@@ -909,6 +975,7 @@ namespace ShaRide.Application.Services.Concrete
             {
                 x.RideCarSeatComposition.SeatStatus = SeatStatus.Sold;
                 x.RideCarSeatComposition.PassengerId = x.UserId;
+                x.RideCarSeatComposition.PaymentType = x.PaymentType;
             });
 
             //Remove rejected requests.

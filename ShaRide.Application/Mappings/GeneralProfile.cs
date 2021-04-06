@@ -31,7 +31,8 @@ using ShaRide.Domain.Entities;
 
 namespace ShaRide.Application.Mappings
 {
-    public class GeneralProfile : Profile
+    public class 
+        GeneralProfile : Profile
     {
         public GeneralProfile()
         {

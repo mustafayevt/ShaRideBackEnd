@@ -12,8 +12,11 @@ namespace ShaRide.Application.DTO.Response
         public MessageType MessageType { get; set; }
         public MessageSenderType SenderType { get; set; }
         public DateTime DateTime { get; set; }
+        public string StartPoint { get; set; }
+        public string EndPoint { get; set; }
+        public DateTime RideStartDate { get; set; }
 
-        public MessageToUsersVm(int messageId, string senderFullname, short senderUserRating, string content, MessageType messageType, MessageSenderType senderType, DateTime dateTime)
+        public MessageToUsersVm(int messageId, string senderFullname, short senderUserRating, string content, MessageType messageType, MessageSenderType senderType, DateTime dateTime, string startPoint, string endPoint, DateTime rideStartDate)
         {
             MessageId = messageId;
             SenderFullname = senderFullname;
@@ -22,6 +25,9 @@ namespace ShaRide.Application.DTO.Response
             MessageType = messageType;
             SenderType = senderType;
             DateTime = dateTime;
+            StartPoint = startPoint;
+            EndPoint = endPoint;
+            RideStartDate = rideStartDate;
         }
     }
 }

@@ -35,7 +35,14 @@ namespace ShaRide.Application.Services.Concrete
         private readonly IAuthenticatedUserService _authenticatedUserService;
         private readonly IDateTimeService _dateTimeService;
 
-        public MessageService(ApplicationDbContext dbContext, IUserFcmTokenService fcmTokenService, IStringLocalizer<Resource> localizer, IMapper mapper, IOptions<FcmNotificationContract> fcmNotificationContract, IUserRatingService userRatingService, IAuthenticatedUserService authenticatedUserService, IDateTimeService dateTimeService)
+        public MessageService(ApplicationDbContext dbContext,
+            IUserFcmTokenService fcmTokenService, 
+            IStringLocalizer<Resource> localizer, 
+            IMapper mapper, 
+            IOptions<FcmNotificationContract> fcmNotificationContract,
+            IUserRatingService userRatingService,
+            IAuthenticatedUserService authenticatedUserService,
+            IDateTimeService dateTimeService)
         {
             _dbContext = dbContext;
             _fcmTokenService = fcmTokenService;
@@ -49,7 +56,13 @@ namespace ShaRide.Application.Services.Concrete
 
         public async Task<int> InsertMessage(InsertMessageRequest request)
         {
-            var ride = await _dbContext.Rides.Include(x=>x.RideCarSeatComposition).FirstOrDefaultAsync(x=>x.IsRowActive && x.Id.Equals(request.RideId));
+            var ride = await _dbContext
+                .Rides
+                .Include(x=>x.RideCarSeatComposition)
+                .Include(x=>x.RideLocationPointComposition)
+                .ThenInclude(x=>x.LocationPoint)
+                .ThenInclude(x=>x.Location)
+                .FirstOrDefaultAsync(x=>x.IsRowActive && x.Id.Equals(request.RideId));
 
             if (ride is null)
                 throw new ApiException(_localizer.GetString(LocalizationKeys.RIDE_NOT_FOUND, request.RideId));
@@ -63,14 +76,17 @@ namespace ShaRide.Application.Services.Concrete
             //After inserting message to our db, need to send message to other passenger/driver as well.
             await Task.Run(async () =>
             {
-                var notificationsToUser = _dbContext
+                var notificationsToPassenger = _dbContext
                     .RideCarSeatCompositions
                     .Include(x=>x.Passenger)
                     .Where(x=>x.IsRowActive && x.RideId == ride.Id && x.PassengerId.HasValue)
-                    .Select(x=>x.Passenger);
+                    .Select(x=>x.Passenger)
+                    .Where(x=>x.Id != _authenticatedUserService.UserId); // excluding sender.
 
+                var driverId = _dbContext.Rides.FindAsync(ride.Id).Result.DriverId;
+                
                 var userFcmTokens =
-                    _dbContext.UserFcmTokens.Where(x => x.IsRowActive && notificationsToUser.Select(y=>y.Id).Contains(x.UserId));
+                    _dbContext.UserFcmTokens.Where(x => x.IsRowActive && notificationsToPassenger.Select(y=>y.Id).Contains(x.UserId) || x.UserId.Equals(driverId));
 
                 if (!userFcmTokens.Any()) return;
 
@@ -79,9 +95,15 @@ namespace ShaRide.Application.Services.Concrete
                 var senderFullname = messageEntity.CreatedByUser.Name + " " + messageEntity.CreatedByUser.Surname;
                 var senderRating = await _userRatingService.GetUserRating(messageEntity.CreatedByUser.Id);
 
+                var startLocationName = ride.RideLocationPointComposition
+                    .First(x => x.LocationPointType == LocationPointType.StartPoint).LocationPoint.Location.Name;
+
+                var finishLocationName = ride.RideLocationPointComposition
+                    .First(x => x.LocationPointType == LocationPointType.FinishPoint).LocationPoint.Location.Name;
+                
                 MessageToUsersVm messageToUsersVm = new MessageToUsersVm(messageEntity.Id, senderFullname, senderRating,
                     messageEntity.Content, messageEntity.MessageType, messageEntity.SenderType,
-                    messageEntity.CreatedTimestamp.AddHours(-4));
+                    messageEntity.CreatedTimestamp.ToAzerbaijanDateTime(), startLocationName, finishLocationName, ride.StartDate);
 
                 var notificationBody = JsonConvert.SerializeObject(messageToUsersVm);
 
@@ -109,9 +131,10 @@ namespace ShaRide.Application.Services.Concrete
                 .ThenInclude(x=>x.Location)
                 .Where(x => x.IsRowActive && (x.DriverId.Equals(_authenticatedUserService.UserId.Value) ||
                                                 x.RideCarSeatComposition.Any(y => y.PassengerId.Equals(_authenticatedUserService.UserId.Value)
-                                                && (x.RideState.Equals(RideState.Finished) && x.RideStateChangeDatetime != null && (x.RideStateChangeDatetime.Value < _dateTimeService.AzerbaijanDateTime.AddDays(-2)))
+                                                && (x.RideState.Equals(RideState.Finished) && x.RideStateChangeDatetime != null && (x.RideStateChangeDatetime.Value.Date >= _dateTimeService.AzerbaijanDateTime.AddDays(-2).Date))
                                                 || (x.RideState != RideState.Canceled)
                                               )))
+                .OrderByDescending(x=>x.StartDate)
                 .ToListAsync();
             
             foreach (var ride in rides)
@@ -128,6 +151,7 @@ namespace ShaRide.Application.Services.Concrete
             var response = rides.Select(x => new GetMessageGroupVm
             {
                 RideId = x.Id,
+                DriverId = x.DriverId,
                 RideDateTime = x.StartDate.ToCustomFormat(),
                 RideStartPoint = x.RideLocationPointComposition
                     .First(x => x.LocationPointType.Equals(LocationPointType.StartPoint)).LocationPoint.Location.Name,
@@ -139,7 +163,12 @@ namespace ShaRide.Application.Services.Concrete
                     UserFullname = y.Passenger.Name + " " + y.Passenger.Surname,
                     UserRating = userRatingsPair.First(j=>j.Key.Equals(y.PassengerId.Value)).Value,
                 }).Distinct(h=>h.UserId).ToList(),
-                Messages = _dbContext.Messages.Include(x=>x.CreatedByUser).Where(h=>h.IsRowActive && h.RideId.Equals(x.Id)).ToList().Select(j=>new MessageResponse
+                Messages = _dbContext.Messages
+                    .Include(y=>y.CreatedByUser)
+                    .Where(h=>h.IsRowActive && h.RideId.Equals(x.Id))
+                    .ToList()
+                    .OrderByDescending(h=>h.CreatedTimestamp)
+                    .Select(j=>new MessageResponse
                 {
                     Content = j.Content,
                     MessageDatetime = j.CreatedTimestamp.ToCustomFormat(),

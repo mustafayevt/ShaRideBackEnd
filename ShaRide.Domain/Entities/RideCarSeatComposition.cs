@@ -17,5 +17,6 @@ namespace ShaRide.Domain.Entities
         [ForeignKey(nameof(Passenger))]
         public int? PassengerId { get; set; }
         public User Passenger { get; set; }
+        public PaymentType? PaymentType { get; set; }
     }
 }

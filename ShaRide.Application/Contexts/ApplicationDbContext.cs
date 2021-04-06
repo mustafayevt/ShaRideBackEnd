@@ -114,10 +114,10 @@ namespace ShaRide.Application.Contexts
 
             builder.Entity<Message>(entity =>
             {
-                entity.HasIndex(x => x.Content).IsUnique();
-                entity.HasIndex(x => x.MessageType).IsUnique();
-                entity.HasIndex(x => x.SenderType).IsUnique();
-                entity.HasIndex(x => x.RideId).IsUnique();
+                // entity.HasIndex(x => x.Content).IsUnique();
+                // entity.HasIndex(x => x.MessageType).IsUnique();
+                // entity.HasIndex(x => x.SenderType).IsUnique();
+                // entity.HasIndex(x => x.RideId).IsUnique();
             });
 
             #endregion
