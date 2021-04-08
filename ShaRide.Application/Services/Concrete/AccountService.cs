@@ -124,6 +124,14 @@ namespace ShaRide.Application.Services.Concrete
             var userResult = await _userManager.CreateAsync(user, request.Password);
             if (userResult.Succeeded)
             {
+                //Verify user phone
+                var userPhone = _dbContext.UserPhones.AsTracking().FirstOrDefault(x => x.IsRowActive && x.UserId.Equals(user.Id) && x.IsMain);
+                if (userPhone != null)
+                {
+                    userPhone.IsConfirmed = true;
+                    await _dbContext.SaveChangesAsync();
+                }
+                
                 var roleResult = await _userManager.AddToRoleAsync(user, Roles.Basic.ToString());
 
                 if (roleResult.Succeeded)
@@ -132,7 +140,7 @@ namespace ShaRide.Application.Services.Concrete
                     return new AuthenticationResponse
                     {
                         Id = user.Id,
-                        IsVerified = false,
+                        IsVerified = true,
                         JWToken = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken)
                     };
                 }

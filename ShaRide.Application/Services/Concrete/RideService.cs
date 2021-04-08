@@ -13,6 +13,7 @@ using Microsoft.Extensions.Options;
 using ShaRide.Application.Contexts;
 using ShaRide.Application.DTO.Request.Ride;
 using ShaRide.Application.DTO.Request.UserFcmToken;
+using ShaRide.Application.DTO.Response.Message;
 using ShaRide.Application.DTO.Response.Ride;
 using ShaRide.Application.Extensions;
 using ShaRide.Application.Helpers;
@@ -323,11 +324,15 @@ namespace ShaRide.Application.Services.Concrete
             {
                 if (!ride.RideState.In(RideState.Finished, RideState.OnRoad))
                     return;
-                
-                var notificationsToUser = _dbContext
+
+                var usersInRide = _dbContext
                     .RideCarSeatCompositions
-                    .Include(x=>x.Passenger)
-                    .Where(x=>x.IsRowActive && x.RideId == ride.Id && x.PassengerId.HasValue)
+                    .Include(x => x.Passenger)
+                    .Where(x=>x.IsRowActive && x.PassengerId.HasValue)
+                    .ToList();
+                
+                var notificationsToUser = usersInRide
+                    .Where(x => x.RideId == ride.Id)
                     .Select(x=>x.Passenger);
 
                 var userFcmTokens =
@@ -347,9 +352,17 @@ namespace ShaRide.Application.Services.Concrete
                     throw new NotImplementedException();
                 
                 var fcmContract = _fcmNotificationContract.Value;
-                fcmContract.data.click_action = "RIDE_HAS_FINISHED";
-                fcmContract.data.id = "2";
-                fcmContract.notification = new FcmNotificationContract.Notification {body = notificationBody};
+                fcmContract.data.ActionInApp = "RIDE_HAS_FINISHED";
+                fcmContract.data.Model = new RateUserNotificationVm
+                {
+                    Participants = usersInRide.Select(x=>new RateUserNotificationVm.RateUserNotificationDetailVm
+                    {
+                        Type = ride.DriverId == x.PassengerId ? MessageSenderType.Driver : MessageSenderType.Passenger,
+                        UserFullname = $"{x.Passenger.Name} {x.Passenger.Surname}",
+                        UserId = x.PassengerId.Value
+                    }).ToList()
+                };
+                fcmContract.notification = new FcmNotificationContract.Notification(notificationBody,fcmContract.data.Title);
                 fcmContract.registration_ids = userFcmTokens.Select(x => x.Token).ToList();
 
                 await _userFcmTokenService.SendNotificationToUser(fcmContract);
@@ -435,8 +448,8 @@ namespace ShaRide.Application.Services.Concrete
                     $"{user.Name} {user.Surname} {startLocationName} - {finishLocationName} səyahətində {request.RideCarSeatCompositionIds.Count} oturacaq sifariş etmək istəyir.";
 
                 var fcmContract = _fcmNotificationContract.Value;
-                fcmContract.data = new FcmNotificationContract.Data("ADD_PASSENGER_TO_RIDE", "1", "pending");
-                fcmContract.notification = new FcmNotificationContract.Notification{body = notificationBody};
+                fcmContract.data = new FcmNotificationContract.Data(notificationBody,"ShaRide","ADD_PASSENGER_TO_RIDE");
+                fcmContract.notification = new FcmNotificationContract.Notification(notificationBody,"ShaRide");
                 fcmContract.registration_ids = userFcmTokens.Select(x => x.Token).ToList();
 
                 await _userFcmTokenService.SendNotificationToUser(fcmContract);
@@ -583,7 +596,8 @@ namespace ShaRide.Application.Services.Concrete
                     $"{ride.StartDate.ToString("F", new CultureInfo("az-AZ"))} tarixli {startLocationName} - {finishLocationName} səyahəti sürücü tərəfindən ləğv edildi.";
 
                 var fcmContract = _fcmNotificationContract.Value;
-                fcmContract.notification = new FcmNotificationContract.Notification {body = notificationBody};
+                fcmContract.notification = new FcmNotificationContract.Notification(notificationBody,"ShaRide");
+                fcmContract.data = new FcmNotificationContract.Data(notificationBody, "ShaRide", "ADD_PASSENGER_TO_RIDE");
                 fcmContract.registration_ids = userFcmTokens.Select(x => x.Token).ToList();
 
                 await _userFcmTokenService.SendNotificationToUser(fcmContract);
@@ -787,7 +801,8 @@ namespace ShaRide.Application.Services.Concrete
                     $"Sərnişin {currentUser.Name} {currentUser.Surname}, {startLocationName} - {finishLocationName} səyahəti üçün verdiyi sifarişdən imtina etdi.";
 
                 var fcmContract = _fcmNotificationContract.Value;
-                fcmContract.notification = new FcmNotificationContract.Notification {body = notificationBody};
+                fcmContract.notification = new FcmNotificationContract.Notification(notificationBody,"ShaRide");
+                fcmContract.data = new FcmNotificationContract.Data(notificationBody, "ShaRide", "CANCEL_ORDER");
                 fcmContract.registration_ids = userFcmTokens.Select(x => x.Token).ToList();
 
                 await _userFcmTokenService.SendNotificationToUser(fcmContract);
@@ -932,8 +947,8 @@ namespace ShaRide.Application.Services.Concrete
                     .Distinct(y => y.Token);
 
             var fcmContract = _fcmNotificationContract.Value;
-            // fcmContract.data = new FcmNotificationContract.Data("testClickAction", "1", "pending");
-            fcmContract.notification = new FcmNotificationContract.Notification {body = notificationBody};
+            fcmContract.notification = new FcmNotificationContract.Notification(notificationBody,"ShaRide");
+            fcmContract.data = new FcmNotificationContract.Data(notificationBody, "ShaRide", "GET_READY");
             fcmContract.registration_ids = userFcmTokens.Select(x => x.Token).ToList();
 
             await _userFcmTokenService.SendNotificationToUser(fcmContract);
@@ -1006,8 +1021,8 @@ namespace ShaRide.Application.Services.Concrete
                     $"Sürücü {startLocationName} - {finishLocationName} səyahəti üçün verdiyiniz sifarişi qəbul etdi.";
 
                 var fcmContract = _fcmNotificationContract.Value;
-                fcmContract.data = new FcmNotificationContract.Data("ADD_PASSENGER_TO_RIDE", "1", "pending");
-                fcmContract.notification = new FcmNotificationContract.Notification {body = notificationBody};
+                fcmContract.notification = new FcmNotificationContract.Notification(notificationBody,"ShaRIde");
+                fcmContract.data = new FcmNotificationContract.Data(notificationBody, "ShaRide", "ADD_PASSENGER_TO_RIDE");
                 fcmContract.registration_ids = userFcmTokens.Select(x => x.Token).ToList();
 
                 await _userFcmTokenService.SendNotificationToUser(fcmContract);
@@ -1060,8 +1075,8 @@ namespace ShaRide.Application.Services.Concrete
                     $"{startLocationName} - {finishLocationName} səyahəti üçün verdiyiniz sifariş sistem tərəfindən ləğv olundu.";
 
                 var fcmContract = _fcmNotificationContract.Value;
-                fcmContract.data = new FcmNotificationContract.Data("ADD_PASSENGER_TO_RIDE", "1", "pending");
-                fcmContract.notification = new FcmNotificationContract.Notification {body = notificationBody};
+                fcmContract.data = new FcmNotificationContract.Data(notificationBody, "ShaRide", "ADD_PASSENGER_TO_RIDE");
+                fcmContract.notification = new FcmNotificationContract.Notification(notificationBody, "ShaRide");
                 fcmContract.registration_ids = userFcmTokens.Select(x => x.Token).ToList();
 
                 await _userFcmTokenService.SendNotificationToUser(fcmContract);
@@ -1102,8 +1117,8 @@ namespace ShaRide.Application.Services.Concrete
                     $"Sürücü {startLocationName} - {finishLocationName} səyahəti üçün verdiyiniz sifarişdən imtina etdi.";
 
                 var fcmContract = _fcmNotificationContract.Value;
-                fcmContract.data = new FcmNotificationContract.Data("ADD_PASSENGER_TO_RIDE", "1", "pending");
-                fcmContract.notification = new FcmNotificationContract.Notification {body = notificationBody};
+                fcmContract.data = new FcmNotificationContract.Data(notificationBody, "ShaRide", "ADD_PASSENGER_TO_RIDE");
+                fcmContract.notification = new FcmNotificationContract.Notification(notificationBody, "ShaRide");
                 fcmContract.registration_ids = userFcmTokens.Select(x => x.Token).ToList();
 
                 await _userFcmTokenService.SendNotificationToUser(fcmContract);

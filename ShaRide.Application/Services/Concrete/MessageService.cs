@@ -103,14 +103,16 @@ namespace ShaRide.Application.Services.Concrete
                 
                 MessageToUsersVm messageToUsersVm = new MessageToUsersVm(messageEntity.Id, senderFullname, senderRating,
                     messageEntity.Content, messageEntity.MessageType, messageEntity.SenderType,
-                    messageEntity.CreatedTimestamp.ToAzerbaijanDateTime(), startLocationName, finishLocationName, ride.StartDate);
+                    messageEntity.CreatedTimestamp.ToAzerbaijanDateTime(), startLocationName, finishLocationName, ride.StartDate, ride.Id);
 
                 var notificationBody = JsonConvert.SerializeObject(messageToUsersVm);
 
                 var fcmContract = _fcmNotificationContract.Value;
-                fcmContract.data.click_action = "MESSAGE_NOTIFICATION_CLICK";
-                fcmContract.data.id = "3";
-                fcmContract.notification = new FcmNotificationContract.Notification {body = notificationBody};
+                fcmContract.data.ActionInApp = "MESSAGE_NOTIFICATION_CLICK";
+                fcmContract.notification = new FcmNotificationContract.Notification($"{senderFullname} : {messageEntity.Content}", $"{startLocationName} - {finishLocationName} səyahətindən");
+                fcmContract.data.Message = notificationBody;
+                fcmContract.data.Body = $"{senderFullname} : {messageEntity.Content}";
+                fcmContract.data.Title = $"{startLocationName} - {finishLocationName} səyahətindən";
                 fcmContract.registration_ids = userFcmTokens.Select(x => x.Token).ToList();
 
                 await _fcmTokenService.SendNotificationToUser(fcmContract);
@@ -131,8 +133,8 @@ namespace ShaRide.Application.Services.Concrete
                 .ThenInclude(x=>x.Location)
                 .Where(x => x.IsRowActive && (x.DriverId.Equals(_authenticatedUserService.UserId.Value) ||
                                                 x.RideCarSeatComposition.Any(y => y.PassengerId.Equals(_authenticatedUserService.UserId.Value)
-                                                && (x.RideState.Equals(RideState.Finished) && x.RideStateChangeDatetime != null && (x.RideStateChangeDatetime.Value.Date >= _dateTimeService.AzerbaijanDateTime.AddDays(-2).Date))
-                                                || (x.RideState != RideState.Canceled)
+                                                && ((x.RideState.Equals(RideState.Finished) && x.RideStateChangeDatetime != null && (x.RideStateChangeDatetime.Value.Date >= _dateTimeService.AzerbaijanDateTime.AddDays(-2).Date))
+                                                || (x.RideState != RideState.Canceled))
                                               )))
                 .OrderByDescending(x=>x.StartDate)
                 .ToListAsync();
@@ -175,7 +177,7 @@ namespace ShaRide.Application.Services.Concrete
                     MessageType = j.MessageType,
                     SenderType = j.SenderType,
                     SenderId = j.CreatedByUserId,
-                    SenderRating = userRatingsPair.First(h=>h.Key.Equals(j.CreatedByUserId)).Value,
+                    SenderRating = userRatingsPair.FirstOrDefault(h=>h.Key.Equals(j.CreatedByUserId)).Value,
                     SenderFullname = j.CreatedByUser.Name + " " + j.CreatedByUser.Surname
                 }).ToList()
             }).ToList();

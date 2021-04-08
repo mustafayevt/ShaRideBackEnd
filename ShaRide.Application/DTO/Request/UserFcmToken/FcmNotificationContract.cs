@@ -1,26 +1,43 @@
 ﻿using System.Collections.Generic;
+using Newtonsoft.Json;
+using ShaRide.Application.DTO.Response.Message;
 
 namespace ShaRide.Application.DTO.Request.UserFcmToken
 {
     public class FcmNotificationContract
     {
+        public FcmNotificationContract()
+        {
+            
+        }
         public Notification notification { get; set; }
         public string priority { get; set; } = "high";
         public Data data { get; set; }
         public List<string> registration_ids { get; set; }
         public class Notification
         {
+            public Notification(string body, string title)
+            {
+                this.body = body;
+                this.title = title;
+            }
+
+            public Notification()
+            {
+                
+            }
+
             public string body { get; set; }
-            public string title { get; set; } = "ShaRide";
+            public string title { get; set; }
         }
 
         public class Data
         {
-            public Data(string clickAction, string id, string status)
+            public Data(string body, string title, string actionInApp)
             {
-                click_action = clickAction;
-                this.id = id;
-                this.status = status;
+                Body = body;
+                Title = title;
+                ActionInApp = actionInApp;
             }
 
             public Data()
@@ -28,9 +45,16 @@ namespace ShaRide.Application.DTO.Request.UserFcmToken
                 
             }
 
-            public string click_action { get; set; }
-            public string id { get; set; }
-            public string status { get; set; }
+            public string Message { get; set; }
+            public string Body { get; set; }
+            public string Title { get; set; }
+            public string ClickAction { get; set; }
+            public string Id { get; set; }
+            public string Status { get; set; }
+            [JsonProperty("action_in_app")]
+            public string ActionInApp { get; set; }
+
+            public IModel Model { get; set; }
         }
     }
 }
