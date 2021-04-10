@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using ShaRide.Application.Constants;
 using ShaRide.Application.Contexts;
+using ShaRide.Application.Extensions;
 using ShaRide.Application.Services.Concrete;
 using ShaRide.Application.Services.Interface;
 using ShaRide.Domain.Entities;
@@ -115,6 +116,7 @@ namespace ShaRide.Application.Managers
                 var passwordHash = PasswordHasher.HashPassword(password);
                 user.PasswordHash = passwordHash;
                 user.UserUniqueKey = await GetNewUserUniqueKey();
+                user.CreatedTimestamp = DateTime.Now.ToAzerbaijanDateTime();
                 await _dbContext.Users.AddAsync(user);
                 await _dbContext.SaveChangesAsync();
                 return IdentityResult.Success;

@@ -34,7 +34,7 @@ namespace ShaRide.WebApi.BackgroundServices
             while (!stoppingToken.IsCancellationRequested)
             {
                 // 1 hour before ride starts.
-                var ridesBeforeTime = _serverDate.AddHours(-1);
+                var ridesBeforeTime = _serverDate.AddHours(1);
 
                 var rides = await _rideService.GetRidesForNotificationByDateTime(ridesBeforeTime);
 

@@ -25,5 +25,6 @@ namespace ShaRide.Application.Services.Interface
         Task<ICollection<RideResponse>> SuggestRidesToUserBasedOnUserFavoriteRoute();
         Task<List<Ride>> GetRidesForNotificationByDateTime(DateTime rideStarTime);
         Task SendNotificationsToUsersInRide(Ride ride, string notificationBody);
+        Task<int> DeactivateUserRequest(int requestId);
     }
 }

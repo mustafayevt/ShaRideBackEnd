@@ -5,7 +5,7 @@ namespace ShaRide.Application.DTO.Response.Message
 {
     public class RateUserNotificationVm : IModel
     {
-
+        public int RideId { get; set; }
         public IList<RateUserNotificationDetailVm> Participants { get; set; }
 
         public class RateUserNotificationDetailVm

@@ -33,13 +33,6 @@ namespace ShaRide.Application.DTO.Request.UserFcmToken
 
         public class Data
         {
-            public Data(string body, string title, string actionInApp)
-            {
-                Body = body;
-                Title = title;
-                ActionInApp = actionInApp;
-            }
-
             public Data()
             {
                 
@@ -48,6 +41,7 @@ namespace ShaRide.Application.DTO.Request.UserFcmToken
             public string Message { get; set; }
             public string Body { get; set; }
             public string Title { get; set; }
+            [JsonProperty("click_action")]
             public string ClickAction { get; set; }
             public string Id { get; set; }
             public string Status { get; set; }

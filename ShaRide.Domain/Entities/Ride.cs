@@ -28,5 +28,6 @@ namespace ShaRide.Domain.Entities
         public ICollection<RideLocationPointComposition> RideLocationPointComposition { get; set; }
 
         public ICollection<RestrictionRideComposition> RestrictionRideComposition { get; set; }
+        public ICollection<Message> Messages { get; set; }
     }
 }

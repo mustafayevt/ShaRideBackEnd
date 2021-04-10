@@ -92,6 +92,7 @@ namespace ShaRide.Application.Services.Concrete
 
                 //Loading sender user from db.
                 await _dbContext.Attach(messageEntity).Reference(x => x.CreatedByUser).LoadAsync();
+                var senderId = messageEntity.CreatedByUserId;
                 var senderFullname = messageEntity.CreatedByUser.Name + " " + messageEntity.CreatedByUser.Surname;
                 var senderRating = await _userRatingService.GetUserRating(messageEntity.CreatedByUser.Id);
 
@@ -103,7 +104,7 @@ namespace ShaRide.Application.Services.Concrete
                 
                 MessageToUsersVm messageToUsersVm = new MessageToUsersVm(messageEntity.Id, senderFullname, senderRating,
                     messageEntity.Content, messageEntity.MessageType, messageEntity.SenderType,
-                    messageEntity.CreatedTimestamp.ToAzerbaijanDateTime(), startLocationName, finishLocationName, ride.StartDate, ride.Id);
+                    messageEntity.CreatedTimestamp.ToAzerbaijanDateTime(), startLocationName, finishLocationName, ride.StartDate, ride.Id, senderId);
 
                 var notificationBody = JsonConvert.SerializeObject(messageToUsersVm);
 
@@ -128,6 +129,8 @@ namespace ShaRide.Application.Services.Concrete
                 .Include(x => x.RideCarSeatComposition)
                 .ThenInclude(x => x.Passenger)
                 .Include(x => x.Driver)
+                .Include(x=>x.Messages)
+                .ThenInclude(y=>y.CreatedByUser)
                 .Include(x=>x.RideLocationPointComposition)
                 .ThenInclude(x=>x.LocationPoint)
                 .ThenInclude(x=>x.Location)
@@ -165,11 +168,10 @@ namespace ShaRide.Application.Services.Concrete
                     UserFullname = y.Passenger.Name + " " + y.Passenger.Surname,
                     UserRating = userRatingsPair.First(j=>j.Key.Equals(y.PassengerId.Value)).Value,
                 }).Distinct(h=>h.UserId).ToList(),
-                Messages = _dbContext.Messages
-                    .Include(y=>y.CreatedByUser)
+                Messages = x.Messages
                     .Where(h=>h.IsRowActive && h.RideId.Equals(x.Id))
                     .ToList()
-                    .OrderByDescending(h=>h.CreatedTimestamp)
+                    .OrderBy(x=>x.CreatedTimestamp)
                     .Select(j=>new MessageResponse
                 {
                     Content = j.Content,

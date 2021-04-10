@@ -93,5 +93,17 @@ namespace ShaRide.WebApi.Controllers
         {
             return Ok(await _rideService.SuggestRidesToUser());
         }
+
+        [HttpGet("SuggestRidesToUserBasedOnUserFavoriteRoute")]
+        public async Task<IActionResult> SuggestRidesToUserBasedOnUserFavoriteRoute()
+        {
+            return Ok(await _rideService.SuggestRidesToUserBasedOnUserFavoriteRoute());
+        }
+
+        [HttpPut("DeactivateUserRideRequest/{requestId:int}")]
+        public async Task<IActionResult> DeactivateUserRideRequest(int requestId)
+        {
+            return Ok(await _rideService.DeactivateUserRequest(requestId));
+        }
     }
 }
