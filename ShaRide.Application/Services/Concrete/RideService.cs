@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
-using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
 using AutoMapper;
 using AutoWrapper.Wrappers;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
 using ShaRide.Application.Contexts;
@@ -39,10 +38,11 @@ namespace ShaRide.Application.Services.Concrete
         private readonly IOptions<FcmNotificationContract> _fcmNotificationContract;
         private readonly IUserFcmTokenService _userFcmTokenService;
         private readonly IDateTimeService _dateTimeService;
+        private readonly PaymentManager _paymentManager;
 
         public RideService(ApplicationDbContext dbContext, IStringLocalizer<Resource> localizer, IMapper mapper,
             ICarService carService, IAuthenticatedUserService authenticatedUserService, UserManager userManager,
-            IUserRatingService userRatingService, IOptions<FcmNotificationContract> fcmNotificationContract, IUserFcmTokenService userFcmTokenService, ILocationService locationService, IDateTimeService dateTimeService)
+            IUserRatingService userRatingService, IOptions<FcmNotificationContract> fcmNotificationContract, IUserFcmTokenService userFcmTokenService, ILocationService locationService, IDateTimeService dateTimeService, PaymentManager paymentManager)
         {
             _dbContext = dbContext;
             _localizer = localizer;
@@ -55,6 +55,7 @@ namespace ShaRide.Application.Services.Concrete
             _userFcmTokenService = userFcmTokenService;
             _locationService = locationService;
             _dateTimeService = dateTimeService;
+            _paymentManager = paymentManager;
         }
 
         public async Task<ICollection<RideResponse>> GetAllActiveRides()
@@ -281,42 +282,8 @@ namespace ShaRide.Application.Services.Concrete
             ride.RideStateChangeDatetime = _dateTimeService.AzerbaijanDateTime;
 
             //Payment stuff
-            if (request.RideState.Equals(RideState.Finished))
-            {
-                #region Payment source balance
-
-                var paymentSourceFromBalance = ride.RideCarSeatComposition.Where(x => x.PaymentType == PaymentType.Balance).ToList();
-
-                if (paymentSourceFromBalance.Any())
-                {
-                    foreach (var payments in paymentSourceFromBalance)
-                    {
-                        var amount = ride.PricePerSeat;
-
-                        payments.Passenger.Balance -= amount;
-                        // In here, we're deducting driver's income for our great future.
-                        ride.Driver.Balance += (amount * 85) / 100;
-                    }
-                }
-
-                #endregion
-
-                #region Payment source cash
-
-                var paymentSourceFromCash = ride.RideCarSeatComposition.Where(x => x.PaymentType == PaymentType.Cash).ToList();
-
-                if (paymentSourceFromCash.Any())
-                {
-                    foreach (var rideCarSeatComposition in paymentSourceFromBalance)
-                    {
-                        var amount = ride.PricePerSeat;
-                        // In here, we're deducting driver's income for our great future.
-                        ride.Driver.Balance -= (amount * 15) / 100;
-                    }
-                }
-
-                #endregion
-            }
+            if (request.RideState.Equals(RideState.Finished)) 
+                _paymentManager.ProcessPayment(ride);
 
             await _dbContext.SaveChangesAsync();
             

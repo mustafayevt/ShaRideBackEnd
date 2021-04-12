@@ -27,5 +27,8 @@ namespace ShaRide.Application.Executables.Abstraction
             UserManager = userManager;
             Config = config;
         }
+
+        protected abstract void ProcessFromCashPayment(Ride ride);
+        protected abstract void ProcessFromBalancePayment(Ride ride);
     }
 }

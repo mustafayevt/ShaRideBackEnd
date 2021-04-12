@@ -66,6 +66,7 @@ namespace ShaRide.Application
             services.AddScoped<IUserFcmTokenService, UserFcmTokenService>();
             services.AddScoped<IMessageService, MessageService>();
             services.AddScoped<IAccountingService, AccountingService>();
+            services.AddScoped<PaymentManager>();
             #endregion
             
             services.Configure<JWTSettings>(configuration.GetSection("JWTSettings"));

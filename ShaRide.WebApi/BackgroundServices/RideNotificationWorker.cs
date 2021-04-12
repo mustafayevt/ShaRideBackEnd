@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using ShaRide.Application.Extensions;
 using ShaRide.Application.Services.Interface;
 using ShaRide.Domain.Entities;
 using ShaRide.Domain.Enums;
@@ -17,15 +18,13 @@ namespace ShaRide.WebApi.BackgroundServices
     public class RideNotificationWorker : BackgroundService
     {
         private readonly IRideService _rideService;
-        // 4 hour for our system datetime synchronization.
-        private readonly DateTime _serverDate;
+        private DateTime ServerDate => DateTime.Now.ToAzerbaijanDateTime();
 
         public RideNotificationWorker(IServiceScopeFactory serviceScopeFactory)
         {
             //Creating service scope. Don't use 'CreateScope()' method in 'using' statement. we need this object as singleton.
             IServiceScope serviceScope = serviceScopeFactory.CreateScope();
             _rideService = serviceScope.ServiceProvider.GetRequiredService<IRideService>();
-            _serverDate = serviceScope.ServiceProvider.GetRequiredService<IDateTimeService>().AzerbaijanDateTime;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -34,7 +33,7 @@ namespace ShaRide.WebApi.BackgroundServices
             while (!stoppingToken.IsCancellationRequested)
             {
                 // 1 hour before ride starts.
-                var ridesBeforeTime = _serverDate.AddHours(1);
+                var ridesBeforeTime = ServerDate.AddHours(1);
 
                 var rides = await _rideService.GetRidesForNotificationByDateTime(ridesBeforeTime);
 
@@ -69,7 +68,7 @@ namespace ShaRide.WebApi.BackgroundServices
                 ride.RideLocationPointComposition.SingleOrDefault(x =>
                     x.LocationPointType == LocationPointType.FinishPoint);
 
-            var remainingInMinute = (ride.StartDate - _serverDate).Minutes;
+            var remainingInMinute = (ride.StartDate - ServerDate).Minutes;
 
             if (remainingInMinute == 0)
                 return $"{startLocation.LocationPoint.Location.Name} - {finishLocation.LocationPoint.Location.Name} səyahətin vaxtıdır!";

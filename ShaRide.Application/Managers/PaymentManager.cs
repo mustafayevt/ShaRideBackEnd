@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using ShaRide.Application.Attributes;
 using ShaRide.Application.Contexts;
@@ -31,7 +30,7 @@ namespace ShaRide.Application.Managers
         /// Process payment stuff with discount and campaigns.
         /// </summary>
         /// <param name="ride"></param>
-        public async Task ProcessPayment(Ride ride)
+        public void ProcessPayment(Ride ride)
         {
             //Payment source balance processing.
             ProcessFromBalancePayment(ride);
@@ -41,8 +40,6 @@ namespace ShaRide.Application.Managers
 
             //Discounts & campaigns processing.
             ProcessDiscountsAndCampaigns(ride);
-
-            await _dbContext.SaveChangesAsync();
         }
 
         /// <summary>
