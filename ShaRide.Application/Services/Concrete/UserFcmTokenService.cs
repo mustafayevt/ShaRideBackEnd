@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
@@ -42,10 +43,12 @@ namespace ShaRide.Application.Services.Concrete
 
         public async Task<UserFcmTokenResponse> InsertToken(UserFcmTokenInsertRequest request)
         {
-            var userFcmTokenExist = await _dbContext.UserFcmTokens.AsTracking().FirstOrDefaultAsync(x => x.IsRowActive && x.Token == request.Token && request.UserId == x.UserId);
+            var existingToken = await _dbContext.UserFcmTokens.AsTracking().FirstOrDefaultAsync(x => x.IsRowActive && x.Token == request.Token && request.UserId == x.UserId && request.DeviceId == x.DeviceId);
 
-            if (userFcmTokenExist != null)
-                return _mapper.Map<UserFcmTokenResponse>(userFcmTokenExist);
+            if (existingToken != null)
+                return _mapper.Map<UserFcmTokenResponse>(existingToken);
+
+            _dbContext.UserFcmTokens.RemoveRange(_dbContext.UserFcmTokens.Where(x => x.DeviceId.Equals(request.DeviceId)));
             
             var userFcmToken = _mapper.Map<UserFcmToken>(request);
 

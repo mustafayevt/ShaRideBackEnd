@@ -75,7 +75,7 @@ namespace ShaRide.Application.Managers
         private void ProcessFromCashPayment(Ride ride)
         {
             var paymentSourceFromCashCarSeatComposition =
-                ride.RideCarSeatComposition.Where(x => x.PaymentType == PaymentType.Cash).ToList();
+                ride.RideCarSeatComposition.Where(x => x.PaymentType == PaymentType.Cash && x.PassengerId.HasValue).ToList();
 
             if (paymentSourceFromCashCarSeatComposition.Any())
             {
@@ -100,7 +100,7 @@ namespace ShaRide.Application.Managers
         private void ProcessFromBalancePayment(Ride ride)
         {
             var paymentSourceFromBalanceCarSeatComposition =
-                ride.RideCarSeatComposition.Where(x => x.PaymentType == PaymentType.Balance).ToList();
+                ride.RideCarSeatComposition.Where(x => x.PaymentType == PaymentType.Balance && x.PassengerId.HasValue).ToList();
 
             if (paymentSourceFromBalanceCarSeatComposition.Any())
             {

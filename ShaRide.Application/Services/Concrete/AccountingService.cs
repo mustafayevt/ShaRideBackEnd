@@ -56,7 +56,7 @@ namespace ShaRide.Application.Services.Concrete
                 .ToListAsync();
 
             var driverRidesGroupingByCar =
-                driverRides.GroupBy(x => x.RideCarSeatComposition.Select(y => y.CarSeatComposition.Car).First());
+                driverRides.GroupBy(x => x.RideCarSeatComposition.Select(y => y.CarSeatComposition.CarId).First());
 
             var carAccountingResponses = new List<CarAccountingResponse>();
             foreach (var byCar in driverRidesGroupingByCar)
@@ -87,21 +87,28 @@ namespace ShaRide.Application.Services.Concrete
 
                 var sumIncome = detailed.Sum(x => x.SumIncome);
 
+                var car = driverRides
+                    .FirstOrDefault(x => x.RideCarSeatComposition.Any(y => y.CarSeatComposition.CarId == byCar.Key))
+                    !.RideCarSeatComposition.FirstOrDefault(x => x.CarSeatComposition.CarId == byCar.Key)
+                    !.CarSeatComposition.Car;
+                
                 carAccountingResponses.Add(new CarAccountingResponse
                 {
                     Detailed = detailed,
                     SumIncome = sumIncome,
                     Profit = sumIncome * 85 / 100,
-                    CarTitle = $"{byCar.Key.CarModel.CarBrand.Title}  {byCar.Key.CarModel.Title}",
-                    RegisterNumber = byCar.Key.RegisterNumber,
-                    CarBanAsset = byCar.Key.CarModel.BanType.AssetPath
+                    CarTitle = $"{car.CarModel.CarBrand.Title}  {car.CarModel.Title}",
+                    RegisterNumber = car.RegisterNumber,
+                    CarBanAsset = car.CarModel.BanType.AssetPath
                 });
             }
 
-            var response = new CarAccountingGeneralInfoResponse();
-            response.CarAccountings = carAccountingResponses;
-            response.Profit = carAccountingResponses.Sum(x => x.Profit);
-            response.SumIncome = carAccountingResponses.Sum(x => x.SumIncome);
+            var response = new CarAccountingGeneralInfoResponse
+            {
+                CarAccountings = carAccountingResponses,
+                Profit = carAccountingResponses.Sum(x => x.Profit),
+                SumIncome = carAccountingResponses.Sum(x => x.SumIncome)
+            };
 
             return response;
         }

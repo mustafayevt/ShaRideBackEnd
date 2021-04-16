@@ -8,6 +8,7 @@ namespace ShaRide.Domain.Entities
         public int UserId { get; set; }
         public User User { get; set; }
         public string Token { get; set; }
+        public string DeviceId { get; set; }
 
         public override bool Equals(object obj)
         {

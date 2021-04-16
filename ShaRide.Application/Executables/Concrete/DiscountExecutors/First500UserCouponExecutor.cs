@@ -21,7 +21,7 @@ namespace ShaRide.Application.Executables.Concrete.DiscountExecutors
         }
 
         private const int FREE_SEAT_COUNT = 20;
-        private int userSoldSeatsCount;
+        private int _userSoldSeatsCount;
         
         public override void Execute()
         {
@@ -37,10 +37,10 @@ namespace ShaRide.Application.Executables.Concrete.DiscountExecutors
             if (!userHasCoupon)
                 return;
 
-            userSoldSeatsCount = DbContext.RideCarSeatCompositions.Include(x => x.Ride)
-                .Count(x => x.SeatStatus == SeatStatus.Sold && x.PassengerId.HasValue);
+            _userSoldSeatsCount = DbContext.RideCarSeatCompositions.Include(x => x.Ride)
+                .Count(x => x.SeatStatus == SeatStatus.Sold && x.PassengerId.HasValue && x.Ride.DriverId == Ride.DriverId && x.RideId != Ride.Id);
 
-            if (userSoldSeatsCount >= FREE_SEAT_COUNT)
+            if (_userSoldSeatsCount >= FREE_SEAT_COUNT)
                 return;
             
             ProcessFromBalancePayment(Ride);
@@ -56,7 +56,7 @@ namespace ShaRide.Application.Executables.Concrete.DiscountExecutors
             {
                 foreach (var rideCarSeatComposition in paymentSourceFromCashCarSeatComposition)
                 {
-                    if(userSoldSeatsCount++ > FREE_SEAT_COUNT)
+                    if(_userSoldSeatsCount++ > FREE_SEAT_COUNT)
                         return;
                     
                     var amount = ride.PricePerSeat;
@@ -65,7 +65,7 @@ namespace ShaRide.Application.Executables.Concrete.DiscountExecutors
                         Config.GetValue<decimal>("PaymentObject:FromCashProperties:DriverDeductPercentage"); // 15
 
                     // In here, we're increase driver's income with default percentage.
-                    ride.Driver.Balance += (amount * (100 - driverPercentage)) / 100;
+                    ride.Driver.Balance += (amount * driverPercentage) / 100;
                 }
             }
         }
@@ -79,7 +79,7 @@ namespace ShaRide.Application.Executables.Concrete.DiscountExecutors
             {
                 foreach (var rideCarSeatComposition in paymentSourceFromBalanceCarSeatComposition)
                 {
-                    if(userSoldSeatsCount++ > FREE_SEAT_COUNT)
+                    if(_userSoldSeatsCount++ > FREE_SEAT_COUNT)
                         return;
 
                     var amount = ride.PricePerSeat;
@@ -87,7 +87,7 @@ namespace ShaRide.Application.Executables.Concrete.DiscountExecutors
                     var driverPercentage = Config.GetValue<decimal>("PaymentObject:FromBalanceProperties:DriverDeductPercentage"); // 85
 
                     // In here, we're increase driver's income with default percentage.
-                    ride.Driver.Balance += (amount * (100 - driverPercentage)) / 100;
+                    ride.Driver.Balance += (amount * driverPercentage) / 100;
                 }
             }
         }

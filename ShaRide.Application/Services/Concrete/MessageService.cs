@@ -79,14 +79,14 @@ namespace ShaRide.Application.Services.Concrete
                 var notificationsToPassenger = _dbContext
                     .RideCarSeatCompositions
                     .Include(x=>x.Passenger)
-                    .Where(x=>x.IsRowActive && x.RideId == ride.Id && x.PassengerId.HasValue)
+                    .Where(x=>x.IsRowActive && x.RideId == ride.Id && x.PassengerId.HasValue && x.PassengerId != _authenticatedUserService.UserId)
                     .Select(x=>x.Passenger)
                     .Where(x=>x.Id != _authenticatedUserService.UserId); // excluding sender.
 
                 var driverId = _dbContext.Rides.FindAsync(ride.Id).Result.DriverId;
                 
                 var userFcmTokens =
-                    _dbContext.UserFcmTokens.Where(x => x.IsRowActive && notificationsToPassenger.Select(y=>y.Id).Contains(x.UserId) || x.UserId.Equals(driverId));
+                    _dbContext.UserFcmTokens.Where(x => x.IsRowActive && notificationsToPassenger.Select(y=>y.Id).Contains(x.UserId) || (driverId != _authenticatedUserService.UserId && x.UserId.Equals(driverId)));
 
                 if (!userFcmTokens.Any()) return;
 

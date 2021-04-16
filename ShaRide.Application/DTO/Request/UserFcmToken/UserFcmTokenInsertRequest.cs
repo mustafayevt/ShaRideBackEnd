@@ -9,5 +9,8 @@ namespace ShaRide.Application.DTO.Request.UserFcmToken
         
         [Required(ErrorMessage = LocalizationKeys.REQUIRED)]
         public string Token { get; set; }
+
+        [Required(ErrorMessage = LocalizationKeys.REQUIRED)]
+        public string DeviceId { get; set; }
     }
 }
