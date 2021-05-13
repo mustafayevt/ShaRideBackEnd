@@ -233,8 +233,6 @@ namespace ShaRide.Application.Services.Concrete
 
         public async Task<int> InsertPotentialClientPhone(InsertPotentialClientPhoneRequest request)
         {
-            await Task.Delay(1500);
-            
             var phone = request.Phone.Replace("+","").Replace("-","").Replace(" ","");
             
             if (string.IsNullOrEmpty(phone))
@@ -253,6 +251,20 @@ namespace ShaRide.Application.Services.Concrete
             await _dbContext.SaveChangesAsync();
 
             
+            return 0;
+        }
+
+        public async Task<int> BanUser(int userId)
+        {
+            User user;
+            if (!_userManager.TryGetUserById(userId, out user))
+                throw new ApiException(_localizer.GetString(LocalizationKeys.NOT_FOUND, userId));
+
+            var result = await _userManager.ResetUserRolesAndAddNewRoleToUser(user, Roles.BannedUser.ToString());
+            
+            if (!result.Succeeded)
+                throw new ApiException(result.Errors);
+
             return 0;
         }
 

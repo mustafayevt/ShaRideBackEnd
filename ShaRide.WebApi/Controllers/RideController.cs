@@ -10,7 +10,7 @@ namespace ShaRide.WebApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
+    [Authorize(Roles = "Admin,Basic")]
     [ApiKey]
     public class RideController : ControllerBase
     {

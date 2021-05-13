@@ -1,5 +1,4 @@
 ﻿using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ShaRide.Application.Attributes;
 using ShaRide.Application.DTO.Request.Sms;
@@ -24,6 +23,18 @@ namespace ShaRide.WebApi.Controllers
         {
             await _smsService.SendSms(request);
             return NoContent();
+        }
+
+        [HttpPost("[action]")]
+        public async Task<IActionResult> SendSmsToAllPotentialClients(string body)
+        {
+            return Ok(await _smsService.SendSmsToAllPotentialClients(body));
+        }
+
+        [HttpPost("[action]")]
+        public async Task<IActionResult> SendSmsToAllOurClients(string body)
+        {
+            return Ok(await _smsService.SendSmsToAllOurClients(body));
         }
     }
 }

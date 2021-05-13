@@ -16,7 +16,7 @@ namespace ShaRide.WebApi.Controllers
     [Route("api/[controller]")]
     [ApiController]
     [ApiKey]
-    [Authorize]
+    [Authorize(Roles = "Admin,Basic")]
     public class UserRatingController : ControllerBase
     {
         private readonly IUserRatingService _userRatingService;

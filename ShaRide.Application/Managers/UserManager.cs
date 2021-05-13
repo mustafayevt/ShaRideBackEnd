@@ -157,23 +157,41 @@ namespace ShaRide.Application.Managers
         /// Adds role to user.
         /// </summary>
         /// <param name="user"></param>
-        /// <param name="roleName"></param>
+        /// <param name="roleNames"></param>
         /// <returns></returns>
-        public async Task<IdentityResult> AddToRoleAsync(User user, string roleName)
+        public async Task<IdentityResult> AddToRoleAsync(User user, params string[] roleNames)
         {
-            if (!Enum.TryParse(typeof(Roles), roleName, false, out var roleEnum))
-                throw new ArgumentException("role name is not correct");
+            foreach (var roleName in roleNames)
+            {
+                if (!Enum.TryParse(typeof(Roles), roleName, false, out var roleEnum))
+                    throw new ArgumentException("role name is not correct");
 
-            var dbUser = await FindByPhoneAsync(user.Phones.First().Number);
-            var dbRole = await _dbContext.Roles.FirstOrDefaultAsync(x => x.RoleName == roleEnum.ToString());
+                var dbRole = await _dbContext.Roles.FirstOrDefaultAsync(x => x.RoleName == roleEnum.ToString());
 
-            var composition = new UserRoleComposition(dbUser.Id, dbRole.Id);
+                var composition = new UserRoleComposition(user.Id, dbRole.Id);
 
-            await _dbContext.UserRoleComposition.AddAsync(composition);
+                await _dbContext.UserRoleComposition.AddAsync(composition);
 
-            await _dbContext.SaveChangesAsync();
+                await _dbContext.SaveChangesAsync();
+            }
 
             return IdentityResult.Success;
+        }
+
+        /// <summary>
+        /// Removes user's current roles and adds new roles. 
+        /// </summary>
+        /// <param name="user"></param>
+        /// <param name="roleNames"></param>
+        /// <returns></returns>
+        public async Task<IdentityResult> ResetUserRolesAndAddNewRoleToUser(User user, params string[] roleNames)
+        {
+            var userRoleComposition = _dbContext.UserRoleComposition.Where(x => x.UserId.Equals(user.Id));
+            _dbContext.UserRoleComposition.RemoveRange(userRoleComposition);
+
+            await _dbContext.SaveChangesAsync();
+            
+            return await AddToRoleAsync(user, roleNames);
         }
 
         /// <summary>

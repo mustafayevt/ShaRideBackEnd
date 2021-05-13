@@ -8,8 +8,8 @@ namespace ShaRide.WebApi.Controllers
 {
     public class MetaController : ControllerBase
     {
-        [HttpGet("/info")]
-        [Authorize(Roles = "Admin")]
+        [HttpGet("/info")]    
+        [Authorize(Roles = "Admin,Basic")]
         public ActionResult<string> Info()
         {
             var assembly = typeof(Startup).Assembly;

@@ -24,5 +24,6 @@ namespace ShaRide.Application.Services.Interface
         Task<decimal> GetCurrentUserBalance();
         Task<decimal> GetUserBalance(int userId);
         Task<int> InsertPotentialClientPhone(InsertPotentialClientPhoneRequest request);
+        Task<int> BanUser(int userId);
     }
 }

@@ -10,7 +10,7 @@ namespace ShaRide.WebApi.Controllers
     [Route("api/[controller]")]
     [ApiController]
     [ApiKey]
-    [Authorize]
+    [Authorize(Roles = "Admin,Basic")]
     public class MessageController : ControllerBase
     {
         private readonly IMessageService _messageService;

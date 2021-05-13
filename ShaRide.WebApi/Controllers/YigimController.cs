@@ -27,7 +27,7 @@ namespace ShaRide.WebApi.Controllers
             _invoiceService = invoiceService;
         }
 
-        [HttpGet("GetUserBalance")]
+        [HttpGet("GetUserBalance")] 
         public async Task<ActionResult> GetUserInfoById([Required]string userId)
         {
             var user = await _userManager.FindByUniqueKey(userId);

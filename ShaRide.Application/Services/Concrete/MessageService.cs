@@ -104,7 +104,7 @@ namespace ShaRide.Application.Services.Concrete
                 
                 MessageToUsersVm messageToUsersVm = new MessageToUsersVm(messageEntity.Id, senderFullname, senderRating,
                     messageEntity.Content, messageEntity.MessageType, messageEntity.SenderType,
-                    messageEntity.CreatedTimestamp.ToAzerbaijanDateTime(), startLocationName, finishLocationName, ride.StartDate, ride.Id, senderId);
+                    messageEntity.CreatedTimestamp, startLocationName, finishLocationName, ride.StartDate, ride.Id, senderId);
 
                 var notificationBody = JsonConvert.SerializeObject(messageToUsersVm);
 

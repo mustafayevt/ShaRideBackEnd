@@ -1126,7 +1126,7 @@ namespace ShaRide.Application.Services.Concrete
                     $"Sürücü {startLocationName} - {finishLocationName} səyahəti üçün verdiyiniz sifarişi qəbul etdi.";
 
                 var fcmContract = _fcmNotificationContract.Value;
-                fcmContract.notification = new FcmNotificationContract.Notification(notificationBody,"ShaRIde");
+                fcmContract.notification = new FcmNotificationContract.Notification(notificationBody,"ShaRide");
                 fcmContract.data.Body = notificationBody;
                 fcmContract.data.Title = "ShaRide";
                 fcmContract.data.ActionInApp = "ADD_PASSENGER_TO_RIDE";

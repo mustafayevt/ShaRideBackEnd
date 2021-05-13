@@ -27,6 +27,8 @@ namespace ShaRide.WebApi.Controllers
         [HttpPost("InsertPotentialClient")]
         public async Task<IActionResult> InsertPotentialClient(InsertPotentialClientPhoneRequest request)
         {
+            await Task.Delay(1500); // to show spinner to client.
+
             return Ok(await _accountService.InsertPotentialClientPhone(request));
         }
     }

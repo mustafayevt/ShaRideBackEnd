@@ -14,6 +14,7 @@ namespace ShaRide.WebApi.Controllers
     [Route("api/[controller]")]
     [ApiController]
     [ApiKey]
+    [Authorize(Roles = "Admin,Basic")]
     public class AccountController : ControllerBase
     {
         private readonly IAccountService _accountService;
@@ -27,6 +28,7 @@ namespace ShaRide.WebApi.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpPost("authenticate")]
+        [AllowAnonymous]
         public async Task<IActionResult> AuthenticateAsync(AuthenticationRequest request)
         {
             return Ok(await _accountService.AuthenticateAsync(request, GenerateIpAddress()));
@@ -37,6 +39,7 @@ namespace ShaRide.WebApi.Controllers
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
+        [AllowAnonymous]
         [HttpPost("register")]
         [Produces(typeof(AuthenticationResponse))]
         public async Task<IActionResult> RegisterAsync(RegisterRequest request)
@@ -50,6 +53,7 @@ namespace ShaRide.WebApi.Controllers
         /// </summary>
         /// <param name="phoneNumber"></param>
         /// <returns></returns>
+        [AllowAnonymous]
         [HttpGet("send-phone-verification-sms")]
         [Produces(typeof(string))]
         public async Task<IActionResult> SendPhoneVerificationSmsAsync([Required]string phoneNumber)
@@ -62,6 +66,7 @@ namespace ShaRide.WebApi.Controllers
         /// </summary>
         /// <param name="phoneNumber"></param>
         /// <returns></returns>
+        [AllowAnonymous]
         [HttpGet("send-password-reset-sms")]
         [Produces(typeof(string))]
         public async Task<IActionResult> SendPasswordResetSmsAsync([Required]string phoneNumber)
@@ -75,6 +80,7 @@ namespace ShaRide.WebApi.Controllers
         /// <param name="phoneNumber"></param>
         /// <param name="newPassword">new password of user</param>
         /// <returns></returns>
+        [AllowAnonymous]
         [HttpGet("reset-user-password")]
         [Produces(typeof(int))]
         public async Task<IActionResult> ResetUserPasswordAsync([Required]string phoneNumber, [Required]string newPassword)
@@ -128,12 +134,23 @@ namespace ShaRide.WebApi.Controllers
         /// Returns current users balance.
         /// </summary>
         /// <returns></returns>
-        [HttpGet("GetUserBalance/{userId}")]
+        [HttpGet("GetUserBalance/{userId:int}")]
         public async Task<IActionResult> GetUserBalance([Required] int userId)
         {
             return Ok(await _accountService.GetUserBalance(userId));
         }
-        
+
+        /// <summary>
+        /// Bans user by id.
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <returns>0 when succeed</returns>
+        [HttpPut("BanUser/{userId:int}")]
+        public async Task<IActionResult> BanUser([Required] int userId)
+        {
+            return Ok(await _accountService.BanUser(userId));
+        }
+
         private string GenerateIpAddress()
         {
             if (Request.Headers.ContainsKey("X-Forwarded-For"))

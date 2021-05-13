@@ -14,6 +14,7 @@ namespace ShaRide.Application.Seeds
         {
             await userManager.CreateRoleAsync(new Role(Roles.Admin.ToString()));
             await userManager.CreateRoleAsync(new Role(Roles.Basic.ToString()));
+            await userManager.CreateRoleAsync(new Role(Roles.BannedUser.ToString()));
         }
     }
 }

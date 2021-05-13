@@ -3,13 +3,14 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ShaRide.Application.Attributes;
 using ShaRide.Application.Services.Interface;
+using ShaRide.Domain.Enums;
 
 namespace ShaRide.WebApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
     [ApiKey]
-    [Authorize]
+    [Authorize(Roles = "Admin,Basic")]
     public class AccountingController : ControllerBase
     {
         private readonly IAccountingService _accountingService;

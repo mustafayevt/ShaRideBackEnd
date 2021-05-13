@@ -87,7 +87,7 @@ namespace ShaRide.Application.Executables.Concrete.DiscountExecutors
                     var driverPercentage = Config.GetValue<decimal>("PaymentObject:FromBalanceProperties:DriverDeductPercentage"); // 85
 
                     // In here, we're increase driver's income with default percentage.
-                    ride.Driver.Balance += (amount * driverPercentage) / 100;
+                    ride.Driver.Balance += (amount * (100 - driverPercentage)) / 100;
                 }
             }
         }
