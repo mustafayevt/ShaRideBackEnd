@@ -1,11 +1,10 @@
-﻿using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using ShaRide.Application.Services.Interface;
 using ShaRide.Domain.Common;
 using ShaRide.Domain.Entities;
-using ShaRide.Domain.Enums;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace ShaRide.Application.Contexts
 {
@@ -98,19 +97,19 @@ namespace ShaRide.Application.Contexts
                 entity.HasIndex(x => x.Number).IsUnique();
             });
 
-            builder.Entity<UserRoleComposition>().HasKey(x => new {x.UserId, x.RoleId});
-            
-            builder.Entity<RestrictionRideComposition>().HasKey(x => new {x.RestrictionId, x.RideId});
-            
-            builder.Entity<RideLocationPointComposition>().HasKey(x => new {x.RideId,x.LocationPointId});
+            builder.Entity<UserRoleComposition>().HasKey(x => new { x.UserId, x.RoleId });
 
-            builder.Entity<CarSeatComposition>().HasIndex(x => new {x.SeatId, x.CarId}).IsUnique();
+            builder.Entity<RestrictionRideComposition>().HasKey(x => new { x.RestrictionId, x.RideId });
+
+            builder.Entity<RideLocationPointComposition>().HasKey(x => new { x.RideId, x.LocationPointId });
+
+            builder.Entity<CarSeatComposition>().HasIndex(x => new { x.SeatId, x.CarId }).IsUnique();
 
             builder.Entity<Restriction>().HasIndex(x => x.Title);
 
             builder.Entity<PotentialClientNumber>().HasIndex(x => x.Phone);
 
-            builder.Entity<LocationPoint>().HasIndex(x => new {x.Latitude, x.Longitude}).IsUnique();
+            builder.Entity<LocationPoint>().HasIndex(x => new { x.Latitude, x.Longitude }).IsUnique();
 
             builder.Entity<Message>(entity =>
             {
@@ -129,7 +128,6 @@ namespace ShaRide.Application.Contexts
 
         public DbSet<User> Users { get; set; }
         public DbSet<UserPhone> UserPhones { get; set; }
-
         public DbSet<Role> Roles { get; set; }
         public DbSet<UserRoleComposition> UserRoleComposition { get; set; }
         public DbSet<Location> Locations { get; set; }

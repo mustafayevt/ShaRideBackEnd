@@ -129,11 +129,16 @@ namespace ShaRide.Application.Services.Concrete
                 if (userPhone != null)
                 {
                     userPhone.IsConfirmed = true;
-                    await _dbContext.SaveChangesAsync();
                 }
                 
                 var roleResult = await _userManager.AddToRoleAsync(user, Roles.Basic.ToString());
+                var isBakcellNumber = await BAKCELL.IsBakCellNUmber(userPhone.Number);
+                if (isBakcellNumber)
+                {
+                    user.Balance += 3;
+                }
 
+                await _dbContext.SaveChangesAsync();
                 if (roleResult.Succeeded)
                 {
                     JwtSecurityToken jwtSecurityToken = await GenerateJWToken(user);

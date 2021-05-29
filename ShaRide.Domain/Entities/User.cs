@@ -1,7 +1,7 @@
-﻿using System;
+﻿using ShaRide.Domain.Common;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using ShaRide.Domain.Common;
 
 namespace ShaRide.Domain.Entities
 {

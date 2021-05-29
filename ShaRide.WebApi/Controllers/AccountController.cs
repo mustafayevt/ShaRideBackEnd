@@ -7,6 +7,7 @@ using ShaRide.Application.Attributes;
 using ShaRide.Application.DTO.Request.Account;
 using ShaRide.Application.DTO.Request.Feedback;
 using ShaRide.Application.DTO.Response.Account;
+using ShaRide.Application.Helpers;
 using ShaRide.Application.Services.Interface;
 
 namespace ShaRide.WebApi.Controllers
