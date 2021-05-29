@@ -137,7 +137,7 @@ namespace ShaRide.Application.Services.Concrete
                 {
                     user.Balance += 3;
                 }
-
+                _dbContext.Users.Update(user);
                 await _dbContext.SaveChangesAsync();
                 if (roleResult.Succeeded)
                 {
