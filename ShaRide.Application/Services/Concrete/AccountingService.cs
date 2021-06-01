@@ -35,7 +35,6 @@ namespace ShaRide.Application.Services.Concrete
                 .Include(x => x.RideCarSeatComposition)
                 .ThenInclude(x => x.CarSeatComposition)
                 .ThenInclude(x => x.Car)
-                .ThenInclude(x => x.CarModel)
                 .ThenInclude(x => x.BanType)
                 .Include(x => x.RideCarSeatComposition)
                 .ThenInclude(x => x.CarSeatComposition)
@@ -99,7 +98,7 @@ namespace ShaRide.Application.Services.Concrete
                     Profit = sumIncome * 85 / 100,
                     CarTitle = $"{car.CarModel.CarBrand.Title}  {car.CarModel.Title}",
                     RegisterNumber = car.RegisterNumber,
-                    CarBanAsset = car.CarModel.BanType.AssetPath
+                    CarBanAsset = car.BanType.AssetPath
                 });
             }
 

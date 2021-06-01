@@ -85,17 +85,6 @@ namespace ShaRide.WebApi.Controllers
         }
 
         /// <summary>
-        /// Updates banId in car models.
-        /// </summary>
-        /// <param name="request"></param>
-        /// <returns></returns>
-        [HttpPut("UpdateCarModelBanId")]
-        public async Task<IActionResult> UpdateCarModelBanId(ICollection<UpdateCarModelBanIdRequest> request)
-        {
-            return Ok(await _carModelService.UpdateCarModelBanIdAsync(request));
-        }
-
-        /// <summary>
         /// Deletes carModel by id.
         /// </summary>
         /// <param name="id"></param>

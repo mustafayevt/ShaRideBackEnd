@@ -7,6 +7,8 @@ namespace ShaRide.Domain.Entities
     {
         public int CarModelId { get; set; }
         public CarModel CarModel { get; set; }
+        public int BanTypeId { get; set; }
+        public virtual BanType BanType { get; set; }
         public ICollection<CarImage> CarImages { get; set; }
         public string RegisterNumber { get; set; }
         public ICollection<CarSeatComposition> CarSeatComposition { get; set; }

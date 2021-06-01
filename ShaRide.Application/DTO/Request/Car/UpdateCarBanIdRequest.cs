@@ -1,13 +1,13 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using ShaRide.Application.Helpers;
 
-namespace ShaRide.Application.DTO.Request.CarModel
+namespace ShaRide.Application.DTO.Request.Car
 {
-    public class UpdateCarModelBanIdRequest
+    public class UpdateCarBanIdRequest
     {
         [Required(ErrorMessage = LocalizationKeys.REQUIRED)]
-        public int ModelId { get; set; }
-        
+        public int CarId { get; set; }
+
         [Required(ErrorMessage = LocalizationKeys.REQUIRED)]
         public int BanId { get; set; }
     }

@@ -178,6 +178,7 @@ namespace ShaRide.Application.Mappings
             
             CreateMap<Car, InsertCarRequest>()
                 .ForMember(x => x.ModelId, opt => opt.MapFrom(y => y.CarModelId))
+                .ForMember(x => x.BanTypeId, opt => opt.MapFrom(y => y.BanTypeId))
                 .ForMember(x => x.RegisterNumber, opt => opt.MapFrom(y => y.RegisterNumber))
                 .ForMember(x => x.CarImages, opt => opt.MapFrom(y => y.CarImages))
                 .ForMember(x => x.CarSeats, opt => opt.MapFrom(y => y.CarSeatComposition))
@@ -188,6 +189,7 @@ namespace ShaRide.Application.Mappings
                 .ForMember(x => x.CarImageIds, opt => opt.MapFrom(x=>x.CarImages.Select(carImage=>carImage.Id)))
                 .ForMember(x => x.CarSeats, opt => opt.MapFrom(y => y.CarSeatComposition))
                 .ForMember(x => x.Model, opt => opt.MapFrom(y => y.CarModel))
+                .ForMember(x => x.BanType, opt => opt.MapFrom(y => y.BanType))
                 .ReverseMap();
             
             CreateMap<Car, RideCarResponse>()
@@ -196,6 +198,7 @@ namespace ShaRide.Application.Mappings
                 .ForMember(x => x.CarImageIds, opt => opt.MapFrom(x=>x.CarImages.Select(carImage=>carImage.Id)))
                 .ForMember(x => x.CarSeats, opt => opt.MapFrom(y => y.CarSeatComposition))
                 .ForMember(x => x.Model, opt => opt.MapFrom(y => y.CarModel))
+                .ForMember(x => x.BanType, opt => opt.MapFrom(y => y.BanType))
                 .ReverseMap();
 
             CreateMap<RideCarSeatComposition, RideCarSeatCompositionResponse>()

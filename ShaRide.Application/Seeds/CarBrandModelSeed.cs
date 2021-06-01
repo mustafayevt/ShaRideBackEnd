@@ -1,11 +1,11 @@
-﻿using System.Globalization;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-using CsvHelper;
+﻿using CsvHelper;
 using ShaRide.Application.Contexts;
 using ShaRide.Application.Contracts;
 using ShaRide.Domain.Entities;
+using System.Globalization;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace ShaRide.Application.Seeds
 {
@@ -59,12 +59,11 @@ namespace ShaRide.Application.Seeds
             using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
             {
                 var records = csv.GetRecords<VehicleModelContract>();
-                
+
                 var carModelDbModels = records.Select(x => new CarModel()
                 {
                     Id = x.Id,
                     Title = x.Name,
-                    BanTypeId = 6, //change later
                     CarBrandId = x.BrandId,
                     IsRowActive = true
                 });

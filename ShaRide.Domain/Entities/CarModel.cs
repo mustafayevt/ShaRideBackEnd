@@ -9,8 +9,5 @@ namespace ShaRide.Domain.Entities
 
         public int CarBrandId { get; set; }
         public virtual CarBrand CarBrand { get; set; }
-        
-        public int BanTypeId { get; set; }
-        public virtual BanType BanType { get; set; }
     }
 }

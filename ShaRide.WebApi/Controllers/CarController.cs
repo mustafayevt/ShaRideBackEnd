@@ -1,14 +1,13 @@
-﻿using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Threading.Tasks;
-using AutoWrapper.Filters;
+﻿using AutoWrapper.Filters;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ShaRide.Application.Attributes;
 using ShaRide.Application.DTO.Request.Car;
-using ShaRide.Application.DTO.Response;
 using ShaRide.Application.DTO.Response.Car;
 using ShaRide.Application.Services.Interface;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Threading.Tasks;
 
 namespace ShaRide.WebApi.Controllers
 {
@@ -31,7 +30,7 @@ namespace ShaRide.WebApi.Controllers
         /// <returns></returns>
         [HttpGet("GetCars")]
         [AllowAnonymous]
-        [ProducesResponseType(typeof(ICollection<CarResponse>),200)]
+        [ProducesResponseType(typeof(ICollection<CarResponse>), 200)]
         public async Task<IActionResult> GetCars()
         {
             return Ok(await _carService.GetCarsAsync());
@@ -44,7 +43,7 @@ namespace ShaRide.WebApi.Controllers
         /// <returns></returns>
         [HttpGet("GetCarById/{id}")]
         [AllowAnonymous]
-        [ProducesResponseType(typeof(CarResponse),200)]
+        [ProducesResponseType(typeof(CarResponse), 200)]
         public async Task<IActionResult> GetCarById(int id)
         {
             return Ok(await _carService.GetCarByIdAsync(id));
@@ -57,7 +56,7 @@ namespace ShaRide.WebApi.Controllers
         /// <returns></returns>
         [HttpGet("GetCarsByUserId/{id}")]
         [AllowAnonymous]
-        [ProducesResponseType(typeof(ICollection<CarResponse>),200)]
+        [ProducesResponseType(typeof(ICollection<CarResponse>), 200)]
         public async Task<IActionResult> GetCarsByUserIdAsync(int id)
         {
             return Ok(await _carService.GetCarsByUserIdAsync(id));
@@ -69,7 +68,7 @@ namespace ShaRide.WebApi.Controllers
         /// <param name="request"></param>
         /// <returns></returns>
         [HttpPost("InsertCar")]
-        [ProducesResponseType(typeof(CarResponse),201)]
+        [ProducesResponseType(typeof(CarResponse), 201)]
         public async Task<IActionResult> InsertCar(InsertCarRequest request)
         {
             return Ok(await _carService.InsertCarAsync(request));
@@ -81,10 +80,21 @@ namespace ShaRide.WebApi.Controllers
         /// <param name="request"></param>
         /// <returns></returns>
         [HttpPost("InsertCars")]
-        [ProducesResponseType(typeof(ICollection<CarResponse>),200)]
+        [ProducesResponseType(typeof(ICollection<CarResponse>), 200)]
         public async Task<IActionResult> InsertCars(ICollection<InsertCarRequest> request)
         {
             return Ok(await _carService.InsertCarsAsync(request));
+        }
+
+        /// <summary>
+        /// Updates banId in car.
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPut("UpdateCarModelBanId")]
+        public async Task<IActionResult> UpdateCarBanId(UpdateCarBanIdRequest request)
+        {
+            return Ok(await _carService.UpdateCarBanIdAsync(request));
         }
 
         /// <summary>
@@ -98,11 +108,11 @@ namespace ShaRide.WebApi.Controllers
             await _carService.DeleteCarAsync(id);
             return Ok();
         }
-        
+
         [HttpGet("get-car-image")]
         [Produces(typeof(byte[]))]
         [AutoWrapIgnore]
-        public async Task<IActionResult> GetCarImageByCarImageId([Required]int carImageId)
+        public async Task<IActionResult> GetCarImageByCarImageId([Required] int carImageId)
         {
             var image = await _carService.GetCarImageByCarImageId(carImageId);
             var data = image.Image;

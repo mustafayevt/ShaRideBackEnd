@@ -1,8 +1,6 @@
-﻿using System.Collections.Generic;
-using Newtonsoft.Json;
-using ShaRide.Application.DTO.Request.Car;
-using ShaRide.Application.DTO.Response.BanType;
+﻿using ShaRide.Application.DTO.Response.BanType;
 using ShaRide.Application.DTO.Response.CarModel;
+using System.Collections.Generic;
 
 namespace ShaRide.Application.DTO.Response.Car
 {
@@ -10,6 +8,7 @@ namespace ShaRide.Application.DTO.Response.Car
     {
         public int Id { get; set; }
         public CarModelResponse Model { get; set; }
+        public BanTypeResponse BanType { get; set; }
 
         public string RegisterNumber { get; set; }
 

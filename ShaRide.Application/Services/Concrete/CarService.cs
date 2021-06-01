@@ -1,21 +1,20 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Dynamic.Core;
-using System.Threading.Tasks;
-using AutoMapper;
+﻿using AutoMapper;
 using AutoWrapper.Wrappers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.Localization;
 using ShaRide.Application.Contexts;
 using ShaRide.Application.DTO.Request.Car;
-using ShaRide.Application.DTO.Response;
 using ShaRide.Application.DTO.Response.Car;
 using ShaRide.Application.Helpers;
 using ShaRide.Application.Localize;
 using ShaRide.Application.Services.Interface;
 using ShaRide.Domain.Entities;
 using ShaRide.Domain.Enums;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Dynamic.Core;
+using System.Threading.Tasks;
 
 namespace ShaRide.Application.Services.Concrete
 {
@@ -35,11 +34,10 @@ namespace ShaRide.Application.Services.Concrete
         public async Task<ICollection<CarResponse>> GetCarsAsync()
         {
             var cars = await _dbContext.Cars
-                .Include(x=>x.CarImages)
-                .Include(x=>x.CarModel)
-                .ThenInclude(x=> x.CarBrand)
-                .Include(x=>x.CarModel)
-                .ThenInclude(x=>x.BanType)
+                .Include(x => x.CarImages)
+                .Include(x => x.CarModel)
+                .ThenInclude(x => x.CarBrand)
+                .Include(x => x.BanType)
                 .Where(x => x.IsRowActive)
                 .ToListAsync();
 
@@ -48,7 +46,7 @@ namespace ShaRide.Application.Services.Concrete
 
         public async Task<CarResponse> GetCarByIdAsync(int request)
         {
-            var car = await _dbContext.Cars.Include(x=>x.CarImages).Where(x => x.IsRowActive).FirstOrDefaultAsync(x => x.Id == request);
+            var car = await _dbContext.Cars.Include(x => x.CarImages).Where(x => x.IsRowActive).FirstOrDefaultAsync(x => x.Id == request);
 
             return _mapper.Map<CarResponse>(car);
         }
@@ -57,12 +55,11 @@ namespace ShaRide.Application.Services.Concrete
         {
             var cars = await _dbContext
                 .Cars
-                .Include(x => x.CarModel)
-                .ThenInclude(x => x.BanType)
+                .Include(x => x.BanType)
                 .Include(x => x.CarModel)
                 .ThenInclude(x => x.CarBrand)
-                .Include(x=>x.CarSeatComposition)
-                .ThenInclude(x=>x.Seat)
+                .Include(x => x.CarSeatComposition)
+                .ThenInclude(x => x.Seat)
                 .Where(x =>
                     _dbContext
                         .Rides
@@ -70,15 +67,15 @@ namespace ShaRide.Application.Services.Concrete
                         .ThenInclude(x2 => x2.CarSeatComposition)
                         .Any(y => y.RideCarSeatComposition.Any(h => h.CarSeatComposition.CarId == x.Id) &&
                                   y.DriverId == request)).ToListAsync();
-            
-                foreach (var car in cars)
+
+            foreach (var car in cars)
+            {
+                foreach (var carSeatComposition in car.CarSeatComposition)
                 {
-                    foreach (var carSeatComposition in car.CarSeatComposition)
-                    {
-                        if (carSeatComposition.SeatType == SeatStatus.Sold)
-                            carSeatComposition.SeatType = SeatStatus.Suitable;
-                    }
+                    if (carSeatComposition.SeatType == SeatStatus.Sold)
+                        carSeatComposition.SeatType = SeatStatus.Suitable;
                 }
+            }
 
             return _mapper.Map<ICollection<CarResponse>>(cars);
         }
@@ -87,11 +84,17 @@ namespace ShaRide.Application.Services.Concrete
         {
 
             var car = _mapper.Map<Car>(request);
+
             
-            await _dbContext.Cars.AddAsync(car);
+
+            var insertedCar = await _dbContext.Cars.AddAsync(car);
 
             await _dbContext.SaveChangesAsync();
-            
+
+            await insertedCar.Reference(c => c.BanType).LoadAsync();
+
+            await insertedCar.Reference(x => x.CarModel).LoadAsync();
+
             return _mapper.Map<CarResponse>(car);
         }
 
@@ -108,6 +111,15 @@ namespace ShaRide.Application.Services.Concrete
                 throw new ApiException(_localizer[LocalizationKeys.NOT_FOUND]);
 
             return carImage;
+        }
+
+        public async Task<int> UpdateCarBanIdAsync(UpdateCarBanIdRequest request)
+        {
+            var car = await _dbContext.Cars.AsTracking().FirstOrDefaultAsync(x => request.CarId == x.Id);
+            car.BanTypeId = request.BanId;
+
+            await _dbContext.SaveChangesAsync();
+            return 0;
         }
 
         public Task DeleteCarAsync(int request)

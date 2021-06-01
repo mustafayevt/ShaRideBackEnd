@@ -109,7 +109,6 @@ namespace ShaRide.Application.Services.Concrete
                 .Include(x => x.RideCarSeatComposition)
                 .ThenInclude(x => x.CarSeatComposition)
                 .ThenInclude(x => x.Car)
-                .ThenInclude(x => x.CarModel)
                 .ThenInclude(x => x.BanType)
                 .Include(x => x.RideCarSeatComposition)
                 .ThenInclude(x => x.CarSeatComposition)
@@ -135,7 +134,7 @@ namespace ShaRide.Application.Services.Concrete
                             x.RideState != RideState.Canceled &&
                             x.StartDate.Date == request.Date.Date &&
                             (!request.BanTypeId.HasValue || x.RideCarSeatComposition.Any(y =>
-                                y.CarSeatComposition.Car.CarModel.BanTypeId == request.BanTypeId)) 
+                                y.CarSeatComposition.Car.BanTypeId == request.BanTypeId)) 
                             && x.RideCarSeatComposition.Any(y=>y.SeatStatus == SeatStatus.Suitable)
                             && x.DriverId != _authenticatedUserService.UserId);
 
@@ -612,7 +611,6 @@ namespace ShaRide.Application.Services.Concrete
                 .Include(x => x.RideCarSeatComposition)
                 .ThenInclude(x => x.CarSeatComposition)
                 .ThenInclude(x => x.Car)
-                .ThenInclude(x => x.CarModel)
                 .ThenInclude(x => x.BanType)
                 .Include(x => x.RideCarSeatComposition)
                 .ThenInclude(x => x.CarSeatComposition)
@@ -667,7 +665,6 @@ namespace ShaRide.Application.Services.Concrete
                 .Include(x => x.RideCarSeatComposition)
                 .ThenInclude(x => x.CarSeatComposition)
                 .ThenInclude(x => x.Car)
-                .ThenInclude(x => x.CarModel)
                 .ThenInclude(x => x.BanType)
                 .Include(x => x.RideCarSeatComposition)
                 .ThenInclude(x => x.CarSeatComposition)
@@ -836,7 +833,6 @@ namespace ShaRide.Application.Services.Concrete
                 .Include(x => x.RideCarSeatComposition)
                 .ThenInclude(x => x.CarSeatComposition)
                 .ThenInclude(x => x.Car)
-                .ThenInclude(x => x.CarModel)
                 .ThenInclude(x => x.BanType)
                 .Include(x => x.RideCarSeatComposition)
                 .ThenInclude(x => x.CarSeatComposition)
@@ -922,7 +918,6 @@ namespace ShaRide.Application.Services.Concrete
                 .Include(x => x.RideCarSeatComposition)
                 .ThenInclude(x => x.CarSeatComposition)
                 .ThenInclude(x => x.Car)
-                .ThenInclude(x => x.CarModel)
                 .ThenInclude(x => x.BanType)
                 .Include(x => x.RideCarSeatComposition)
                 .ThenInclude(x => x.CarSeatComposition)
@@ -983,7 +978,6 @@ namespace ShaRide.Application.Services.Concrete
                 .Include(x => x.RideCarSeatComposition)
                 .ThenInclude(x => x.CarSeatComposition)
                 .ThenInclude(x => x.Car)
-                .ThenInclude(x => x.CarModel)
                 .ThenInclude(x => x.BanType)
                 .Include(x => x.RideCarSeatComposition)
                 .ThenInclude(x => x.CarSeatComposition)

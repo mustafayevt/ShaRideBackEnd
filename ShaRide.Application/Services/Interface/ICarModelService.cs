@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using ShaRide.Application.DTO.Request.CarModel;
+﻿using ShaRide.Application.DTO.Request.CarModel;
 using ShaRide.Application.DTO.Response.CarModel;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace ShaRide.Application.Services.Interface
 {
@@ -12,7 +12,6 @@ namespace ShaRide.Application.Services.Interface
         Task<CarModelResponse> InsertCarModelAsync(InsertCarModelRequest request);
         Task<ICollection<CarModelResponse>> InsertCarModelsAsync(ICollection<InsertCarModelRequest> request);
         Task<CarModelResponse> UpdateCarModelAsync(UpdateCarModelRequest request);
-        Task<int> UpdateCarModelBanIdAsync(ICollection<UpdateCarModelBanIdRequest> request);
         Task DeleteCarModelAsync(int request);
     }
 }
