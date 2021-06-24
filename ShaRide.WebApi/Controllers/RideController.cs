@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ShaRide.Application.Attributes;
 using ShaRide.Application.DTO.Request.Ride;
+using ShaRide.Application.DTO.Response.Ride;
+using ShaRide.Application.Pagination;
 using ShaRide.Application.Services.Interface;
 
 namespace ShaRide.WebApi.Controllers
@@ -32,6 +34,16 @@ namespace ShaRide.WebApi.Controllers
         public async Task<IActionResult> GetActiveRides(GetActiveRidesRequest request)
         {
             return Ok(await _rideService.GetActiveRides(request));
+        }
+
+        [HttpPost("GetRides")]
+        [AllowAnonymous]
+        [ProducesResponseType(200, Type = typeof(PaginatedList<RideResponse>))]
+        [Produces("application/json")]
+        public async Task<IActionResult> GetRides(RidesFilterRequest ridesFilterRequest)
+        {
+            var rides = await _rideService.GetRides(ridesFilterRequest);
+            return Ok(rides);
         }
 
         [HttpPost("UpdateRideState")]

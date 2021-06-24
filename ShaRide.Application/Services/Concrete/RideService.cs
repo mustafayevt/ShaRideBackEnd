@@ -20,6 +20,7 @@ using ShaRide.Application.Helpers;
 using ShaRide.Application.Localize;
 using ShaRide.Application.Managers;
 using ShaRide.Application.ManualMapping;
+using ShaRide.Application.Pagination;
 using ShaRide.Application.Services.Interface;
 using ShaRide.Domain.Entities;
 using ShaRide.Domain.Enums;
@@ -94,6 +95,121 @@ namespace ShaRide.Application.Services.Concrete
             }
 
             return rides;
+        }
+
+        /// <summary>
+        /// Returns filtered Rides.
+        /// </summary>
+        /// <param name="ridesFilterRequest"></param>
+        /// <returns></returns>
+        /// <exception cref="ApiException"></exception>
+        public async Task<PaginatedList<RideResponse>> GetRides(RidesFilterRequest ridesFilterRequest)
+        {
+            var ridesQuery = _dbContext.Rides
+                .Include(x => x.Driver)
+                .ThenInclude(x => x.Phones)
+
+                .Include(x => x.RideCarSeatComposition)
+                .ThenInclude(x => x.CarSeatComposition)
+                .ThenInclude(x => x.Seat)
+
+                .Include(x => x.RideCarSeatComposition)
+                .ThenInclude(x => x.Passenger)
+
+                .Include(x => x.RideCarSeatComposition)
+                .ThenInclude(x => x.CarSeatComposition)
+                .ThenInclude(x => x.Car)
+                .ThenInclude(x => x.BanType)
+
+                .Include(x => x.RideCarSeatComposition)
+                .ThenInclude(x => x.CarSeatComposition)
+                .ThenInclude(x => x.Car)
+                .ThenInclude(x => x.CarModel)
+                .ThenInclude(x => x.CarBrand)
+
+                .Include(x => x.RideCarSeatComposition)
+                .ThenInclude(x => x.CarSeatComposition)
+                .ThenInclude(x => x.Car)
+                .ThenInclude(x => x.CarImages)
+
+                .Include(x => x.RideLocationPointComposition)
+                .ThenInclude(x => x.LocationPoint)
+                .ThenInclude(x => x.Location)
+
+                .Include(x => x.RestrictionRideComposition)
+                .ThenInclude(x => x.Restriction).AsNoTracking().AsQueryable();
+
+            if (ridesFilterRequest.FromLocationId.HasValue)
+            {
+                ridesQuery = ridesQuery.Where(x => x.RideLocationPointComposition
+                    .Any(y => y.LocationPoint.LocationId == ridesFilterRequest.FromLocationId &&
+                              y.LocationPointType == LocationPointType.StartPoint));
+            }
+
+            if (ridesFilterRequest.ToLocationId.HasValue)
+            {
+                ridesQuery = ridesQuery.Where(x => x.RideLocationPointComposition
+                    .Any(y => y.LocationPoint.LocationId == ridesFilterRequest.ToLocationId &&
+                              y.LocationPointType == LocationPointType.FinishPoint));
+            }
+
+            if (ridesFilterRequest.PricePerSeatFrom.HasValue)
+            {
+                ridesQuery = ridesQuery.Where(x => x.PricePerSeat >= ridesFilterRequest.PricePerSeatFrom);
+            }
+
+            if (ridesFilterRequest.PricePerSeatTo.HasValue)
+            {
+                ridesQuery = ridesQuery.Where(x => x.PricePerSeat <= ridesFilterRequest.PricePerSeatTo);
+            }
+
+            if (ridesFilterRequest.StartDateFrom.HasValue)
+            {
+                ridesQuery = ridesQuery.Where(x => x.StartDate >= ridesFilterRequest.StartDateFrom);
+            }
+
+            if (ridesFilterRequest.StartDateTo.HasValue)
+            {
+                ridesQuery = ridesQuery.Where(x => x.StartDate <= ridesFilterRequest.StartDateTo);
+            }
+
+            if (ridesFilterRequest.RideStates != null && ridesFilterRequest.RideStates.Count() > 0)
+            {
+                ridesQuery = ridesQuery.Where(x => ridesFilterRequest.RideStates.Contains(x.RideState));
+            }
+
+            if (ridesFilterRequest.BanTypeIds != null && ridesFilterRequest.BanTypeIds.Count() > 0)
+            {
+                ridesQuery = ridesQuery.Where(x => x.RideCarSeatComposition.Any(y =>
+                                ridesFilterRequest.BanTypeIds.Contains(y.CarSeatComposition.Car.BanTypeId)));
+            }
+
+            if (ridesFilterRequest.DriverIds != null && ridesFilterRequest.DriverIds.Count() > 0)
+            {
+                ridesQuery = ridesQuery.Where(x => x.RideCarSeatComposition.Any(y =>
+                                ridesFilterRequest.BanTypeIds.Contains(y.CarSeatComposition.Car.BanTypeId)));
+            }
+
+            var ridesFiltered = await ridesQuery.Skip((ridesFilterRequest.PageNumber - 1) * ridesFilterRequest.PageSize).Take(ridesFilterRequest.PageSize).ToListAsync();
+
+            var ridesResponses = ridesFiltered.RidesToRideResponses(_mapper);
+
+            foreach (var rideResponse in ridesResponses)
+            {
+                rideResponse.Driver.Rating = await _userRatingService.GetUserRating(rideResponse.Driver.Id);
+                if (rideResponse.Car?.CarSeats.Any() ?? false)
+                    foreach (var carSeatCompositionResponse in rideResponse.Car.CarSeats)
+                    {
+                        if (carSeatCompositionResponse.Passenger != null)
+                            carSeatCompositionResponse.Passenger.Rating =
+                                await _userRatingService.GetUserRating(carSeatCompositionResponse.Passenger.Id);
+                    }
+            }
+
+            var ridesPaginated = new PaginatedList<RideResponse>
+                (ridesResponses.ToList(), await ridesQuery.CountAsync(), ridesFilterRequest.PageNumber, ridesFilterRequest.PageSize);
+
+            return ridesPaginated;
         }
 
         public async Task<ICollection<RideResponse>> GetActiveRides(GetActiveRidesRequest request)

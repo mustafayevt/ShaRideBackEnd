@@ -1,9 +1,10 @@
-﻿using System;
+﻿using ShaRide.Application.DTO.Request.Ride;
+using ShaRide.Application.DTO.Response.Ride;
+using ShaRide.Application.Pagination;
+using ShaRide.Domain.Entities;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using ShaRide.Application.DTO.Request.Ride;
-using ShaRide.Application.DTO.Response.Ride;
-using ShaRide.Domain.Entities;
 
 namespace ShaRide.Application.Services.Interface
 {
@@ -11,6 +12,7 @@ namespace ShaRide.Application.Services.Interface
     {
         Task<ICollection<RideResponse>> GetAllActiveRides();
         Task<ICollection<RideResponse>> GetActiveRides(GetActiveRidesRequest request);
+        Task<PaginatedList<RideResponse>> GetRides(RidesFilterRequest request);
         Task<int> InsertRide(InsertRideRequest request);
         Task<int> UpdateRideState(UpdateRideStateRequest request);
         Task<int> AddPassengerToRide(AddPassengerToRideRequest request);

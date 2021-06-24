@@ -1,11 +1,10 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using AutoMapper;
+﻿using AutoMapper;
 using ShaRide.Application.DTO.Response.Account;
 using ShaRide.Application.DTO.Response.Car;
 using ShaRide.Application.DTO.Response.Ride;
 using ShaRide.Domain.Entities;
-using ShaRide.Domain.Enums;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace ShaRide.Application.ManualMapping
 {
@@ -55,7 +54,7 @@ namespace ShaRide.Application.ManualMapping
             {
                 var response = new PassengerToRideResponse
                 {
-                    Ride = RidesToRideResponses(new []{passengerToRideRequest.RideCarSeatComposition.Ride},mapper).First(),
+                    Ride = RidesToRideResponses(new[] { passengerToRideRequest.RideCarSeatComposition.Ride }, mapper).First(),
                     RequestId = passengerToRideRequest.Id,
                     PassengerRequest = new CarSeatCompositionResponse
                     {
