@@ -113,14 +113,18 @@ namespace ShaRide.Application.Services.Concrete
             }
 
             var user = _mapper.Map<User>(request);
-            user.UserImages = new List<UserImage>
+            if (request.Attachment != null)
             {
-                new UserImage
+                user.UserImages = new List<UserImage>
                 {
-                    Image = request.Attachment.Content.ToArray(),
-                    Extension = request.Attachment.Extension
-                }
-            };
+                    new UserImage
+                    {
+                        Image = request.Attachment.Content.ToArray(),
+                        Extension = request.Attachment.Extension
+                    }
+                };
+            }
+
             var userResult = await _userManager.CreateAsync(user, request.Password);
             if (userResult.Succeeded)
             {
@@ -130,7 +134,7 @@ namespace ShaRide.Application.Services.Concrete
                 {
                     userPhone.IsConfirmed = true;
                 }
-                
+
                 var roleResult = await _userManager.AddToRoleAsync(user, Roles.Basic.ToString());
                 var isBakcellNumber = await BAKCELL.IsBakCellNUmber(userPhone.Number);
                 if (isBakcellNumber)
@@ -238,11 +242,11 @@ namespace ShaRide.Application.Services.Concrete
 
         public async Task<int> InsertPotentialClientPhone(InsertPotentialClientPhoneRequest request)
         {
-            var phone = request.Phone.Replace("+","").Replace("-","").Replace(" ","");
-            
+            var phone = request.Phone.Replace("+", "").Replace("-", "").Replace(" ", "");
+
             if (string.IsNullOrEmpty(phone))
                 return 1;
-            
+
             var isExistingPhone = _dbContext.PotentialClientNumbers.Any(x => x.Phone.Equals(phone));
 
             if (isExistingPhone)
@@ -255,7 +259,7 @@ namespace ShaRide.Application.Services.Concrete
 
             await _dbContext.SaveChangesAsync();
 
-            
+
             return 0;
         }
 
@@ -266,7 +270,7 @@ namespace ShaRide.Application.Services.Concrete
                 throw new ApiException(_localizer.GetString(LocalizationKeys.NOT_FOUND, userId));
 
             var result = await _userManager.ResetUserRolesAndAddNewRoleToUser(user, Roles.BannedUser.ToString());
-            
+
             if (!result.Succeeded)
                 throw new ApiException(result.Errors);
 
@@ -338,7 +342,7 @@ namespace ShaRide.Application.Services.Concrete
                 throw new ApiException(_localizer[LocalizationKeys.NOT_FOUND]);
 
             await _dbContext.Attach(user).Collection(x => x.UserImages).LoadAsync();
-            
+
             if (!_dbContext.Users.Where(x => x.IsRowActive).Any(x => x.Id == userId))
                 throw new ApiException(_localizer[LocalizationKeys.NOT_FOUND]);
 

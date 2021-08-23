@@ -1,8 +1,8 @@
-﻿using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using ShaRide.Application.Attributes;
+﻿using ShaRide.Application.Attributes;
 using ShaRide.Application.DTO.Request.Common;
 using ShaRide.Application.Helpers;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace ShaRide.Application.DTO.Request.Account
 {
@@ -21,7 +21,6 @@ namespace ShaRide.Application.DTO.Request.Account
         [Password(ErrorMessage = LocalizationKeys.PASSWORD)]
         public string Password { get; set; }
 
-        [Required(ErrorMessage = LocalizationKeys.REQUIRED)]
         public AttachmentRequest Attachment { get; set; }
     }
 }
