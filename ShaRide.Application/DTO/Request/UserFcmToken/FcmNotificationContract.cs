@@ -1,6 +1,5 @@
-﻿using System.Collections.Generic;
-using Newtonsoft.Json;
-using ShaRide.Application.DTO.Response.Message;
+﻿using Newtonsoft.Json;
+using System.Collections.Generic;
 
 namespace ShaRide.Application.DTO.Request.UserFcmToken
 {
@@ -8,7 +7,7 @@ namespace ShaRide.Application.DTO.Request.UserFcmToken
     {
         public FcmNotificationContract()
         {
-            
+
         }
         public Notification notification { get; set; }
         public string priority { get; set; } = "high";
@@ -24,7 +23,7 @@ namespace ShaRide.Application.DTO.Request.UserFcmToken
 
             public Notification()
             {
-                
+
             }
 
             public string body { get; set; }
@@ -35,7 +34,7 @@ namespace ShaRide.Application.DTO.Request.UserFcmToken
         {
             public Data()
             {
-                
+
             }
 
             public string Message { get; set; }

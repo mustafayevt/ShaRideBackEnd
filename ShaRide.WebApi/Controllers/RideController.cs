@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ShaRide.Application.Attributes;
+using ShaRide.Application.DTO.Request.Account;
 using ShaRide.Application.DTO.Request.Ride;
 using ShaRide.Application.DTO.Response.Ride;
 using ShaRide.Application.Pagination;
@@ -48,6 +49,12 @@ namespace ShaRide.WebApi.Controllers
 
         [HttpPost("UpdateRideState")]
         public async Task<IActionResult> UpdateRideState(UpdateRideStateRequest request)
+        {
+            return Ok(await _rideService.UpdateRideState(request));
+        }
+
+        [HttpPost("GiveFeedbackForRide")]
+        public async Task<IActionResult> GiveFeedbackForRide(RideFeedbackRequest request)
         {
             return Ok(await _rideService.UpdateRideState(request));
         }

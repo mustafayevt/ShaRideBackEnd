@@ -1,14 +1,13 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.Threading.Tasks;
-using AutoWrapper.Filters;
+﻿using AutoWrapper.Filters;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ShaRide.Application.Attributes;
 using ShaRide.Application.DTO.Request.Account;
 using ShaRide.Application.DTO.Request.Feedback;
 using ShaRide.Application.DTO.Response.Account;
-using ShaRide.Application.Helpers;
 using ShaRide.Application.Services.Interface;
+using System.ComponentModel.DataAnnotations;
+using System.Threading.Tasks;
 
 namespace ShaRide.WebApi.Controllers
 {
@@ -23,7 +22,7 @@ namespace ShaRide.WebApi.Controllers
         {
             _accountService = accountService;
         }
-        
+
         /// <summary>
         /// Authenticate user.
         /// </summary>
@@ -57,7 +56,7 @@ namespace ShaRide.WebApi.Controllers
         [AllowAnonymous]
         [HttpGet("send-phone-verification-sms")]
         [Produces(typeof(string))]
-        public async Task<IActionResult> SendPhoneVerificationSmsAsync([Required]string phoneNumber)
+        public async Task<IActionResult> SendPhoneVerificationSmsAsync([Required] string phoneNumber)
         {
             return Ok(await _accountService.SendPhoneVerificationSms(phoneNumber));
         }
@@ -70,7 +69,7 @@ namespace ShaRide.WebApi.Controllers
         [AllowAnonymous]
         [HttpGet("send-password-reset-sms")]
         [Produces(typeof(string))]
-        public async Task<IActionResult> SendPasswordResetSmsAsync([Required]string phoneNumber)
+        public async Task<IActionResult> SendPasswordResetSmsAsync([Required] string phoneNumber)
         {
             return Ok(await _accountService.SendPasswordResetSms(phoneNumber));
         }
@@ -84,15 +83,16 @@ namespace ShaRide.WebApi.Controllers
         [AllowAnonymous]
         [HttpGet("reset-user-password")]
         [Produces(typeof(int))]
-        public async Task<IActionResult> ResetUserPasswordAsync([Required]string phoneNumber, [Required]string newPassword)
+        public async Task<IActionResult> ResetUserPasswordAsync([Required] string phoneNumber, [Required] string newPassword)
         {
-            return Ok(await _accountService.ResetUserPassword(phoneNumber,newPassword));
+            return Ok(await _accountService.ResetUserPassword(phoneNumber, newPassword));
         }
 
         [HttpGet("get-user-thumbnail-photo")]
         [Produces(typeof(byte[]))]
         [AutoWrapIgnore]
-        public async Task<IActionResult> GetUserThumbnailPhoto([Required]int userId)
+        [AllowAnonymous]
+        public async Task<IActionResult> GetUserThumbnailPhoto([Required] int userId)
         {
             var image = await _accountService.GetUserThumbnailPhoto(userId);
             var data = image.Image;

@@ -29,5 +29,7 @@ namespace ShaRide.Domain.Entities
 
         public ICollection<RestrictionRideComposition> RestrictionRideComposition { get; set; }
         public ICollection<Message> Messages { get; set; }
+        public ICollection<RideFeedback> Feedbacks { get; set; }
+
     }
 }

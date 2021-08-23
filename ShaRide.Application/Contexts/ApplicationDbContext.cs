@@ -92,6 +92,11 @@ namespace ShaRide.Application.Contexts
                 entity.Property(x => x.Image).HasColumnType("bytea");
             });
 
+            builder.Entity<Attachment>(entity =>
+            {
+                entity.Property(x => x.Content).HasColumnType("bytea");
+            });
+
             builder.Entity<UserPhone>(entity =>
             {
                 entity.HasIndex(x => x.Number).IsUnique();
@@ -152,6 +157,8 @@ namespace ShaRide.Application.Contexts
         public DbSet<PotentialClientNumber> PotentialClientNumbers { get; set; }
         public DbSet<SiteVisitor> SiteVisitors { get; set; }
         public DbSet<Message> Messages { get; set; }
+        public DbSet<RideFeedback> RideFeedbacks { get; set; }
+        public DbSet<Attachment> Attachments { get; set; }
 
         #endregion
     }

@@ -11,6 +11,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
 using ShaRide.Application.Contexts;
+using ShaRide.Application.DTO.Request.Account;
 using ShaRide.Application.DTO.Request.Ride;
 using ShaRide.Application.DTO.Request.UserFcmToken;
 using ShaRide.Application.DTO.Response.Message;
@@ -471,6 +472,81 @@ namespace ShaRide.Application.Services.Concrete
             
             await _dbContext.SaveChangesAsync();
             
+            return 0;
+        }
+
+        public async Task<int> GiveFeedbackForRide(RideFeedbackRequest request)
+        {
+            var ride = await _dbContext
+                .Rides
+                .Include(x => x.Driver)
+                .Include(x => x.RideCarSeatComposition)
+                .ThenInclude(x => x.Passenger)
+                .AsTracking()
+                .FirstOrDefaultAsync(x => x.IsRowActive && x.Id == request.RideId);
+
+            if (ride is null)
+                throw new ApiException(_localizer.GetString(LocalizationKeys.RIDE_NOT_FOUND, request.RideId));
+
+            if (ride.RideCarSeatComposition.Select(c=>c.Passenger).All(p=> p.Id != request.SenderId))
+                throw new ApiException(_localizer.GetString(LocalizationKeys.USER_HAS_NOT_ACCESS_OPERATION));
+
+            //Sending messages to passengers about feedback.
+            await Task.Run(async () =>
+            {
+                var notificationsToUser = await _dbContext.RideCarSeatCompositions
+                    .Where(x => x.RideId == ride.Id &&
+                                x.IsRowActive && 
+                                x.PassengerId.HasValue)
+                    .Select(x => x.Passenger)
+                    .ToListAsync();
+
+                notificationsToUser.Add(ride.Driver);
+
+                var sender = notificationsToUser.FirstOrDefault(u => u.Id == request.SenderId);
+
+                notificationsToUser = notificationsToUser.Distinct(x => x.Id).Where(u=> u.Id != request.SenderId).ToList();
+
+                var userFcmTokens =
+                    _dbContext.UserFcmTokens.Where(x => x.IsRowActive && notificationsToUser.Select(y => y.Id).Contains(x.UserId));
+
+                if (!userFcmTokens.Any())
+                    return;
+
+                var fcmContract = _fcmNotificationContract.Value;
+
+                fcmContract.data.ActionInApp = $"{sender.Name} {sender.Surname} sent feedback to your ride";
+                var notificationBody = "Yaxşı yol!";
+
+                if (string.IsNullOrEmpty(notificationBody))
+                    throw new NotImplementedException();
+
+
+                fcmContract.notification = new FcmNotificationContract.Notification(notificationBody, fcmContract.data.Title);
+                foreach (var userFcmToken in userFcmTokens)
+                {
+                    if (userFcmToken.UserId == ride.DriverId)
+                        continue;
+
+                    fcmContract.registration_ids = new List<string>() { userFcmToken.Token };
+                    fcmContract.data.Model = new RateUserNotificationVm
+                    {
+                        RideId = ride.Id,
+                        Participants = notificationsToUser.Where(x => x.Id != userFcmToken.UserId)
+                            .Select(x => new RateUserNotificationVm.RateUserNotificationDetailVm
+                            {
+                                Type = ride.DriverId == x.Id ? MessageSenderType.Driver : MessageSenderType.Passenger,
+                                UserFullname = $"{x.Name} {x.Surname}",
+                                UserId = x.Id
+                            }).ToList()
+                    };
+                    await _userFcmTokenService.SendNotificationToUser(fcmContract);
+                }
+
+            });
+
+            await _dbContext.SaveChangesAsync();
+
             return 0;
         }
 

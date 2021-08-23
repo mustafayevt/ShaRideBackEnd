@@ -112,6 +112,7 @@ namespace ShaRide.WebApi.Controllers
         [HttpGet("get-car-image")]
         [Produces(typeof(byte[]))]
         [AutoWrapIgnore]
+        [AllowAnonymous]
         public async Task<IActionResult> GetCarImageByCarImageId([Required] int carImageId)
         {
             var image = await _carService.GetCarImageByCarImageId(carImageId);
