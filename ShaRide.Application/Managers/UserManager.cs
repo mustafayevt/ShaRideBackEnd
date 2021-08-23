@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Authentication;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using ShaRide.Application.Constants;
 using ShaRide.Application.Contexts;
@@ -12,6 +7,11 @@ using ShaRide.Application.Services.Concrete;
 using ShaRide.Application.Services.Interface;
 using ShaRide.Domain.Entities;
 using ShaRide.Domain.Enums;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Security.Authentication;
+using System.Threading.Tasks;
 
 namespace ShaRide.Application.Managers
 {
@@ -66,7 +66,7 @@ namespace ShaRide.Application.Managers
         {
             try
             {
-                var user = _dbContext.Users.First(x => x.Phones.Any(y => y.Number == phone));
+                var user = await _dbContext.Users.FirstAsync(x => x.Phones.Any(y => y.Number == phone));
                 var passwordHash = PasswordHasher.HashPassword(password);
                 if (user.PasswordHash != passwordHash)
                 {
@@ -75,7 +75,7 @@ namespace ShaRide.Application.Managers
 
                 return SignInResult.Success;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return SignInResult.Failed;
             }
@@ -121,7 +121,7 @@ namespace ShaRide.Application.Managers
                 await _dbContext.SaveChangesAsync();
                 return IdentityResult.Success;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return IdentityResult.Failed();
             }
@@ -138,16 +138,16 @@ namespace ShaRide.Application.Managers
             try
             {
                 var passwordHash = PasswordHasher.HashPassword(newPassword);
-                
+
                 _dbContext.Users.Attach(user);
-                
+
                 user.PasswordHash = passwordHash;
-                
+
                 await _dbContext.SaveChangesAsync();
-                
+
                 return IdentityResult.Success;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return IdentityResult.Failed();
             }
@@ -190,7 +190,7 @@ namespace ShaRide.Application.Managers
             _dbContext.UserRoleComposition.RemoveRange(userRoleComposition);
 
             await _dbContext.SaveChangesAsync();
-            
+
             return await AddToRoleAsync(user, roleNames);
         }
 
@@ -227,10 +227,10 @@ namespace ShaRide.Application.Managers
         /// <returns></returns>
         public async Task<List<string>> GetRolesAsync(User user)
         {
-            return _dbContext.UserRoleComposition
+            return await _dbContext.UserRoleComposition
                 .Include(x => x.Role)
                 .Where(x => x.UserId == user.Id)
-                .Select(x => x.Role.RoleName).ToList();
+                .Select(x => x.Role.RoleName).ToListAsync();
         }
 
         /// <summary>
@@ -248,7 +248,7 @@ namespace ShaRide.Application.Managers
         /// <param name="userId"></param>
         /// <param name="user"></param>
         /// <returns></returns>
-        public bool TryGetUserById(int userId, out User user )
+        public bool TryGetUserById(int userId, out User user)
         {
             user = _dbContext.Users.Find(userId);
             return user != null;

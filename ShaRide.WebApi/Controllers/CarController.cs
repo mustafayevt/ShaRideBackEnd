@@ -62,6 +62,14 @@ namespace ShaRide.WebApi.Controllers
             return Ok(await _carService.GetCarsByUserIdAsync(id));
         }
 
+        [HttpGet("GetUserCars/{id}")]
+        [AllowAnonymous]
+        [ProducesResponseType(typeof(ICollection<CarResponse>), 200)]
+        public async Task<IActionResult> GetUserCars(int id)
+        {
+            return Ok(await _carService.GetUserCarsAsync(id));
+        }
+
         /// <summary>
         /// Inserts one car.
         /// </summary>
@@ -119,6 +127,17 @@ namespace ShaRide.WebApi.Controllers
             var data = image.Image;
             var filename = image.Id + image.Extension;
             return File(data, "application/force-download", filename);
+        }
+
+        /// <summary>
+        /// Updates banId in car.
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPut("AddNewCar")]
+        public async Task<IActionResult> AddNewCar(UpdateCarBanIdRequest request)
+        {
+            return Ok(await _carService.UpdateCarBanIdAsync(request));
         }
     }
 }

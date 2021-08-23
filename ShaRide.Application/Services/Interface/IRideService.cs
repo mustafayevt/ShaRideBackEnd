@@ -1,4 +1,5 @@
-﻿using ShaRide.Application.DTO.Request.Ride;
+﻿using ShaRide.Application.DTO.Request.Account;
+using ShaRide.Application.DTO.Request.Ride;
 using ShaRide.Application.DTO.Response.Ride;
 using ShaRide.Application.Pagination;
 using ShaRide.Domain.Entities;
@@ -28,5 +29,6 @@ namespace ShaRide.Application.Services.Interface
         Task<List<Ride>> GetRidesForNotificationByDateTime(DateTime rideStarTime);
         Task SendNotificationsToUsersInRide(Ride ride, string notificationBody);
         Task<int> DeactivateUserRequest(int requestId);
+        Task<int> GiveFeedbackForRide(RideFeedbackRequest request);
     }
 }

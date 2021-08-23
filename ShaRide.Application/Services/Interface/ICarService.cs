@@ -11,6 +11,7 @@ namespace ShaRide.Application.Services.Interface
         Task<ICollection<CarResponse>> GetCarsAsync();
         Task<CarResponse> GetCarByIdAsync(int request);
         Task<ICollection<CarResponse>> GetCarsByUserIdAsync(int request);
+        Task<ICollection<CarResponse>> GetUserCarsAsync(int request);
         Task<CarResponse> InsertCarAsync(InsertCarRequest request);
         Task<ICollection<CarResponse>> InsertCarsAsync(ICollection<InsertCarRequest> request);
         Task<CarImage> GetCarImageByCarImageId(int request);

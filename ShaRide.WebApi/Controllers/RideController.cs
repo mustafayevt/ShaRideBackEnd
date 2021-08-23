@@ -56,7 +56,7 @@ namespace ShaRide.WebApi.Controllers
         [HttpPost("GiveFeedbackForRide")]
         public async Task<IActionResult> GiveFeedbackForRide(RideFeedbackRequest request)
         {
-            return Ok(await _rideService.UpdateRideState(request));
+            return Ok(await _rideService.GiveFeedbackForRide(request));
         }
 
         [HttpPost("AddPassengerToRide")]

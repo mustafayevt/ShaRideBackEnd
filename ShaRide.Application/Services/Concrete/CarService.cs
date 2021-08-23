@@ -80,12 +80,31 @@ namespace ShaRide.Application.Services.Concrete
             return _mapper.Map<ICollection<CarResponse>>(cars);
         }
 
+        public async Task<ICollection<CarResponse>> GetUserCarsAsync(int userId)
+        {
+            var cars = await _dbContext.Users
+                .Include(x => x.UserCars).ThenInclude(m => m.Car).ThenInclude(x => x.BanType)
+                .Include(x => x.UserCars).ThenInclude(m => m.Car).ThenInclude(x => x.CarModel).ThenInclude(x => x.CarBrand)
+                .Include(x => x.UserCars).ThenInclude(m => m.Car).ThenInclude(x => x.CarSeatComposition).ThenInclude(x => x.Seat)
+                .Where(x => x.Id == userId)
+                .SelectMany(c => c.UserCars)
+                .Select(m => m.Car).ToListAsync();
+
+            foreach (var car in cars)
+            {
+                foreach (var carSeatComposition in car.CarSeatComposition)
+                {
+                    if (carSeatComposition.SeatType == SeatStatus.Sold)
+                        carSeatComposition.SeatType = SeatStatus.Suitable;
+                }
+            }
+
+            return _mapper.Map<ICollection<CarResponse>>(cars);
+        }
+
         public async Task<CarResponse> InsertCarAsync(InsertCarRequest request)
         {
-
             var car = _mapper.Map<Car>(request);
-
-            
 
             var insertedCar = await _dbContext.Cars.AddAsync(car);
 

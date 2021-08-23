@@ -1,16 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
-using System.Security.Claims;
-using System.Security.Cryptography;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using AutoMapper;
+﻿using AutoMapper;
 using AutoWrapper.Wrappers;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
@@ -28,40 +17,38 @@ using ShaRide.Application.Services.Interface;
 using ShaRide.Domain.Entities;
 using ShaRide.Domain.Enums;
 using ShaRide.Domain.Settings;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
+using System.Security.Claims;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace ShaRide.Application.Services.Concrete
 {
     public class AccountService : IAccountService
     {
         private readonly UserManager _userManager;
-        private readonly IEmailService _emailService;
         private readonly JWTSettings _jwtSettings;
-        private readonly IDateTimeService _dateTimeService;
         private readonly ISmsService _smsService;
         private readonly IMapper _mapper;
         private readonly IStringLocalizer _localizer;
         private readonly ApplicationDbContext _dbContext;
-        private readonly IUserRatingService _userRatingService;
-        private readonly IAuthenticatedUserService _authenticatedUserService;
 
         public AccountService(UserManager userManager,
             IOptions<JWTSettings> jwtSettings,
-            IDateTimeService dateTimeService,
-            IEmailService emailService,
             IMapper mapper,
             IStringLocalizer<Resource> localizer,
-            ApplicationDbContext dbContext, ISmsService smsService, IUserRatingService userRatingService, IAuthenticatedUserService authenticatedUserService)
+            ApplicationDbContext dbContext, ISmsService smsService)
         {
             _userManager = userManager;
             _jwtSettings = jwtSettings.Value;
-            _dateTimeService = dateTimeService;
-            _emailService = emailService;
             _mapper = mapper;
             _localizer = localizer;
             _dbContext = dbContext;
             _smsService = smsService;
-            _userRatingService = userRatingService;
-            _authenticatedUserService = authenticatedUserService;
         }
 
         /// <summary>
@@ -86,10 +73,12 @@ namespace ShaRide.Application.Services.Concrete
             }
 
             JwtSecurityToken jwtSecurityToken = await GenerateJWToken(user);
-            AuthenticationResponse response = new AuthenticationResponse();
-            response.Id = user.Id;
-            response.IsVerified = user.Phones.FirstOrDefault(x => x.IsMain).IsConfirmed;
-            response.JWToken = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);
+            AuthenticationResponse response = new AuthenticationResponse
+            {
+                Id = user.Id,
+                IsVerified = user.Phones.FirstOrDefault(x => x.IsMain).IsConfirmed,
+                JWToken = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken)
+            };
 
             return response;
         }
@@ -265,8 +254,7 @@ namespace ShaRide.Application.Services.Concrete
 
         public async Task<int> BanUser(int userId)
         {
-            User user;
-            if (!_userManager.TryGetUserById(userId, out user))
+            if (!_userManager.TryGetUserById(userId, out User user))
                 throw new ApiException(_localizer.GetString(LocalizationKeys.NOT_FOUND, userId));
 
             var result = await _userManager.ResetUserRolesAndAddNewRoleToUser(user, Roles.BannedUser.ToString());
@@ -325,7 +313,7 @@ namespace ShaRide.Application.Services.Concrete
         {
             var confirmationCode = GenerateConfirmationCode();
             var smsBody = _localizer.GetString(LocalizationKeys.CONFIRMATION_SMS, confirmationCode);
-            var result = await _smsService.SendSms(new SendSmsRequest(phoneNumber, smsBody));
+            await _smsService.SendSms(new SendSmsRequest(phoneNumber, smsBody));
             return confirmationCode;
         }
 
@@ -337,8 +325,7 @@ namespace ShaRide.Application.Services.Concrete
         /// <exception cref="ApiException"></exception>
         public async Task<UserImage> GetUserThumbnailPhoto(int userId)
         {
-            User user;
-            if (!_userManager.TryGetUserById(userId, out user))
+            if (!_userManager.TryGetUserById(userId, out User user))
                 throw new ApiException(_localizer[LocalizationKeys.NOT_FOUND]);
 
             await _dbContext.Attach(user).Collection(x => x.UserImages).LoadAsync();
@@ -395,13 +382,13 @@ namespace ShaRide.Application.Services.Concrete
         /// Generates token.
         /// </summary>
         /// <returns></returns>
-        private string RandomTokenString()
-        {
-            using var rngCryptoServiceProvider = new RNGCryptoServiceProvider();
-            var randomBytes = new byte[40];
-            rngCryptoServiceProvider.GetBytes(randomBytes);
-            // convert random bytes to hex string
-            return BitConverter.ToString(randomBytes).Replace("-", "");
-        }
+        //private string RandomTokenString()
+        //{
+        //    using var rngCryptoServiceProvider = new RNGCryptoServiceProvider();
+        //    var randomBytes = new byte[40];
+        //    rngCryptoServiceProvider.GetBytes(randomBytes);
+        //    // convert random bytes to hex string
+        //    return BitConverter.ToString(randomBytes).Replace("-", "");
+        //}
     }
 }

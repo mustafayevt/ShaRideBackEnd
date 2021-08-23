@@ -19,6 +19,7 @@ namespace ShaRide.Domain.Entities
         public ICollection<UserPhone> Phones { get; set; }
         public ICollection<UserRoleComposition> UserRoleComposition { get; set; }
         public ICollection<UserImage> UserImages { get; set; }
+        public ICollection<UserCarComposition> UserCars { get; set; }
 
         public decimal Balance { get; set; }
 
