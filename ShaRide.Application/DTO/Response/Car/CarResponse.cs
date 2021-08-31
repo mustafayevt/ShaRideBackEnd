@@ -16,5 +16,6 @@ namespace ShaRide.Application.DTO.Response.Car
 
         // [JsonIgnore]
         public ICollection<CarSeatCompositionResponse> CarSeats { get; set; }
+        public bool IsDefault { get; set; }
     }
 }

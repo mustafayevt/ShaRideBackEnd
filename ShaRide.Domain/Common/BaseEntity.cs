@@ -1,6 +1,4 @@
-﻿using System.Text.Json.Serialization;
-
-namespace ShaRide.Domain.Common
+﻿namespace ShaRide.Domain.Common
 {
     public abstract class BaseEntity
     {

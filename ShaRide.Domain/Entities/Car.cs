@@ -12,5 +12,8 @@ namespace ShaRide.Domain.Entities
         public ICollection<CarImage> CarImages { get; set; }
         public string RegisterNumber { get; set; }
         public ICollection<CarSeatComposition> CarSeatComposition { get; set; }
+        public int? UserId { get; set; }
+        public User User { get; set; }
+        public bool IsDefault { get; set; }
     }
 }

@@ -8,6 +8,7 @@ using ShaRide.Application.DTO.Request.Car;
 using ShaRide.Application.DTO.Response.Car;
 using ShaRide.Application.Helpers;
 using ShaRide.Application.Localize;
+using ShaRide.Application.Managers;
 using ShaRide.Application.Services.Interface;
 using ShaRide.Domain.Entities;
 using ShaRide.Domain.Enums;
@@ -23,12 +24,14 @@ namespace ShaRide.Application.Services.Concrete
         private readonly ApplicationDbContext _dbContext;
         private readonly IStringLocalizer _localizer;
         private readonly IMapper _mapper;
+        private readonly UserManager _userManager;
 
-        public CarService(ApplicationDbContext dbContext, IStringLocalizer<Resource> localizer, IMapper mapper)
+        public CarService(ApplicationDbContext dbContext, IStringLocalizer<Resource> localizer, IMapper mapper, UserManager userManager)
         {
             _dbContext = dbContext;
             _localizer = localizer;
             _mapper = mapper;
+            _userManager = userManager;
         }
 
         public async Task<ICollection<CarResponse>> GetCarsAsync()
@@ -83,12 +86,11 @@ namespace ShaRide.Application.Services.Concrete
         public async Task<ICollection<CarResponse>> GetUserCarsAsync(int userId)
         {
             var cars = await _dbContext.Users
-                .Include(x => x.UserCars).ThenInclude(m => m.Car).ThenInclude(x => x.BanType)
-                .Include(x => x.UserCars).ThenInclude(m => m.Car).ThenInclude(x => x.CarModel).ThenInclude(x => x.CarBrand)
-                .Include(x => x.UserCars).ThenInclude(m => m.Car).ThenInclude(x => x.CarSeatComposition).ThenInclude(x => x.Seat)
+                .Include(x => x.UserCars).ThenInclude(x => x.BanType)
+                .Include(x => x.UserCars).ThenInclude(x => x.CarModel).ThenInclude(x => x.CarBrand)
+                .Include(x => x.UserCars).ThenInclude(x => x.CarSeatComposition).ThenInclude(x => x.Seat)
                 .Where(x => x.Id == userId)
-                .SelectMany(c => c.UserCars)
-                .Select(m => m.Car).ToListAsync();
+                .SelectMany(c => c.UserCars).ToListAsync();
 
             foreach (var car in cars)
             {
@@ -99,12 +101,111 @@ namespace ShaRide.Application.Services.Concrete
                 }
             }
 
-            return _mapper.Map<ICollection<CarResponse>>(cars);
+            var responseCars = _mapper.Map<ICollection<CarResponse>>(cars);
+            if (!responseCars.Any(c=>c.IsDefault))
+            {
+                responseCars.OrderByDescending(c => c.Id).FirstOrDefault().IsDefault = true;
+            }
+           
+            return responseCars;
         }
+
+        public async Task<ICollection<CarResponse>> MakeCarDefault(int carId)
+        {
+            var user = await _userManager.GetCurrentUser();
+
+            if (user == null)
+                throw new ApiException(_localizer.GetString(LocalizationKeys.INVALID_CREDENTIALS));
+
+            var cars = await _dbContext.Users
+                .Include(x => x.UserCars).ThenInclude(x => x.BanType)
+                .Include(x => x.UserCars).ThenInclude(x => x.CarModel).ThenInclude(x => x.CarBrand)
+                .Include(x => x.UserCars).ThenInclude(x => x.CarSeatComposition).ThenInclude(x => x.Seat)
+                .Where(x => x.Id == user.Id)
+                .SelectMany(c => c.UserCars).ToListAsync();
+
+            foreach (var car in cars)
+            {
+                if (car.Id != carId)
+                {
+                    car.IsDefault = false;
+                }
+                else
+                {
+                    car.IsDefault = true;
+                }
+            }
+
+            await _dbContext.SaveChangesAsync();
+
+            foreach (var car in cars)
+            {
+                foreach (var carSeatComposition in car.CarSeatComposition)
+                {
+                    if (carSeatComposition.SeatType == SeatStatus.Sold)
+                        carSeatComposition.SeatType = SeatStatus.Suitable;
+                }
+            }
+
+            var responseCars = _mapper.Map<ICollection<CarResponse>>(cars);
+            if (!responseCars.Any(c => c.IsDefault))
+            {
+                responseCars.OrderByDescending(c => c.Id).FirstOrDefault().IsDefault = true;
+            }
+
+            return responseCars;
+        }
+
+        //public async Task MigrateCars()
+        //{
+        //    try
+        //    {
+        //        var rides = await _dbContext.Rides
+        //       .Include(x1 => x1.RideCarSeatComposition)
+        //       .ThenInclude(x2 => x2.CarSeatComposition)
+        //       .ThenInclude(x2 => x2.Car)
+        //       .ToListAsync();
+
+        //        List<Car> cars = new List<Car>();
+        //        foreach (var ride in rides)
+        //        {
+        //            foreach (var car in ride.RideCarSeatComposition.Where(r => r.CarSeatComposition.Car != null).Select(r=>r.CarSeatComposition.Car))
+        //            {
+        //                if (!cars.Select(c=>c.Id).Contains(car.Id))
+        //                {
+        //                    cars.Add(car);
+        //                    car.UserId = ride.DriverId;
+        //                    _dbContext.Cars.Update(car);
+        //                }
+        //            }
+        //        }
+        //    }
+        //    catch (System.Exception ex)
+        //    {
+
+        //        throw;
+        //    }
+
+
+        //    await _dbContext.SaveChangesAsync();
+        //}
 
         public async Task<CarResponse> InsertCarAsync(InsertCarRequest request)
         {
+            var user = await _userManager.GetCurrentUser();
+
+            if (user == null)
+                throw new ApiException(_localizer.GetString(LocalizationKeys.INVALID_CREDENTIALS));
+
             var car = _mapper.Map<Car>(request);
+
+            car.UserId = user.Id;
+
+            var userInDb = await _dbContext.Users.Include(u => u.UserCars).FirstOrDefaultAsync(u=>u.Id == user.Id);
+            if (!user.UserCars.Any())
+            {
+                car.IsDefault = true;
+            }
 
             var insertedCar = await _dbContext.Cars.AddAsync(car);
 

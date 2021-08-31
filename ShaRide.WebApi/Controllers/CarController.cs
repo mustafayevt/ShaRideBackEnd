@@ -62,25 +62,17 @@ namespace ShaRide.WebApi.Controllers
             return Ok(await _carService.GetCarsByUserIdAsync(id));
         }
 
-        [HttpGet("GetUserCars/{id}")]
-        [AllowAnonymous]
-        [ProducesResponseType(typeof(ICollection<CarResponse>), 200)]
-        public async Task<IActionResult> GetUserCars(int id)
-        {
-            return Ok(await _carService.GetUserCarsAsync(id));
-        }
-
         /// <summary>
         /// Inserts one car.
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        [HttpPost("InsertCar")]
-        [ProducesResponseType(typeof(CarResponse), 201)]
-        public async Task<IActionResult> InsertCar(InsertCarRequest request)
-        {
-            return Ok(await _carService.InsertCarAsync(request));
-        }
+        //[HttpPost("InsertCar")]
+        //[ProducesResponseType(typeof(CarResponse), 201)]
+        //public async Task<IActionResult> InsertCar(InsertCarRequest request)
+        //{
+        //    return Ok(await _carService.InsertCarAsync(request));
+        //}
 
         /// <summary>
         /// Inserts multiple cars.
@@ -139,5 +131,51 @@ namespace ShaRide.WebApi.Controllers
         {
             return Ok(await _carService.UpdateCarBanIdAsync(request));
         }
+
+        /// <summary>
+        /// Updates banId in car.
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost("AddNewCar")]
+        public async Task<IActionResult> AddNewCar(InsertCarRequest request)
+        {
+            return Ok(await _carService.InsertCarAsync(request));
+        }
+
+        /// <summary>
+        /// Returnes user cars.
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpGet("GetUserCars/{id}")]
+        [AllowAnonymous]
+        [ProducesResponseType(typeof(ICollection<CarResponse>), 200)]
+        public async Task<IActionResult> GetUserCars(int id)
+        {
+            return Ok(await _carService.GetUserCarsAsync(id));
+        }
+
+        /// <summary>
+        /// Marks car as a default car.
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpGet("MakeCarDefault")]
+        [AllowAnonymous]
+        [ProducesResponseType(typeof(ICollection<CarResponse>), 200)]
+        public async Task<IActionResult> MakeCarDefault(int carId)
+        {
+            return Ok(await _carService.MakeCarDefault(carId));
+        }
+
+        //[HttpGet("migrateCars")]
+        //[AllowAnonymous]
+        //[ProducesResponseType(typeof(ICollection<CarResponse>), 200)]
+        //public async Task<IActionResult> migrateCarsToUsers()
+        //{
+        //    await _carService.MigrateCars();
+        //    return Ok();
+        //}
     }
 }
