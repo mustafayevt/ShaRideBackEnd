@@ -1,5 +1,6 @@
 ﻿using AutoWrapper.Filters;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using ShaRide.Application.Attributes;
 using ShaRide.Application.DTO.Request.Account;
@@ -18,9 +19,11 @@ namespace ShaRide.WebApi.Controllers
     public class AccountController : ControllerBase
     {
         private readonly IAccountService _accountService;
-        public AccountController(IAccountService accountService)
+        private readonly IWebHostEnvironment _env;
+        public AccountController(IAccountService accountService, IWebHostEnvironment env)
         {
             _accountService = accountService;
+            _env = env;
         }
 
         /// <summary>
@@ -94,10 +97,18 @@ namespace ShaRide.WebApi.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> GetUserThumbnailPhoto([Required] int userId)
         {
-            var image = await _accountService.GetUserThumbnailPhoto(userId);
-            var data = image.Image;
-            var filename = image.Id + image.Extension;
-            return File(data, "application/force-download", filename);
+            try
+            {
+                var image = await _accountService.GetUserThumbnailPhoto(userId);
+                var data = image.Image;
+                var filename = image.Id + image.Extension;
+                return File(data, "application/force-download", filename);
+            }
+            catch (System.Exception)
+            {
+                var icon = await System.IO.File.ReadAllBytesAsync($"{_env.WebRootPath}/dist/images/profile.png");
+                return File(icon, "image/png", "profile.png");
+            }
         }
 
         /// <summary>

@@ -102,11 +102,11 @@ namespace ShaRide.Application.Services.Concrete
             }
 
             var responseCars = _mapper.Map<ICollection<CarResponse>>(cars);
-            if (!responseCars.Any(c=>c.IsDefault))
+            if (!responseCars.Any(c => c.IsDefault))
             {
                 responseCars.OrderByDescending(c => c.Id).FirstOrDefault().IsDefault = true;
             }
-           
+
             return responseCars;
         }
 
@@ -118,9 +118,7 @@ namespace ShaRide.Application.Services.Concrete
                 throw new ApiException(_localizer.GetString(LocalizationKeys.INVALID_CREDENTIALS));
 
             var cars = await _dbContext.Users
-                .Include(x => x.UserCars).ThenInclude(x => x.BanType)
-                .Include(x => x.UserCars).ThenInclude(x => x.CarModel).ThenInclude(x => x.CarBrand)
-                .Include(x => x.UserCars).ThenInclude(x => x.CarSeatComposition).ThenInclude(x => x.Seat)
+                .Include(x => x.UserCars)
                 .Where(x => x.Id == user.Id)
                 .SelectMany(c => c.UserCars).ToListAsync();
 
@@ -135,10 +133,17 @@ namespace ShaRide.Application.Services.Concrete
                     car.IsDefault = true;
                 }
             }
-
+            _dbContext.Cars.UpdateRange(cars);
             await _dbContext.SaveChangesAsync();
 
-            foreach (var car in cars)
+            var resultCars = await _dbContext.Cars
+            .Include(x => x.BanType)
+            .Include(x => x.CarModel).ThenInclude(x => x.CarBrand)
+            .Include(x => x.CarSeatComposition).ThenInclude(x => x.Seat)
+            .Where(c => cars.Contains(c))
+            .ToListAsync();
+
+            foreach (var car in resultCars)
             {
                 foreach (var carSeatComposition in car.CarSeatComposition)
                 {
@@ -147,7 +152,7 @@ namespace ShaRide.Application.Services.Concrete
                 }
             }
 
-            var responseCars = _mapper.Map<ICollection<CarResponse>>(cars);
+            var responseCars = _mapper.Map<ICollection<CarResponse>>(resultCars);
             if (!responseCars.Any(c => c.IsDefault))
             {
                 responseCars.OrderByDescending(c => c.Id).FirstOrDefault().IsDefault = true;
@@ -201,7 +206,7 @@ namespace ShaRide.Application.Services.Concrete
 
             car.UserId = user.Id;
 
-            var userInDb = await _dbContext.Users.Include(u => u.UserCars).FirstOrDefaultAsync(u=>u.Id == user.Id);
+            var userInDb = await _dbContext.Users.Include(u => u.UserCars).FirstOrDefaultAsync(u => u.Id == user.Id);
             if (!user.UserCars.Any())
             {
                 car.IsDefault = true;

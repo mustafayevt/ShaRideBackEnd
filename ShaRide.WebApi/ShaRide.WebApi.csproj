@@ -66,8 +66,6 @@
 
   <ItemGroup>
     <Folder Include="Handlers" />
-    <Folder Include="wwwroot" />
-    <Folder Include="wwwroot\dist" />
   </ItemGroup>
 
   <ItemGroup>
