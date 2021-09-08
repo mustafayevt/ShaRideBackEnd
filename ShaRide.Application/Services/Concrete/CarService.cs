@@ -69,7 +69,7 @@ namespace ShaRide.Application.Services.Concrete
                         .Include(x1 => x1.RideCarSeatComposition)
                         .ThenInclude(x2 => x2.CarSeatComposition)
                         .Any(y => y.RideCarSeatComposition.Any(h => h.CarSeatComposition.CarId == x.Id) &&
-                                  y.DriverId == request)).ToListAsync();
+                                  y.DriverId == request) && x.IsRowActive).ToListAsync();
 
             foreach (var car in cars)
             {
@@ -85,12 +85,13 @@ namespace ShaRide.Application.Services.Concrete
 
         public async Task<ICollection<CarResponse>> GetUserCarsAsync(int userId)
         {
-            var cars = await _dbContext.Users
+            var user = await _dbContext.Users
                 .Include(x => x.UserCars).ThenInclude(x => x.BanType)
                 .Include(x => x.UserCars).ThenInclude(x => x.CarModel).ThenInclude(x => x.CarBrand)
                 .Include(x => x.UserCars).ThenInclude(x => x.CarSeatComposition).ThenInclude(x => x.Seat)
-                .Where(x => x.Id == userId)
-                .SelectMany(c => c.UserCars).ToListAsync();
+                .FirstOrDefaultAsync(x => x.Id == userId);
+
+            var cars = user.UserCars.Where(c => c.IsRowActive);
 
             foreach (var car in cars)
             {
@@ -117,10 +118,11 @@ namespace ShaRide.Application.Services.Concrete
             if (user == null)
                 throw new ApiException(_localizer.GetString(LocalizationKeys.INVALID_CREDENTIALS));
 
-            var cars = await _dbContext.Users
+            var userInDb = await _dbContext.Users
                 .Include(x => x.UserCars)
-                .Where(x => x.Id == user.Id)
-                .SelectMany(c => c.UserCars).ToListAsync();
+                .FirstOrDefaultAsync(x => x.Id == user.Id);
+
+            var cars = userInDb.UserCars.Where(c=>c.IsRowActive);
 
             foreach (var car in cars)
             {
@@ -207,7 +209,7 @@ namespace ShaRide.Application.Services.Concrete
             car.UserId = user.Id;
 
             var userInDb = await _dbContext.Users.Include(u => u.UserCars).FirstOrDefaultAsync(u => u.Id == user.Id);
-            if (!user.UserCars.Any())
+            if (!userInDb.UserCars.Where(c=>c.IsRowActive).Any())
             {
                 car.IsDefault = true;
             }
@@ -247,9 +249,20 @@ namespace ShaRide.Application.Services.Concrete
             return 0;
         }
 
-        public Task DeleteCarAsync(int request)
+        public async Task DeleteCarAsync(int carId)
         {
-            throw new System.NotImplementedException();
+            var user = await _userManager.GetCurrentUser();
+
+            if (user == null)
+                throw new ApiException(_localizer.GetString(LocalizationKeys.INVALID_CREDENTIALS));
+
+            var userInDb = await _dbContext.Users.Include(u => u.UserCars).FirstOrDefaultAsync(u => u.Id == user.Id);
+            var car = userInDb.UserCars.FirstOrDefault(c => c.Id == carId);
+            car.IsRowActive = false;
+
+            _dbContext.Cars.Update(car);
+
+            await _dbContext.SaveChangesAsync();
         }
     }
 }

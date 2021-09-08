@@ -15,7 +15,7 @@ namespace ShaRide.Application.Seeds
     {
         public static async Task SeedAsync(UserManager userManager)
         {
-            var defaultUserPhone = "994700000000";
+            var defaultUserPhone = "994700000000-";
             var defaultUser = new User
             {
                 Name = "Saleh",

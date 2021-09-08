@@ -17,7 +17,7 @@ namespace ShaRide.Application.Services.Interface
         Task<ICollection<CarResponse>> InsertCarsAsync(ICollection<InsertCarRequest> request);
         Task<CarImage> GetCarImageByCarImageId(int request);
         Task<int> UpdateCarBanIdAsync(UpdateCarBanIdRequest request);
-        Task DeleteCarAsync(int request);
+        Task DeleteCarAsync(int carId);
         //Task MigrateCars();
     }
 }
