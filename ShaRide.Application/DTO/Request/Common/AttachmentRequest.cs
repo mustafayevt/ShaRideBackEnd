@@ -6,10 +6,7 @@ namespace ShaRide.Application.DTO.Request.Common
 {
     public class AttachmentRequest
     {
-        [Required(ErrorMessage = LocalizationKeys.REQUIRED)]
         public List<byte> Content { get; set; }
-        
-        [Required(ErrorMessage = LocalizationKeys.REQUIRED)]
         public string Extension { get; set; }
     }
 

@@ -102,7 +102,7 @@ namespace ShaRide.Application.Services.Concrete
             }
 
             var user = _mapper.Map<User>(request);
-            if (request.Attachment != null)
+            if (request.Attachment != null && request.Attachment.Content != null && request.Attachment.Extension != null)
             {
                 user.UserImages = new List<UserImage>
                 {

@@ -92,6 +92,10 @@ namespace ShaRide.Application.Services.Concrete
                 .FirstOrDefaultAsync(x => x.Id == userId);
 
             var cars = user.UserCars.Where(c => c.IsRowActive);
+            if (cars.Count() == 0)
+            {
+                return new List<CarResponse>();
+            }
 
             foreach (var car in cars)
             {
