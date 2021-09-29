@@ -22,10 +22,10 @@ using ShaRide.Application.DTO.Response.CarModel;
 using ShaRide.Application.DTO.Response.Feedback;
 using ShaRide.Application.DTO.Response.Invoice;
 using ShaRide.Application.DTO.Response.Location;
+using ShaRide.Application.DTO.Response.Phone;
 using ShaRide.Application.DTO.Response.Restriction;
 using ShaRide.Application.DTO.Response.Ride;
 using ShaRide.Application.DTO.Response.UserFcmToken;
-using ShaRide.Application.DTO.Response.UserPhone;
 using ShaRide.Application.DTO.Response.UserRating;
 using ShaRide.Domain.Entities;
 

@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using ShaRide.Application.DTO.Response.UserPhone;
+using ShaRide.Application.DTO.Response.Phone;
 
 namespace ShaRide.Application.DTO.Response.Account
 {

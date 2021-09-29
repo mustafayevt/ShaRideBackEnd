@@ -1,7 +1,4 @@
-﻿using System;
-using System.Reflection;
-using System.Text;
-using AutoMapper;
+﻿using AutoMapper;
 using AutoWrapper.Wrappers;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -13,7 +10,6 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using ShaRide.Application.Contexts;
-using ShaRide.Application.DTO.Request;
 using ShaRide.Application.DTO.Request.UserFcmToken;
 using ShaRide.Application.Helpers;
 using ShaRide.Application.Managers;
@@ -21,6 +17,10 @@ using ShaRide.Application.Services.Concrete;
 using ShaRide.Application.Services.Interface;
 using ShaRide.Application.ViewModels;
 using ShaRide.Domain.Settings;
+using ShaRide.WebApi.Services;
+using System;
+using System.Reflection;
+using System.Text;
 
 namespace ShaRide.Application
 {
@@ -66,20 +66,22 @@ namespace ShaRide.Application
             services.AddScoped<IUserFcmTokenService, UserFcmTokenService>();
             services.AddScoped<IMessageService, MessageService>();
             services.AddScoped<IAccountingService, AccountingService>();
+            services.AddScoped<IUserService, UserService>();
             services.AddScoped<PaymentManager>();
             #endregion
-            
+
             services.Configure<JWTSettings>(configuration.GetSection("JWTSettings"));
             services.Configure<AdminAuthorizationRequest>(configuration.GetSection("AdminAuthorization"));
 
             #region Authentication
 
-            services.AddAuthentication(options => {
-                    options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-                    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-                    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-                })
+            services.AddAuthentication(options =>
+            {
+                options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
                 .AddCookie(options =>
                 {
                     options.LoginPath = "/Admin/Login";
@@ -126,7 +128,7 @@ namespace ShaRide.Application
                         }
                     };
                 });
-            
+
             #endregion
         }
     }

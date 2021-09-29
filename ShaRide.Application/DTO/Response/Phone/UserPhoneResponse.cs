@@ -1,4 +1,6 @@
-﻿namespace ShaRide.Application.DTO.Response.UserPhone
+﻿using ShaRide.Domain.Entities;
+
+namespace ShaRide.Application.DTO.Response.Phone
 {
     public class UserPhoneResponse
     {

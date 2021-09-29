@@ -9,12 +9,8 @@ namespace ShaRide.Application.DTO.Response.Car
         public int Id { get; set; }
         public CarModelResponse Model { get; set; }
         public BanTypeResponse BanType { get; set; }
-
         public string RegisterNumber { get; set; }
-
         public ICollection<int> CarImageIds { get; set; }
-
-        // [JsonIgnore]
         public ICollection<CarSeatCompositionResponse> CarSeats { get; set; }
         public bool IsDefault { get; set; }
     }
