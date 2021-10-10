@@ -8,11 +8,15 @@ using ShaRide.Application.Contexts;
 using ShaRide.Application.DTO.Request.Account;
 using ShaRide.Application.DTO.Request.Feedback;
 using ShaRide.Application.DTO.Request.Sms;
+using ShaRide.Application.DTO.Request.UserFcmToken;
 using ShaRide.Application.DTO.Response.Account;
+using ShaRide.Application.DTO.Response.Car;
 using ShaRide.Application.DTO.Response.Feedback;
+using ShaRide.Application.DTO.Response.Phone;
 using ShaRide.Application.Helpers;
 using ShaRide.Application.Localize;
 using ShaRide.Application.Managers;
+using ShaRide.Application.Pagination;
 using ShaRide.Application.Services.Interface;
 using ShaRide.Domain.Entities;
 using ShaRide.Domain.Enums;
@@ -36,12 +40,18 @@ namespace ShaRide.Application.Services.Concrete
         private readonly IMapper _mapper;
         private readonly IStringLocalizer _localizer;
         private readonly ApplicationDbContext _dbContext;
+        private readonly IUserRatingService _userRatingService;
+        private readonly IOptions<FcmNotificationContract> _fcmNotificationContract;
+        private readonly IUserFcmTokenService _userFcmTokenService;
 
         public AccountService(UserManager userManager,
             IOptions<JWTSettings> jwtSettings,
             IMapper mapper,
             IStringLocalizer<Resource> localizer,
-            ApplicationDbContext dbContext, ISmsService smsService)
+            ApplicationDbContext dbContext, ISmsService smsService,
+            IUserRatingService userRatingService,
+            IOptions<FcmNotificationContract> fcmNotificationContract,
+            IUserFcmTokenService userFcmTokenService)
         {
             _userManager = userManager;
             _jwtSettings = jwtSettings.Value;
@@ -49,6 +59,9 @@ namespace ShaRide.Application.Services.Concrete
             _localizer = localizer;
             _dbContext = dbContext;
             _smsService = smsService;
+            _userRatingService = userRatingService;
+            _fcmNotificationContract = fcmNotificationContract;
+            _userFcmTokenService = userFcmTokenService;
         }
 
         /// <summary>
@@ -118,7 +131,8 @@ namespace ShaRide.Application.Services.Concrete
             if (userResult.Succeeded)
             {
                 //Verify user phone
-                var userPhone = _dbContext.UserPhones.AsTracking().FirstOrDefault(x => x.IsRowActive && x.UserId.Equals(user.Id) && x.IsMain);
+                var userPhone = _dbContext.UserPhones.AsTracking()
+                    .FirstOrDefault(x => x.IsRowActive && x.UserId.Equals(user.Id) && x.IsMain);
                 if (userPhone != null)
                 {
                     userPhone.IsConfirmed = true;
@@ -128,7 +142,21 @@ namespace ShaRide.Application.Services.Concrete
                 var isBakcellNumber = await BAKCELL.IsBakCellNUmber(userPhone.Number);
                 if (isBakcellNumber)
                 {
-                    user.Balance += 3;
+                    var baccellUers = _dbContext.Users
+                        .Count(x => x.Phones.Any(p => p.Number.Contains("99455") || p.Number.Contains("99499")));
+                    if (baccellUers < 1000)
+                    {
+                        user.Balance += 3;
+                    }
+                    else if (baccellUers < 2000)
+                    {
+                        user.Balance += 2;
+                    }
+                    else if (baccellUers < 3000)
+                    {
+                        user.Balance += 1;
+                    }
+
                 }
                 _dbContext.Users.Update(user);
                 await _dbContext.SaveChangesAsync();
@@ -151,6 +179,73 @@ namespace ShaRide.Application.Services.Concrete
             {
                 throw new ApiException("Error while creating user");
             }
+        }
+
+        /// <summary>
+        /// User registration
+        /// </summary>
+        /// <param name="request"></param>
+        /// <exception cref="ApiException"></exception>
+        /// <returns></returns>
+        /// <exception cref="ApiException"></exception>
+        /// <exception cref="ValidationException"></exception>
+        public async Task<UserResponse> UpdateUserInfoAsync(UpdateUserInfoRequest request)
+        {
+            var mainPhone = request.Phones.First();
+            var userWithSamePhone = await _userManager.FindByPhoneAsync(mainPhone.Number, request.UserId);
+            if (userWithSamePhone != null)
+            {
+                throw new ApiException(_localizer.GetString(LocalizationKeys.PHONE_ALREADY_TAKEN, mainPhone.Number));
+            }
+
+            var user = await _userManager.Users
+                .Include(u => u.UserImages)
+                .Include(u => u.Phones)
+                .FirstOrDefaultAsync(u => u.Id == request.UserId);
+
+            if (request.Attachment != null &&
+                request.Attachment.Content != null &&
+                request.Attachment.Extension != null &&
+                !request.Attachment.Id.HasValue)
+            {
+                _dbContext.UserImage.RemoveRange(user.UserImages);
+
+                user.UserImages = new List<UserImage>
+                {
+                    new UserImage
+                    {
+                        Image = request.Attachment.Content.ToArray(),
+                        Extension = request.Attachment.Extension
+                    }
+                };
+            }
+            else
+            {
+                _dbContext.UserImage.RemoveRange(user.UserImages);
+            }
+
+            user.Name = request.FirstName;
+            user.Surname = request.LastName;
+            try
+            {
+                if (user.Phones.Select(p => p.Number).All(request.Phones.Select(p => p.Number).Contains))
+                {
+                    _dbContext.UserPhones.RemoveRange(user.Phones);
+                    user.Phones = request.Phones.Select(p => _mapper.Map<UserPhone>(p)).ToList();
+                    user.Phones.First(p => p.IsMain).IsConfirmed = true;
+                }
+            }
+            catch (Exception ex) 
+            {
+
+                throw;
+            }
+           
+
+            _dbContext.Users.Update(user);
+            await _dbContext.SaveChangesAsync();
+
+            return _mapper.Map<UserResponse>(user);
         }
 
         /// <summary>
@@ -252,15 +347,48 @@ namespace ShaRide.Application.Services.Concrete
             return 0;
         }
 
-        public async Task<int> BanUser(int userId)
+        public async Task<int> DeactivateUser(DeactivateUserRequest request)
         {
-            if (!_userManager.TryGetUserById(userId, out User user))
-                throw new ApiException(_localizer.GetString(LocalizationKeys.NOT_FOUND, userId));
+            if (!_userManager.TryGetUserById(request.UserId, out User user))
+                throw new ApiException(_localizer.GetString(LocalizationKeys.NOT_FOUND, request.UserId));
 
-            var result = await _userManager.ResetUserRolesAndAddNewRoleToUser(user, Roles.BannedUser.ToString());
+            user = await _userManager.DeactivateUser(user, request);
 
-            if (!result.Succeeded)
-                throw new ApiException(result.Errors);
+
+            try
+            {
+                var userFcmToken = await _dbContext.UserFcmTokens.FirstOrDefaultAsync(x => x.IsRowActive && x.UserId == user.Id);
+
+                var fcmContract = _fcmNotificationContract.Value;
+
+                fcmContract.data.ActionInApp = $"User deaktivated";
+                var notificationBody = _localizer.GetString(LocalizationKeys.UserDeactivated,
+                new string[] {
+                    $"{user.Name} {user.Surname}",
+                    request.ExpirationDate.ToString("dd.MM.yyyy"),
+                    request.Reason
+                });
+
+                fcmContract.notification = new FcmNotificationContract.Notification(notificationBody, fcmContract.data.Title);
+                fcmContract.registration_ids = new List<string>() { userFcmToken.Token };
+                await _userFcmTokenService.SendNotificationToUser(fcmContract);
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+
+
+
+
+            //var smsBody = _localizer.GetString(LocalizationKeys.UserDeactivated, 
+            //    new List<string> {
+            //        $"{user.Name} {user.Surname}",  
+            //        request.ExpirationDate.ToString("dd.MM.yyyy"),
+            //        request.Reason
+            //    });
+            //await _smsService.SendSms(new SendSmsRequest(user.Phones.FirstOrDefault(p=>p.IsMain).Number, smsBody));
 
             return 0;
         }
@@ -390,5 +518,102 @@ namespace ShaRide.Application.Services.Concrete
         //    // convert random bytes to hex string
         //    return BitConverter.ToString(randomBytes).Replace("-", "");
         //}
+
+
+        /// <summary>
+        /// Returns users according to filter request  
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        public async Task<PaginatedList<UserFilterResponse>> AllUsers(UserFilterRequest request)
+        {
+            var users = _dbContext.Users
+                .Include(u => u.Phones)
+                .Include(u => u.UserRoleComposition).ThenInclude(c => c.Role)
+                .Include(u => u.UserCars).ThenInclude(c => c.BanType)
+                .Include(u => u.UserCars).ThenInclude(c => c.CarModel).ThenInclude(c => c.CarBrand)
+                .Include(u => u.UserCars).ThenInclude(c => c.CarSeatComposition).ThenInclude(c => c.Seat)
+                .AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(request.Name))
+            {
+                users = users.Where(u => u.Name.ToLower().Contains(request.Name.ToLower()));
+            }
+
+            if (!string.IsNullOrWhiteSpace(request.Surname))
+            {
+                users = users.Where(u => u.Surname.ToLower().Contains(request.Surname.ToLower()));
+            }
+
+            if (request.FromCreationDate.HasValue)
+            {
+                users = users.Where(u => u.CreatedTimestamp >= request.FromCreationDate);
+            }
+
+            if (request.ToCreationDate.HasValue)
+            {
+                users = users.Where(u => u.CreatedTimestamp <= request.ToCreationDate);
+            }
+
+            if (request.Phones?.Count > 0)
+            {
+                users = users.Where(u => u.Phones.Select(p => p.Number).Any(p => p.Contains(request.Phones.FirstOrDefault())));
+            }
+
+            if (request.UserRoles?.Count > 0)
+            {
+                users = users.Where(u => u.UserRoleComposition.Select(p => p.Role.RoleName).Any(p => request.UserRoles.Contains(p)));
+            }
+
+            if (request.UserCars != null)
+            {
+                if (request.UserCars.ModelIds?.Count > 0)
+                {
+                    users = users.Where(u => u.UserCars.Select(c => c.CarModelId).Any(m => request.UserCars.ModelIds.Contains(m)));
+                }
+
+                if (request.UserCars.BanTypeIds?.Count > 0)
+                {
+                    users = users.Where(u => u.UserCars.Select(c => c.BanTypeId).Any(b => request.UserCars.BanTypeIds.Contains(b)));
+                }
+
+                if (request.UserCars.RegisterNumbers?.Count > 0)
+                {
+                    users = users.Where(u => u.UserCars.Select(c => c.RegisterNumber).Any(n => request.UserCars.RegisterNumbers.Contains(n)));
+                }
+            }
+
+            if (request.FromBalance.HasValue)
+            {
+                users = users.Where(u => u.Balance >= request.FromBalance);
+            }
+
+            if (request.ToBalance.HasValue)
+            {
+                users = users.Where(u => u.Balance <= request.ToBalance);
+            }
+
+            if (users.Any())
+            {
+                var filteredUsers = await users.Skip((request.PageNumber - 1) * request.PageSize).Take(request.PageSize).ToListAsync();
+
+                var filteredUsersResponse = new List<UserFilterResponse>();
+
+                foreach (var user in filteredUsers)
+                {
+                    var userResponse = new UserFilterResponse(user);
+                    userResponse.Cars = user.UserCars.Select(c => _mapper.Map<CarResponse>(c)).ToList();
+                    userResponse.Phones = user.Phones.Select(p => _mapper.Map<UserPhoneResponse>(p)).ToList();
+                    userResponse.Rating = await _userRatingService.GetUserRating(user.Id);
+                    filteredUsersResponse.Add(userResponse);
+                }
+
+                var result = new PaginatedList<UserFilterResponse>
+                    (filteredUsersResponse, await users.CountAsync(), request.PageNumber, request.PageSize);
+
+                return result;
+            }
+            return null;
+        }
     }
 }

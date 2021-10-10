@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace ShaRide.Application.DTO.Response.Management
+namespace ShaRide.Application.DTO.Response.Account
 {
     public class UserFilterResponse
     {
@@ -25,7 +25,7 @@ namespace ShaRide.Application.DTO.Response.Management
             Name = user.Name;
             Surname = user.Surname;
             CreatedTimestamp = user.CreatedTimestamp;
-            Roles = user.UserRoleComposition.Select(r=>r.Role.RoleName).ToList();
+            Roles = user.UserRoleComposition.Select(r => r.Role.RoleName).ToList();
             Balance = user.Balance;
         }
     }

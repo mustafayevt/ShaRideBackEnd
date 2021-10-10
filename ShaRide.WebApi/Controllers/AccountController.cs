@@ -15,7 +15,7 @@ namespace ShaRide.WebApi.Controllers
     [Route("api/[controller]")]
     [ApiController]
     [ApiKey]
-    [Authorize(Roles = "Admin,Basic")]
+    //[Authorize(Roles = "Admin,Basic")]
     public class AccountController : ControllerBase
     {
         private readonly IAccountService _accountService;
@@ -49,6 +49,14 @@ namespace ShaRide.WebApi.Controllers
         {
             var origin = Request.Headers["origin"];
             return Ok(await _accountService.RegisterAsync(request, origin));
+        }
+
+        [AllowAnonymous]
+        [HttpPost("updateUserInfo")]
+        [Produces(typeof(AuthenticationResponse))]
+        public async Task<IActionResult> UpdateUserInfo(UpdateUserInfoRequest request)
+        {
+            return Ok(await _accountService.UpdateUserInfoAsync(request));
         }
 
         /// <summary>
@@ -157,10 +165,10 @@ namespace ShaRide.WebApi.Controllers
         /// </summary>
         /// <param name="userId"></param>
         /// <returns>0 when succeed</returns>
-        [HttpPut("BanUser/{userId:int}")]
-        public async Task<IActionResult> BanUser([Required] int userId)
+        [HttpPut("DeactivateUser/{userId:int}")]
+        public async Task<IActionResult> DeactivateUser(DeactivateUserRequest request)
         {
-            return Ok(await _accountService.BanUser(userId));
+            return Ok(await _accountService.DeactivateUser(request));
         }
 
         private string GenerateIpAddress()
@@ -169,6 +177,18 @@ namespace ShaRide.WebApi.Controllers
                 return Request.Headers["X-Forwarded-For"];
             else
                 return HttpContext.Connection.RemoteIpAddress.MapToIPv4().ToString();
+        }
+
+        /// <summary>
+        /// Returns users according to user filter request.
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns>0 when succeed</returns>
+        [HttpPost("AllUsers")]
+        public async Task<IActionResult> AllUsers(UserFilterRequest request)
+        {
+            var result = await _accountService.AllUsers(request);
+            return Ok(result);
         }
     }
 }

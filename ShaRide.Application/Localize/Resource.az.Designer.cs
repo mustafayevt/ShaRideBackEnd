@@ -203,5 +203,16 @@ namespace ShaRide.Application.Localize {
                 return ResourceManager.GetString("VerificationSms.Confirmation", resourceCulture);
             }
         }
+
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;Hörmətli {0}, Siz {1} tarixinədək deaktiv olursunuz. Deaktiv olunma səbəbiniz : {2}...
+        /// </summary>
+        public static string InformationSms_Deactivation
+        {
+            get
+            {
+                return ResourceManager.GetString("InformationSms.Deactivation", resourceCulture);
+            }
+        }
     }
 }

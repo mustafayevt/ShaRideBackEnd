@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using ShaRide.Application.Constants;
 using ShaRide.Application.Contexts;
+using ShaRide.Application.DTO.Request.Account;
 using ShaRide.Application.Extensions;
 using ShaRide.Application.Services.Concrete;
 using ShaRide.Application.Services.Interface;
@@ -38,10 +39,20 @@ namespace ShaRide.Application.Managers
         /// </summary>
         /// <param name="phone"></param>
         /// <returns></returns>
-        public async Task<User> FindByPhoneAsync(string phone)
+        public async Task<User> FindByPhoneAsync(string phone, int? userId = null)
         {
-            var userPhone = await _dbContext.UserPhones.Include(x => x.User)
+            UserPhone userPhone;
+            if (userId.HasValue)
+            {
+                userPhone = await _dbContext.UserPhones.Include(x => x.User)
+                .FirstOrDefaultAsync(x => x.Number == phone && x.UserId != userId);
+            }
+            else
+            {
+                userPhone = await _dbContext.UserPhones.Include(x => x.User)
                 .FirstOrDefaultAsync(x => x.Number == phone);
+            }
+            
             return userPhone?.User;
         }
 
@@ -192,6 +203,45 @@ namespace ShaRide.Application.Managers
             await _dbContext.SaveChangesAsync();
 
             return await AddToRoleAsync(user, roleNames);
+        }
+
+        public async Task<User> DeactivateUser(User user, DeactivateUserRequest request)
+        {
+            var userInDb = await _dbContext.Users
+                .Include(u=>u.UserRoleComposition)
+                .FirstOrDefaultAsync(x => x.Id.Equals(user.Id));
+
+            if (userInDb.UserRoleComposition.Count > 0)
+            {
+                _dbContext.UserRoleComposition.RemoveRange(userInDb.UserRoleComposition);
+            }
+            
+            if (!Enum.TryParse(typeof(Roles), Roles.BannedUser.ToString(), false, out var roleEnum))
+                throw new ArgumentException("role name is not correct");
+
+            var dbRole = await _dbContext.Roles.FirstOrDefaultAsync(x => x.RoleName == roleEnum.ToString());
+
+            var composition = new UserRoleComposition(userInDb.Id, dbRole.Id);
+
+            _dbContext.UserRoleComposition.Add(composition);
+
+            userInDb.IsRowActive = false;
+
+            await _dbContext.SaveChangesAsync();
+
+            userInDb = await _dbContext.Users
+                .Include(u => u.DeactivationHistory)
+                .Include(u => u.Phones)
+                .FirstOrDefaultAsync(u => u.Id == userInDb.Id);
+
+            userInDb.DeactivationHistory.Add(new UserDeactivationHistory
+            {
+                Reason = request.Reason,
+                ExpirationDate = request.ExpirationDate,
+                DeactivationDate = DateTime.Now.ToAzerbaijanDateTime()
+            });
+
+            return userInDb;
         }
 
         /// <summary>

@@ -12,8 +12,8 @@ namespace ShaRide.WebApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [ApiKey]
-    [Authorize(Roles = "Admin")]
+    //[ApiKey]
+    //[Authorize(Roles = "Admin")]
     public class CarBrandController : ControllerBase
     {
         private readonly ICarBrandService _carBrandService;

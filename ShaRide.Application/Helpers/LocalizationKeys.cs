@@ -115,5 +115,11 @@
         public const string USER_DOES_NOT_HAVE_ENOUGH_BALANCE = "Validation.UserDoesNotHaveEnoughBalance";
 
         public const string RIDE_CANNOT_CANCELLED = "Validation.RideCannotCancelled";
+
+        /// <summary>
+        /// Use case : information.
+        /// sms for deactivation of user.
+        /// </summary>
+        public const string UserDeactivated = "InformationSms.Deactivation";
     }
 }

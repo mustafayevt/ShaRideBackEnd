@@ -23,6 +23,9 @@ namespace ShaRide.Domain.Entities
 
         public decimal Balance { get; set; }
 
+        public ICollection<UserDeactivationHistory> DeactivationHistory { get; set; }
+
+
         public override bool Equals(object? obj)
         {
             return base.Equals(obj);

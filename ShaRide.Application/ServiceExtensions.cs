@@ -17,7 +17,6 @@ using ShaRide.Application.Services.Concrete;
 using ShaRide.Application.Services.Interface;
 using ShaRide.Application.ViewModels;
 using ShaRide.Domain.Settings;
-using ShaRide.WebApi.Services;
 using System;
 using System.Reflection;
 using System.Text;
@@ -66,7 +65,6 @@ namespace ShaRide.Application
             services.AddScoped<IUserFcmTokenService, UserFcmTokenService>();
             services.AddScoped<IMessageService, MessageService>();
             services.AddScoped<IAccountingService, AccountingService>();
-            services.AddScoped<IUserService, UserService>();
             services.AddScoped<PaymentManager>();
             #endregion
 

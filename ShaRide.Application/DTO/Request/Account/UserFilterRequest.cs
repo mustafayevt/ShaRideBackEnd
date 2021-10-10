@@ -1,8 +1,9 @@
-﻿using ShaRide.Application.Pagination;
+﻿using ShaRide.Application.DTO.Request.Management;
+using ShaRide.Application.Pagination;
 using System;
 using System.Collections.Generic;
 
-namespace ShaRide.Application.DTO.Request.Management
+namespace ShaRide.Application.DTO.Request.Account
 {
     public class UserFilterRequest : PagedRequest
     {

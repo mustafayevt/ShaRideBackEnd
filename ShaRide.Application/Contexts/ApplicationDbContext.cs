@@ -132,6 +132,8 @@ namespace ShaRide.Application.Contexts
         #region DbSets
 
         public DbSet<User> Users { get; set; }
+        public DbSet<UserImage> UserImage { get; set; }
+        public DbSet<UserDeactivationHistory> UserDeactivationHistory { get; set; }
         public DbSet<UserPhone> UserPhones { get; set; }
         public DbSet<Role> Roles { get; set; }
         public DbSet<UserRoleComposition> UserRoleComposition { get; set; }
