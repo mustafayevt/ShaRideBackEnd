@@ -107,37 +107,33 @@ namespace ShaRide.Application.Services.Concrete
         {
             var ridesQuery = _dbContext.Rides
                 .Include(x => x.Driver)
-                .ThenInclude(x => x.Phones)
-
+                    .ThenInclude(x => x.Phones)
                 .Include(x => x.RideCarSeatComposition)
-                .ThenInclude(x => x.CarSeatComposition)
-                .ThenInclude(x => x.Seat)
-
+                    .ThenInclude(x => x.CarSeatComposition)
+                    .ThenInclude(x => x.Seat)
                 .Include(x => x.RideCarSeatComposition)
-                .ThenInclude(x => x.Passenger)
-
+                    .ThenInclude(x => x.Passenger)
                 .Include(x => x.RideCarSeatComposition)
-                .ThenInclude(x => x.CarSeatComposition)
-                .ThenInclude(x => x.Car)
-                .ThenInclude(x => x.BanType)
-
+                    .ThenInclude(x => x.CarSeatComposition)
+                    .ThenInclude(x => x.Car)
+                    .ThenInclude(x => x.BanType)
                 .Include(x => x.RideCarSeatComposition)
-                .ThenInclude(x => x.CarSeatComposition)
-                .ThenInclude(x => x.Car)
-                .ThenInclude(x => x.CarModel)
-                .ThenInclude(x => x.CarBrand)
-
+                    .ThenInclude(x => x.CarSeatComposition)
+                    .ThenInclude(x => x.Car)
+                    .ThenInclude(x => x.CarModel)
+                    .ThenInclude(x => x.CarBrand)
                 .Include(x => x.RideCarSeatComposition)
-                .ThenInclude(x => x.CarSeatComposition)
-                .ThenInclude(x => x.Car)
-                .ThenInclude(x => x.CarImages)
-
+                    .ThenInclude(x => x.CarSeatComposition)
+                    .ThenInclude(x => x.Car)
+                    .ThenInclude(x => x.CarImages)
                 .Include(x => x.RideLocationPointComposition)
-                .ThenInclude(x => x.LocationPoint)
-                .ThenInclude(x => x.Location)
-
+                    .ThenInclude(x => x.LocationPoint)
+                    .ThenInclude(x => x.Location)
                 .Include(x => x.RestrictionRideComposition)
-                .ThenInclude(x => x.Restriction).AsNoTracking().AsQueryable();
+                    .ThenInclude(x => x.Restriction)
+                .Where(x=>x.RideCarSeatComposition.Any(c=>c.SeatStatus == SeatStatus.Suitable))
+                .AsNoTracking()
+                .AsQueryable();
 
             if (ridesFilterRequest.FromLocationId.HasValue)
             {
@@ -474,6 +470,33 @@ namespace ShaRide.Application.Services.Concrete
             return 0;
         }
 
+        public async Task<int> UpdateSeatStatus(UpdateSeatsStatusRequest request)
+        {
+            var ride = await _dbContext
+                .Rides
+                .Include(x => x.Driver)
+                .Include(x => x.RideCarSeatComposition)
+                .ThenInclude(x => x.Passenger)
+                .AsTracking()
+                .FirstOrDefaultAsync(x => x.IsRowActive && x.Id == request.RideId);
+
+            if (ride is null)
+                throw new ApiException(_localizer.GetString(LocalizationKeys.RIDE_NOT_FOUND, request.RideId));
+
+            if (ride.DriverId != _authenticatedUserService.UserId)
+                throw new ApiException(_localizer.GetString(LocalizationKeys.USER_HAS_NOT_ACCESS_OPERATION));
+
+            foreach (var req in request.RideSeatRequests)
+            {
+                ride.RideCarSeatComposition.First(c => c.Id == req.CarSeatCompositionId).SeatStatus = req.SeatStatus;
+            }
+            
+
+            await _dbContext.SaveChangesAsync();
+
+            return 0;
+        }
+
         public async Task<int> GiveFeedbackForRide(RideFeedbackRequest request)
         {
             var ride = await _dbContext
@@ -558,10 +581,8 @@ namespace ShaRide.Application.Services.Concrete
 
             #region User balance rule checking
 
-            var ridePricePerSeat = _dbContext.RideCarSeatCompositions
-                .Include(x => x.Ride)
-                .FirstOrDefault(x => x.IsRowActive && request.RideCarSeatCompositionIds.Contains(x.Id))
-                ?.Ride.PricePerSeat;
+            var ridePricePerSeat = _dbContext.Rides
+                .FirstOrDefault(x => x.IsRowActive && request.RideId == x.Id)?.PricePerSeat;
 
             if (request.PaymentType.Equals(PaymentType.Balance))
             {
@@ -569,6 +590,31 @@ namespace ShaRide.Application.Services.Concrete
 
                 if (user.Balance < amountOfRequestedSeats)
                     throw new ApiException(_localizer.GetString(LocalizationKeys.USER_DOES_NOT_HAVE_ENOUGH_BALANCE));
+
+                var amountOfActiveBoughtSeats = _dbContext.RideCarSeatCompositions
+                    .Where(x => x.IsRowActive &&
+                                x.PassengerId == user.Id &&
+                                x.PaymentType == PaymentType.Balance &&
+                                x.RideId != request.RideId &&
+                                x.Ride.RideState < RideState.Finished)
+                    .Sum(s => s.Ride.PricePerSeat);
+
+                if ((user.Balance - amountOfActiveBoughtSeats) < amountOfRequestedSeats)
+                    throw new ApiException(_localizer.GetString(LocalizationKeys.USER_DOES_NOT_HAVE_ENOUGH_BALANCE_BOUGHT_SEATS));
+
+                var amountOfActiveRequestedSeats = _dbContext.PassengerToRideRequests
+                    .Where(x => x.IsRowActive &&
+                                x.RideCarSeatComposition.RideId != request.RideId &&
+                                x.UserId == user.Id &&
+                                x.RideCarSeatComposition.PaymentType == PaymentType.Balance &&
+                                x.RideCarSeatComposition.Ride.RideState < RideState.Finished)
+                    .Sum(r => r.RideCarSeatComposition.Ride.PricePerSeat);
+
+                if ((user.Balance - amountOfActiveRequestedSeats) < amountOfRequestedSeats)
+                    throw new ApiException(_localizer.GetString(LocalizationKeys.USER_DOES_NOT_HAVE_ENOUGH_BALANCE_REQUESTED_SEATS));
+
+                if ((user.Balance - (amountOfActiveRequestedSeats + amountOfActiveBoughtSeats)) < amountOfRequestedSeats)
+                    throw new ApiException(_localizer.GetString(LocalizationKeys.USER_DOES_NOT_HAVE_ENOUGH_BALANCE_BOUGHT_REQUESTED_SEATS));
             }
 
             #endregion

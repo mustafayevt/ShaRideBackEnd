@@ -33,7 +33,9 @@ namespace ShaRide.Application.ManualMapping
                             xCordinant = rideCarSeatComposition.CarSeatComposition.Seat.xCordinant,
                             yCordinant = rideCarSeatComposition.CarSeatComposition.Seat.yCordinant,
                             SeatRotate = rideCarSeatComposition.CarSeatComposition.SeatRotate,
-                            SeatType = rideCarSeatComposition.SeatStatus
+                            SeatType = rideCarSeatComposition.SeatStatus,
+                            Debt = rideCarSeatComposition.PaymentType == Domain.Enums.PaymentType.Cash ? 
+                                ride.PricePerSeat : 0
                         };
                         rideResponse.Car.CarSeats.Add(carSeatCompositionResponse);
                     }

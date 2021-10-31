@@ -1,19 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ShaRide.Application.Attributes;
 using ShaRide.Application.DTO.Request.CarBrand;
 using ShaRide.Application.DTO.Response.CarBrand;
 using ShaRide.Application.Services.Interface;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace ShaRide.WebApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    //[ApiKey]
-    //[Authorize(Roles = "Admin")]
+    [ApiKey]
+    [Authorize(Roles = "Admin")]
     public class CarBrandController : ControllerBase
     {
         private readonly ICarBrandService _carBrandService;
@@ -29,7 +28,7 @@ namespace ShaRide.WebApi.Controllers
         /// <returns></returns>
         [HttpGet("GetCarBrands")]
         [AllowAnonymous]
-        [ProducesResponseType(typeof(ICollection<CarBrandResponse>),200)]
+        [ProducesResponseType(typeof(ICollection<CarBrandResponse>), 200)]
         public async Task<IActionResult> GetCarBrands()
         {
             return Ok(await _carBrandService.GetCarBrandsAsync());
@@ -42,7 +41,7 @@ namespace ShaRide.WebApi.Controllers
         /// <returns></returns>
         [HttpGet("GetCarBrandById/{id}")]
         [AllowAnonymous]
-        [ProducesResponseType(typeof(CarBrandResponse),200)]
+        [ProducesResponseType(typeof(CarBrandResponse), 200)]
         public async Task<IActionResult> GetCarBrandById(int id)
         {
             return Ok(await _carBrandService.GetCarBrandByIdAsync(id));
@@ -54,7 +53,7 @@ namespace ShaRide.WebApi.Controllers
         /// <param name="request"></param>
         /// <returns></returns>
         [HttpPost("InsertCarBrand")]
-        [ProducesResponseType(typeof(CarBrandResponse),201)]
+        [ProducesResponseType(typeof(CarBrandResponse), 201)]
         public async Task<IActionResult> InsertCarBrand(InsertCarBrandRequest request)
         {
             return Ok(await _carBrandService.InsertCarBrandAsync(request));
@@ -66,19 +65,19 @@ namespace ShaRide.WebApi.Controllers
         /// <param name="request"></param>
         /// <returns></returns>
         [HttpPost("InsertCarBrands")]
-        [ProducesResponseType(typeof(ICollection<CarBrandResponse>),200)]
+        [ProducesResponseType(typeof(ICollection<CarBrandResponse>), 200)]
         public async Task<IActionResult> InsertCarBrands(ICollection<InsertCarBrandRequest> request)
         {
             return Ok(await _carBrandService.InsertCarBrandsAsync(request));
         }
-        
+
         /// <summary>
         /// Updates carBrand.
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        [HttpPut("UpdateCarBrand")]        
-        [ProducesResponseType(typeof(CarBrandResponse),200)]
+        [HttpPut("UpdateCarBrand")]
+        [ProducesResponseType(typeof(CarBrandResponse), 200)]
         public async Task<IActionResult> UpdateCarBrand(UpdateCarBrandRequest request)
         {
             return Ok(await _carBrandService.UpdateCarBrandAsync(request));

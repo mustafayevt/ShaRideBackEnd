@@ -15,7 +15,7 @@ namespace ShaRide.WebApi.Controllers
     [Route("api/[controller]")]
     [ApiController]
     [ApiKey]
-    //[Authorize(Roles = "Admin,Basic")]
+    [Authorize(Roles = "Admin,Basic")]
     public class AccountController : ControllerBase
     {
         private readonly IAccountService _accountService;

@@ -114,6 +114,24 @@
         /// </summary>
         public const string USER_DOES_NOT_HAVE_ENOUGH_BALANCE = "Validation.UserDoesNotHaveEnoughBalance";
 
+        /// <summary>
+        /// Use case : validation.
+        /// General not enough balance validation.
+        /// </summary>
+        public const string USER_DOES_NOT_HAVE_ENOUGH_BALANCE_BOUGHT_SEATS = "Validation.UserDoesNotHaveEnoughBalanceBoughtSeats";
+
+        /// <summary>
+        /// Use case : validation.
+        /// General not enough balance validation.
+        /// </summary>
+        public const string USER_DOES_NOT_HAVE_ENOUGH_BALANCE_REQUESTED_SEATS = "Validation.UserDoesNotHaveEnoughBalanceRequestedSeats";
+
+        /// <summary>
+        /// Use case : validation.
+        /// General not enough balance validation.
+        /// </summary>
+        public const string USER_DOES_NOT_HAVE_ENOUGH_BALANCE_BOUGHT_REQUESTED_SEATS = "Validation.UserDoesNotHaveEnoughBalanceRequestedSeats";
+
         public const string RIDE_CANNOT_CANCELLED = "Validation.RideCannotCancelled";
 
         /// <summary>

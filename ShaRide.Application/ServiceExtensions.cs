@@ -63,7 +63,7 @@ namespace ShaRide.Application
             services.AddScoped<IInvoiceService, InvoiceService>();
             services.AddScoped<IUserRatingService, UserRatingService>();
             services.AddScoped<IUserFcmTokenService, UserFcmTokenService>();
-            services.AddScoped<IMessageService, MessageService>();
+            //services.AddScoped<IMessageService, MessageService>();
             services.AddScoped<IAccountingService, AccountingService>();
             services.AddScoped<PaymentManager>();
             #endregion

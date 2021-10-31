@@ -47,6 +47,12 @@ namespace ShaRide.WebApi.Controllers
             return Ok(rides);
         }
 
+        [HttpPost("UpdateSeatStatus")]
+        public async Task<IActionResult> UpdateSeatStatus(UpdateSeatsStatusRequest request)
+        {
+            return Ok(await _rideService.UpdateSeatStatus(request));
+        }
+
         [HttpPost("UpdateRideState")]
         public async Task<IActionResult> UpdateRideState(UpdateRideStateRequest request)
         {
