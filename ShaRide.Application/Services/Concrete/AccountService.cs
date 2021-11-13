@@ -525,7 +525,7 @@ namespace ShaRide.Application.Services.Concrete
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        public async Task<PaginatedList<UserFilterResponse>> AllUsers(UserFilterRequest request)
+        public async Task<PagedList<UserFilterResponse>> AllUsers(UserFilterRequest request)
         {
             var users = _dbContext.Users
                 .Include(u => u.Phones)
@@ -608,7 +608,7 @@ namespace ShaRide.Application.Services.Concrete
                     filteredUsersResponse.Add(userResponse);
                 }
 
-                var result = new PaginatedList<UserFilterResponse>
+                var result = new PagedList<UserFilterResponse>
                     (filteredUsersResponse, await users.CountAsync(), request.PageNumber, request.PageSize);
 
                 return result;

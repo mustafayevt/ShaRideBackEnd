@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -39,7 +40,7 @@ namespace ShaRide.WebApi.Controllers
 
         [HttpPost("GetRides")]
         [AllowAnonymous]
-        [ProducesResponseType(200, Type = typeof(PaginatedList<RideResponse>))]
+        [ProducesResponseType(200, Type = typeof(PagedList<RideResponse>))]
         [Produces("application/json")]
         public async Task<IActionResult> GetRides(RidesFilterRequest ridesFilterRequest)
         {
@@ -83,16 +84,18 @@ namespace ShaRide.WebApi.Controllers
             return Ok(await _rideService.RespondUserRideRequest(requests));
         }
 
-        [HttpGet("GetCurrentUserRidesAsDriver")]
-        public async Task<IActionResult> GetCurrentUsersRidesAsDriver()
+        [HttpPost("GetCurrentUserRidesAsDriver")]
+        public async Task<IActionResult> GetCurrentUsersRidesAsDriver(FilterRequestBase request)
         {
-            return Ok(await _rideService.GetCurrentUsersRidesAsDriver());
+            return Ok(await _rideService.GetCurrentUsersRidesAsDriver(request));
         }
 
-        [HttpGet("GetCurrentUserRidesAsPassenger")]
-        public async Task<IActionResult> GetCurrentUsersRidesAsPassenger()
+        [HttpPost("GetCurrentUserRidesAsPassenger")]
+        [ProducesResponseType(200, Type = typeof(PagedList<RideResponse>))]
+        public async Task<IActionResult> GetCurrentUsersRidesAsPassenger(FilterRequestBase ridesFilterRequest)
         {
-            return Ok(await _rideService.GetCurrentUserRidesAsPassenger());
+            var result = await _rideService.GetCurrentUserRidesAsPassenger(ridesFilterRequest);
+            return Ok(result);
         }
 
         [HttpGet("GetCurrentUserRideRequests")]

@@ -22,6 +22,7 @@ using ShaRide.Domain.Entities;
 using ShaRide.Domain.Enums;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
@@ -103,7 +104,7 @@ namespace ShaRide.Application.Services.Concrete
         /// <param name="ridesFilterRequest"></param>
         /// <returns></returns>
         /// <exception cref="ApiException"></exception>
-        public async Task<PaginatedList<RideResponse>> GetRides(RidesFilterRequest ridesFilterRequest)
+        public async Task<PagedList<RideResponse>> GetRides(RidesFilterRequest ridesFilterRequest)
         {
             var ridesQuery = _dbContext.Rides
                 .Include(x => x.Driver)
@@ -202,7 +203,7 @@ namespace ShaRide.Application.Services.Concrete
                     }
             }
 
-            var ridesPaginated = new PaginatedList<RideResponse>
+            var ridesPaginated = new PagedList<RideResponse>
                 (ridesResponses.ToList(), await ridesQuery.CountAsync(), ridesFilterRequest.PageNumber, ridesFilterRequest.PageSize);
 
             return ridesPaginated;
@@ -595,7 +596,6 @@ namespace ShaRide.Application.Services.Concrete
                     .Where(x => x.IsRowActive &&
                                 x.PassengerId == user.Id &&
                                 x.PaymentType == PaymentType.Balance &&
-                                x.RideId != request.RideId &&
                                 x.Ride.RideState < RideState.Finished)
                     .Sum(s => s.Ride.PricePerSeat);
 
@@ -833,44 +833,56 @@ namespace ShaRide.Application.Services.Concrete
             return 0;
         }
 
-        public async Task<ICollection<RideResponse>> GetCurrentUsersRidesAsDriver()
+        public async Task<PagedList<RideResponse>> GetCurrentUsersRidesAsDriver(FilterRequestBase request)
         {
-            var dbResult = _dbContext
-                .Rides
-                .Include(x => x.Driver)
-                .ThenInclude(x => x.Phones)
+            var ridesQuery = _dbContext.Rides
                 .Include(x => x.RideCarSeatComposition)
-                .ThenInclude(x => x.CarSeatComposition)
-                .ThenInclude(x => x.Seat)
-                .Include(x => x.RideCarSeatComposition)
-                .ThenInclude(x => x.Passenger)
-                .Include(x => x.RideCarSeatComposition)
-                .ThenInclude(x => x.CarSeatComposition)
-                .ThenInclude(x => x.Car)
-                .ThenInclude(x => x.BanType)
-                .Include(x => x.RideCarSeatComposition)
-                .ThenInclude(x => x.CarSeatComposition)
-                .ThenInclude(x => x.Car)
-                .ThenInclude(x => x.CarModel)
-                .ThenInclude(x => x.CarBrand)
-                .Include(x => x.RideCarSeatComposition)
-                .ThenInclude(x => x.CarSeatComposition)
-                .ThenInclude(x => x.Car)
-                .ThenInclude(x => x.CarImages)
-                .Include(x => x.RideLocationPointComposition)
-                .ThenInclude(x => x.LocationPoint)
-                .ThenInclude(x => x.Location)
-                .Include(x => x.RestrictionRideComposition)
-                .ThenInclude(x => x.Restriction)
+                    .ThenInclude(x => x.Passenger)
                 .Where(x => x.IsRowActive &&
                             x.DriverId == _authenticatedUserService.UserId &&
-                            x.RideState != RideState.Canceled)
+                            x.RideState != RideState.Canceled);
+
+            var rides = ridesQuery
                 .OrderByDescending(x => x.StartDate)
-                .Take(50);
+                .Skip((request.PageNumber - 1) * request.PageSize).Take(request.PageSize)
+                .ToList();
 
-            var rides = dbResult.RidesToRideResponses(_mapper);
 
-            foreach (var rideResponse in rides)
+            foreach (var ride in rides)
+            {
+                ride.Driver = _dbContext.Users
+                .Include(x => x.Phones)
+                .FirstOrDefault(u => u.Id == ride.DriverId);
+
+                ride.RestrictionRideComposition = _dbContext.RestrictionRideComposition
+                .Include(x => x.Restriction)
+                .Where(r => r.RestrictionId == ride.Id)
+                .ToList();
+
+                ride.RideLocationPointComposition = _dbContext.RideLocationPointComposition
+                .Include(x => x.LocationPoint)
+                    .ThenInclude(x => x.Location)
+                .Where(l => l.RideId == ride.Id)
+                .ToList();
+
+                foreach (var rideCarSeatComposition in ride.RideCarSeatComposition)
+                {
+                    rideCarSeatComposition.CarSeatComposition = _dbContext.CarSeatComposition
+                    .Include(x => x.Seat)
+                    .FirstOrDefault(c => c.Id == rideCarSeatComposition.CarSeatCompositionId);
+
+                    rideCarSeatComposition.CarSeatComposition.Car = _dbContext.Cars
+                    .Include(x => x.BanType)
+                    .Include(x => x.CarModel)
+                        .ThenInclude(x => x.CarBrand)
+                    .Include(x => x.CarImages)
+                    .FirstOrDefault(c => c.Id == rideCarSeatComposition.CarSeatComposition.CarId);
+                }
+            }
+
+            var ridesResponses = rides.RidesToRideResponses(_mapper);
+
+            foreach (var rideResponse in ridesResponses)
             {
                 rideResponse.Driver.Rating = await _userRatingService.GetUserRating(rideResponse.Driver.Id);
                 if (rideResponse.Car?.CarSeats != null)
@@ -884,59 +896,76 @@ namespace ShaRide.Application.Services.Concrete
                     }
             }
 
-            return rides;
+            var ridesPaginated = new PagedList<RideResponse>
+                (ridesResponses.ToList(), await ridesQuery.CountAsync(), request.PageNumber, request.PageSize);
+
+            return ridesPaginated;
         }
 
-        public async Task<ICollection<RideResponse>> GetCurrentUserRidesAsPassenger()
+        public async Task<PagedList<RideResponse>> GetCurrentUserRidesAsPassenger(FilterRequestBase request)
         {
-            var dbResult = _dbContext
-                .Rides
-                .Include(x => x.Driver)
-                .ThenInclude(x => x.Phones)
+            var ridesQuery = _dbContext.Rides
                 .Include(x => x.RideCarSeatComposition)
-                .ThenInclude(x => x.CarSeatComposition)
-                .ThenInclude(x => x.Seat)
-                .Include(x => x.RideCarSeatComposition)
-                .ThenInclude(x => x.Passenger)
-                .Include(x => x.RideCarSeatComposition)
-                .ThenInclude(x => x.CarSeatComposition)
-                .ThenInclude(x => x.Car)
-                .ThenInclude(x => x.BanType)
-                .Include(x => x.RideCarSeatComposition)
-                .ThenInclude(x => x.CarSeatComposition)
-                .ThenInclude(x => x.Car)
-                .ThenInclude(x => x.CarModel)
-                .ThenInclude(x => x.CarBrand)
-                .Include(x => x.RideCarSeatComposition)
-                .ThenInclude(x => x.CarSeatComposition)
-                .ThenInclude(x => x.Car)
-                .ThenInclude(x => x.CarImages)
-                .Include(x => x.RideLocationPointComposition)
-                .ThenInclude(x => x.LocationPoint)
-                .ThenInclude(x => x.Location)
-                .Include(x => x.RestrictionRideComposition)
-                .ThenInclude(x => x.Restriction)
+                    .ThenInclude(x => x.Passenger)
                 .Where(x => x.IsRowActive &&
                             x.RideCarSeatComposition.Any(y => y.PassengerId.Equals(_authenticatedUserService.UserId)) &&
-                            x.RideState != RideState.Canceled)
+                            x.RideState != RideState.Canceled);
+
+            var rides = ridesQuery
                 .OrderByDescending(x => x.StartDate)
-                .Take(50);
+                .Skip((request.PageNumber - 1) * request.PageSize).Take(request.PageSize)
+                .ToList();
 
-            var rides = dbResult.RidesToRideResponses(_mapper);
-
-            foreach (var rideResponse in rides)
+            foreach (var ride in rides)
             {
-                rideResponse.Driver.Rating = await _userRatingService.GetUserRating(rideResponse.Driver.Id);
-                foreach (var carSeatCompositionResponse in rideResponse.Car.CarSeats)
-                {
-                    if (carSeatCompositionResponse.Passenger is null)
-                        continue;
+                ride.Driver = _dbContext.Users
+                .Include(x => x.Phones)
+                .FirstOrDefault(u => u.Id == ride.DriverId);
 
-                    carSeatCompositionResponse.Passenger.Rating = await _userRatingService.GetUserRating(carSeatCompositionResponse.Passenger.Id);
+                ride.RestrictionRideComposition = _dbContext.RestrictionRideComposition
+                .Include(x => x.Restriction)
+                .Where(r => r.RestrictionId == ride.Id)
+                .ToList();
+
+                ride.RideLocationPointComposition = _dbContext.RideLocationPointComposition
+                .Include(x => x.LocationPoint)
+                    .ThenInclude(x => x.Location)
+                .Where(l => l.RideId == ride.Id)
+                .ToList();
+
+                foreach (var rideCarSeatComposition in ride.RideCarSeatComposition)
+                {
+                    rideCarSeatComposition.CarSeatComposition = _dbContext.CarSeatComposition
+                    .Include(x => x.Seat)
+                    .FirstOrDefault(c => c.Id == rideCarSeatComposition.CarSeatCompositionId);
+
+                    rideCarSeatComposition.CarSeatComposition.Car = _dbContext.Cars
+                    .Include(x => x.BanType)
+                    .Include(x => x.CarModel)
+                        .ThenInclude(x => x.CarBrand)
+                    .Include(x => x.CarImages)
+                    .FirstOrDefault(c => c.Id == rideCarSeatComposition.CarSeatComposition.CarId);
                 }
             }
 
-            return rides;
+            var ridesResponses = rides.RidesToRideResponses(_mapper);
+
+            foreach(var rideResponse in ridesResponses)
+             {
+                 rideResponse.Driver.Rating = await _userRatingService.GetUserRating(rideResponse.Driver.Id);
+                 foreach (var carSeatCompositionResponse in rideResponse.Car.CarSeats)
+                 {
+                     if (carSeatCompositionResponse.Passenger is null)
+                         continue;
+
+                     carSeatCompositionResponse.Passenger.Rating = await _userRatingService.GetUserRating(carSeatCompositionResponse.Passenger.Id);
+                 }
+             };
+
+            var ridesPaginated = new PagedList<RideResponse>
+                (ridesResponses.ToList(), await ridesQuery.CountAsync(), request.PageNumber, request.PageSize);
+
+            return ridesPaginated;
         }
 
         public async Task<ICollection<GetUserRideRequestResponse>> GetCurrentUsersRideRequests()

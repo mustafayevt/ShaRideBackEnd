@@ -13,7 +13,7 @@ namespace ShaRide.Application.Services.Interface
     {
         Task<ICollection<RideResponse>> GetAllActiveRides();
         Task<ICollection<RideResponse>> GetActiveRides(GetActiveRidesRequest request);
-        Task<PaginatedList<RideResponse>> GetRides(RidesFilterRequest request);
+        Task<PagedList<RideResponse>> GetRides(RidesFilterRequest request);
         Task<int> InsertRide(InsertRideRequest request);
         Task<int> UpdateRideState(UpdateRideStateRequest request);
         Task<int> UpdateSeatStatus(UpdateSeatsStatusRequest request);
@@ -21,8 +21,8 @@ namespace ShaRide.Application.Services.Interface
         Task<int> RespondUserRideRequest(List<DriverRespondRequest> requests);
         Task<IEnumerable<PassengerToRideResponse>> GetPassengerToRideRequests();
         Task<int> CancelRide(CancelRideRequest request);
-        Task<ICollection<RideResponse>> GetCurrentUsersRidesAsDriver();
-        Task<ICollection<RideResponse>> GetCurrentUserRidesAsPassenger();
+        Task<PagedList<RideResponse>> GetCurrentUsersRidesAsDriver(FilterRequestBase request);
+        Task<PagedList<RideResponse>> GetCurrentUserRidesAsPassenger(FilterRequestBase request);
         Task<ICollection<GetUserRideRequestResponse>> GetCurrentUsersRideRequests();
         Task<int> CancelPassengerRideRequest(int rideId);
         Task<ICollection<RideResponse>> SuggestRidesToUser();

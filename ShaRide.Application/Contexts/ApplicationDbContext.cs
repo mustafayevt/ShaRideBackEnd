@@ -143,6 +143,7 @@ namespace ShaRide.Application.Contexts
         public DbSet<RestrictionRideComposition> RestrictionRideComposition { get; set; }
         public DbSet<RideLocationPointComposition> RideLocationPointComposition { get; set; }
         public DbSet<RideCarSeatComposition> RideCarSeatCompositions { get; set; }
+        public DbSet<CarSeatComposition> CarSeatComposition { get; set; }
         public DbSet<Ride> Rides { get; set; }
         public DbSet<CarBrand> CarBrands { get; set; }
         public DbSet<CarModel> CarModels { get; set; }

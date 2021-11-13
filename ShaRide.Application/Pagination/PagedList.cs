@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ShaRide.Application.Pagination
 {
-    public class PaginatedList<T>
+    public class PagedList<T>
     {
         public int CurrentPage { get; set; }
         public int TotalPages { get; set; }
@@ -14,7 +14,7 @@ namespace ShaRide.Application.Pagination
         public int ItemsInPage { get; set; }
         public int TotalItems { get; set; }
         public List<T> Items { get; set; } = new List<T>();
-        public PaginatedList(List<T> items, int count, int currentPage, int pageSize)
+        public PagedList(List<T> items, int count, int currentPage, int pageSize)
         {
             CurrentPage = currentPage;
             PageSize = pageSize;
@@ -48,18 +48,18 @@ namespace ShaRide.Application.Pagination
             }
         }
 
-        public static async Task<PaginatedList<T>> CreateAsync(IQueryable<T> source, int pageIndex, int pageSize)
+        public static async Task<PagedList<T>> CreateAsync(IQueryable<T> source, int pageIndex, int pageSize)
         {
             var count = await source.CountAsync();
             var items = await source.Skip((pageIndex - 1) * pageSize).Take(pageSize).ToListAsync();
-            return new PaginatedList<T>(items, count, pageIndex, pageSize);
+            return new PagedList<T>(items, count, pageIndex, pageSize);
         }
 
-        public static PaginatedList<T> Create(IEnumerable<T> source, int pageIndex, int pageSize)
+        public static PagedList<T> Create(IEnumerable<T> source, int pageIndex, int pageSize)
         {
             var count = source.Count();
             var items = source.Skip((pageIndex - 1) * pageSize).Take(pageSize).ToList();
-            return new PaginatedList<T>(items, count, pageIndex, pageSize);
+            return new PagedList<T>(items, count, pageIndex, pageSize);
         }
     }
 }
