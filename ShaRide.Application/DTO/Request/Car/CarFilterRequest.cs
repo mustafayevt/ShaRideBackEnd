@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace ShaRide.Application.DTO.Request.Management
+namespace ShaRide.Application.DTO.Request.Car
 {
     public class CarFilterRequest
     {

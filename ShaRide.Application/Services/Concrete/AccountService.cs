@@ -115,7 +115,7 @@ namespace ShaRide.Application.Services.Concrete
             }
 
             var user = _mapper.Map<User>(request);
-            if (request.Attachment != null && request.Attachment.Content != null && request.Attachment.Extension != null)
+            if (request.Attachment?.Content != null && request.Attachment.Extension != null)
             {
                 user.UserImages = new List<UserImage>
                 {
@@ -203,8 +203,7 @@ namespace ShaRide.Application.Services.Concrete
                 .Include(u => u.Phones)
                 .FirstOrDefaultAsync(u => u.Id == request.UserId);
 
-            if (request.Attachment != null &&
-                request.Attachment.Content != null &&
+            if (request.Attachment?.Content != null &&
                 request.Attachment.Extension != null &&
                 !request.Attachment.Id.HasValue)
             {
@@ -235,12 +234,12 @@ namespace ShaRide.Application.Services.Concrete
                     user.Phones.First(p => p.IsMain).IsConfirmed = true;
                 }
             }
-            catch (Exception ex) 
+            catch (Exception)
             {
 
                 throw;
             }
-           
+
 
             _dbContext.Users.Update(user);
             await _dbContext.SaveChangesAsync();
@@ -475,9 +474,9 @@ namespace ShaRide.Application.Services.Concrete
 
             var roleClaims = new List<Claim>();
 
-            for (int i = 0; i < roles.Count; i++)
+            foreach (var t in roles)
             {
-                roleClaims.Add(new Claim("roles", roles[i]));
+                roleClaims.Add(new Claim("roles", t));
             }
 
             string ipAddress = IpHelper.GetIpAddress();
@@ -601,10 +600,12 @@ namespace ShaRide.Application.Services.Concrete
 
                 foreach (var user in filteredUsers)
                 {
-                    var userResponse = new UserFilterResponse(user);
-                    userResponse.Cars = user.UserCars.Select(c => _mapper.Map<CarResponse>(c)).ToList();
-                    userResponse.Phones = user.Phones.Select(p => _mapper.Map<UserPhoneResponse>(p)).ToList();
-                    userResponse.Rating = await _userRatingService.GetUserRating(user.Id);
+                    var userResponse = new UserFilterResponse(user)
+                    {
+                        Cars = user.UserCars.Select(c => _mapper.Map<CarResponse>(c)).ToList(),
+                        Phones = user.Phones.Select(p => _mapper.Map<UserPhoneResponse>(p)).ToList(),
+                        Rating = await _userRatingService.GetUserRating(user.Id)
+                    };
                     filteredUsersResponse.Add(userResponse);
                 }
 

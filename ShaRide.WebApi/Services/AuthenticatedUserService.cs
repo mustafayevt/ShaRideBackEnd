@@ -13,8 +13,7 @@ namespace ShaRide.WebApi.Services
             if (int.TryParse(httpContextAccessor.HttpContext?.User?.FindFirstValue("uid"), out var userId))
             {
                 UserId = userId;
-            };
-            
+            }
         }
 
         public int? UserId { get;}

@@ -1,7 +1,7 @@
-﻿using ShaRide.Application.DTO.Request.Management;
-using ShaRide.Application.Pagination;
+﻿using ShaRide.Application.Pagination;
 using System;
 using System.Collections.Generic;
+using ShaRide.Application.DTO.Request.Car;
 
 namespace ShaRide.Application.DTO.Request.Account
 {

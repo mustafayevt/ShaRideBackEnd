@@ -1,5 +1,4 @@
-﻿using System.Threading.Tasks;
-using AutoWrapper.Wrappers;
+﻿using AutoWrapper.Wrappers;
 using MailKit.Security;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -7,6 +6,7 @@ using MimeKit;
 using ShaRide.Application.DTO.Request.Account;
 using ShaRide.Application.Services.Interface;
 using ShaRide.Domain.Settings;
+using System.Threading.Tasks;
 using SmtpClient = MailKit.Net.Smtp.SmtpClient;
 
 
@@ -28,12 +28,10 @@ namespace ShaRide.Application.Services.Concrete
             try
             {
                 // create message
-                var email = new MimeMessage();
-                email.Sender = MailboxAddress.Parse(request.From ?? _mailSettings.EmailFrom);
+                var email = new MimeMessage { Sender = MailboxAddress.Parse(request.From ?? _mailSettings.EmailFrom) };
                 email.To.Add(MailboxAddress.Parse(request.To));
                 email.Subject = request.Subject;
-                var builder = new BodyBuilder();
-                builder.HtmlBody = request.Body;
+                var builder = new BodyBuilder { HtmlBody = request.Body };
                 email.Body = builder.ToMessageBody();
                 using var smtp = new SmtpClient();
                 smtp.Connect(_mailSettings.SmtpHost, _mailSettings.SmtpPort, SecureSocketOptions.StartTls);

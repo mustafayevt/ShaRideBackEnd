@@ -1,11 +1,9 @@
-﻿using System;
-using System.Threading.Tasks;
-using AutoWrapper.Wrappers;
+﻿using AutoWrapper.Wrappers;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Localization;
-using ShaRide.Application.Helpers;
+using System;
+using System.Threading.Tasks;
 
 namespace ShaRide.Application.Attributes
 {
@@ -18,18 +16,18 @@ namespace ShaRide.Application.Attributes
         {
             if (!context.HttpContext.Request.Headers.TryGetValue(APIKEYNAME, out var extractedApiKey))
             {
-                throw new ApiException("Api key is not provided.",401);
+                throw new ApiException("Api key is not provided.", 401);
             }
- 
+
             var appSettings = context.HttpContext.RequestServices.GetRequiredService<IConfiguration>();
- 
+
             var apiKey = appSettings.GetValue<string>(APIKEYNAME);
- 
+
             if (!apiKey.Equals(extractedApiKey))
             {
-                throw new ApiException("Api key is not provided.",401);
+                throw new ApiException("Api key is not provided.", 401);
             }
- 
+
             await next();
         }
     }

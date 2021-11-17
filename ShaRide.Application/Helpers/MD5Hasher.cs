@@ -14,9 +14,9 @@ namespace ShaRide.Application.Helpers
 
             // Step 2, convert byte array to hex string
             StringBuilder sb = new StringBuilder();
-            for (int i = 0; i < hashBytes.Length; i++)
+            foreach (var t in hashBytes)
             {
-                sb.Append(hashBytes[i].ToString("X2"));
+                sb.Append(t.ToString("X2"));
             }
             return sb.ToString();
         }

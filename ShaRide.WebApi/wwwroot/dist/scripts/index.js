@@ -18,28 +18,29 @@ advantageText = document.querySelectorAll('#advantages .text .description');
 advantageImg = document.querySelectorAll('#advantages img');
 for (let i = 0; i < advantageText.length; i++) {
     advantageText[i].addEventListener("mouseover", function() {
-        var activeText = document.querySelector('#advantages .text .activeText')
+        var activeText = document.querySelector('#advantages .text .activeText');
         activeText.classList.remove("activeText");
         advantageText[i].classList.add("activeText");
         var activeImg = document.querySelector('#advantages .activeImg');
         activeImg.classList.remove("activeImg");
         advantageImg[i].classList.add("activeImg");
-    })
+    });
 }
 
 //scroll to join section
 document.querySelector('.menu button').addEventListener('click', function() {
 
     var bannerHeight = document.getElementsByClassName('banner')[0].clientHeight;
+    var windowHeight;
     if (document.querySelector('nav').clientHeight == 80) {
-        var windowHeight = bannerHeight - 80;
+        windowHeight = bannerHeight - 80;
     } else {
-        var windowHeight = bannerHeight - 60;
+        windowHeight = bannerHeight - 60;
     }
     window.scrollTo({
         top: windowHeight,
         behavior: 'smooth',
-    })
+    });
 });
 
 //menu toogle
@@ -50,18 +51,18 @@ document.getElementsByClassName('menuIcon')[0].addEventListener('click', functio
     } else {
         window.history.back();
     }
-})
+});
 
 window.addEventListener('popstate', function (event) {
     if (event.state = 'open') {
         var menu = document.querySelector('nav').classList.remove('open');
     }
-})
+});
 
 
 document.querySelector('nav .menu').addEventListener('click', function() {
     var menu = document.querySelector('nav').classList.remove('open');
-})
+});
 
 //send number
 var send = document.querySelector('#bonus .send');
@@ -72,7 +73,7 @@ send.addEventListener("click", function() {
     var regex = /\+\d{3}\s(50|51|55|60|70|77|99)\s-\s(\d{3})\s-\s(\d{2})\s-\s(\d{2})/;
     if (regex.test(phone)) {
         document.querySelector('#bonus input').classList.remove('incorrect');
-        document.querySelector('#bonus .alertText').style.display = 'none'
+        document.querySelector('#bonus .alertText').style.display = 'none';
 
         // switching button animation to on.
         sending.style.display = 'block';
@@ -92,13 +93,13 @@ send.addEventListener("click", function() {
                 sending.style.display = 'none';
                 sent.style.display = 'block';
             }
-        })
-        
+        });
+
     } else {
         document.querySelector('#bonus input').classList.add('incorrect');
-        document.querySelector('#bonus .alertText').style.display = 'block'
+        document.querySelector('#bonus .alertText').style.display = 'block';
     }
-})
+});
 
 var descriptionHeader = document.querySelectorAll('#detailList .description .header');
 var openDescription = document.querySelectorAll('#detailList .description .down');
@@ -109,12 +110,12 @@ for (let i = 0; i < descriptionHeader.length; i++) {
         detailDescriptionText[i].classList.toggle('open');
         closeDescription[i].classList.toggle('active');
         openDescription[i].classList.toggle('active');
-    })
+    });
     closeDescription[i].addEventListener('click', function() {
         detailDescriptionText[i].classList.toggle('open');
         closeDescription[i].classList.toggle('active');
         openDescription[i].classList.toggle('active');
-    })
+    });
 }
 
 

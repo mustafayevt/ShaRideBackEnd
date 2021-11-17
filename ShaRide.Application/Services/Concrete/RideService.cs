@@ -122,14 +122,11 @@ namespace ShaRide.Application.Services.Concrete
 
             #region Add new requests
 
-            var passengerToRideRequests = request.RideCarSeatCompositionIds.Select(x =>
+            var passengerToRideRequests = request.RideCarSeatCompositionIds.Select(x => new PassengerToRideRequest
             {
-                return new PassengerToRideRequest
-                {
-                    UserId = _authenticatedUserService.UserId.Value,
-                    RideCarSeatCompositionId = x,
-                    PaymentType = request.PaymentType
-                };
+                UserId = _authenticatedUserService.UserId.Value,
+                RideCarSeatCompositionId = x,
+                PaymentType = request.PaymentType
             });
 
             await _dbContext.PassengerToRideRequests.AddRangeAsync(passengerToRideRequests);
@@ -469,7 +466,7 @@ namespace ShaRide.Application.Services.Concrete
 
                     carSeatCompositionResponse.Passenger.Rating = await _userRatingService.GetUserRating(carSeatCompositionResponse.Passenger.Id);
                 }
-            };
+            }
 
             var ridesPaginated = new PagedList<RideResponse>
                 (ridesResponses.ToList(), await ridesQuery.CountAsync(), request.PageNumber, request.PageSize);
@@ -700,18 +697,18 @@ namespace ShaRide.Application.Services.Concrete
                 ridesQuery = ridesQuery.Where(x => x.StartDate <= ridesFilterRequest.StartDateTo);
             }
 
-            if (ridesFilterRequest.RideStates != null && ridesFilterRequest.RideStates.Count() > 0)
+            if (ridesFilterRequest.RideStates != null && ridesFilterRequest.RideStates.Any())
             {
                 ridesQuery = ridesQuery.Where(x => ridesFilterRequest.RideStates.Contains(x.RideState));
             }
 
-            if (ridesFilterRequest.BanTypeIds != null && ridesFilterRequest.BanTypeIds.Count() > 0)
+            if (ridesFilterRequest.BanTypeIds != null && ridesFilterRequest.BanTypeIds.Any())
             {
                 ridesQuery = ridesQuery.Where(x => x.RideCarSeatComposition.Any(y =>
                                 ridesFilterRequest.BanTypeIds.Contains(y.CarSeatComposition.Car.BanTypeId)));
             }
 
-            if (ridesFilterRequest.DriverIds != null && ridesFilterRequest.DriverIds.Count() > 0)
+            if (ridesFilterRequest.DriverIds != null && ridesFilterRequest.DriverIds.Any())
             {
                 ridesQuery = ridesQuery.Where(x => x.RideCarSeatComposition.Any(y =>
                                 ridesFilterRequest.BanTypeIds.Contains(y.CarSeatComposition.Car.BanTypeId)));
@@ -899,8 +896,7 @@ namespace ShaRide.Application.Services.Concrete
                     //Custom selection
                     if (rideLocationPointComposition.LocationPoint.Name.Equals("Xəritədən seçildi"))
                     {
-                        LocationPoint locationPoint;
-                        locationPoint = await _dbContext.LocationPoints.Include(x => x.Location)
+                        var locationPoint = await _dbContext.LocationPoints.Include(x => x.Location)
                             .FirstOrDefaultAsync(x =>
                                 x.IsRowActive && x.Latitude.Equals(rideLocationPointComposition.LocationPoint.Latitude) &&
                                 x.Longitude.Equals(rideLocationPointComposition.LocationPoint.Longitude));
@@ -924,8 +920,7 @@ namespace ShaRide.Application.Services.Concrete
                     }
                     else
                     {
-                        LocationPoint locationPoint;
-                        locationPoint = await _dbContext.LocationPoints.Include(x => x.Location)
+                        var locationPoint = await _dbContext.LocationPoints.Include(x => x.Location)
                             .FirstOrDefaultAsync(x =>
                                 x.IsRowActive && x.Name.Equals(rideLocationPointComposition.LocationPoint.Name));
 

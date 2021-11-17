@@ -6,7 +6,9 @@ namespace ShaRide.Application.Attributes
     /// Attribute that defines is applied target is active or not.
     /// </summary>
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct | AttributeTargets.Enum |
-                    AttributeTargets.Interface | AttributeTargets.Constructor | AttributeTargets.Method | AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Event | AttributeTargets.Delegate
+                    AttributeTargets.Interface | AttributeTargets.Constructor | AttributeTargets.Method |
+                    AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Event |
+                    AttributeTargets.Delegate
         , Inherited = false)]
     public class IsTypeActiveAttribute : Attribute
     {
@@ -17,9 +19,6 @@ namespace ShaRide.Application.Attributes
             this._isActive = isActive;
         }
 
-        public bool IsActive
-        {
-            get { return _isActive; }
-        }
+        public bool IsActive => _isActive;
     }
 }

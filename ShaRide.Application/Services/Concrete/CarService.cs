@@ -92,7 +92,7 @@ namespace ShaRide.Application.Services.Concrete
                 .FirstOrDefaultAsync(x => x.Id == userId);
 
             var cars = user.UserCars.Where(c => c.IsRowActive);
-            if (cars.Count() == 0)
+            if (!cars.Any())
             {
                 return new List<CarResponse>();
             }
@@ -130,14 +130,7 @@ namespace ShaRide.Application.Services.Concrete
 
             foreach (var car in cars)
             {
-                if (car.Id != carId)
-                {
-                    car.IsDefault = false;
-                }
-                else
-                {
-                    car.IsDefault = true;
-                }
+                car.IsDefault = car.Id == carId;
             }
             _dbContext.Cars.UpdateRange(cars);
             await _dbContext.SaveChangesAsync();
@@ -213,7 +206,7 @@ namespace ShaRide.Application.Services.Concrete
             car.UserId = user.Id;
 
             var userInDb = await _dbContext.Users.Include(u => u.UserCars).FirstOrDefaultAsync(u => u.Id == user.Id);
-            if (!userInDb.UserCars.Where(c=>c.IsRowActive).Any())
+            if (!userInDb.UserCars.Any(c => c.IsRowActive))
             {
                 car.IsDefault = true;
             }
